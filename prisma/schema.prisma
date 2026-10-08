@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Supabase Postgres. DATABASE_URL = pooled connection (app), DIRECT_URL = direct connection (schema changes).
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id           String    @id @default(cuid())
+  name         String
+  email        String    @unique
+  phone        String?
+  passwordHash String
+  role         String    @default("CUSTOMER") // CUSTOMER | ADMIN
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  addresses    Address[]
+  orders       Order[]
+}
+
+model Address {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label      String   @default("Home")
+  fullName   String
+  phone      String
+  line1      String
+  line2      String?
+  city       String
+  state      String
+  postalCode String
+  country    String   @default("India")
+  isDefault  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Product {
+  id           String      @id @default(cuid())
+  name         String
+  slug         String      @unique
+  tagline      String?
+  description  String
+  category     String      @default("Sunglasses") // Sunglasses | Optical
+  shape        String?
+  frameColor   String?
+  lensColor    String?
+  material     String?
+  price        Int
+  comparePrice Int?
+  stock        Int         @default(0)
+  images       String      @default("[]") // JSON array of image URLs
+  featured     Boolean     @default(false)
+  isActive     Boolean     @default(true)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  orderItems   OrderItem[]
+}
+
+model Order {
+  id             String      @id @default(cuid())
+  orderNumber    String      @unique
+  userId         String
+  user           User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status         String      @default("PENDING") // PENDING | CONFIRMED | SHIPPED | DELIVERED | CANCELLED
+  paymentMethod  String      @default("COD") // COD | ONLINE
+  paymentStatus  String      @default("PENDING") // PENDING | PAID | REFUNDED
+  subtotal       Int
+  shippingFee    Int         @default(0)
+  total          Int
+  shipName       String
+  shipPhone      String
+  shipLine1      String
+  shipLine2      String?
+  shipCity       String
+  shipState      String
+  shipPostalCode String
+  shipCountry    String      @default("India")
+  notes          String?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  items          OrderItem[]
+}
+
+model OrderItem {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  name      String
+  image     String?
+  price     Int
+  quantity  Int
+}

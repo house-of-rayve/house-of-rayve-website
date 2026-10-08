@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+@theme {
+  --color-olive-950: #22221a;
+  --color-olive-900: #2f2f1f;
+  --color-olive-800: #44442a; /* brand dark */
+  --color-olive-700: #5a5a3a;
+  --color-olive-500: #a69f4e; /* brand accent */
+  --color-olive-400: #bcb56a;
+  --color-olive-200: #d9d4b0;
+  --color-sand: #e9e2d0; /* brand light */
+  --color-cream: #f5f2ea;
+  --color-paper: #fbfaf6;
+  --color-ink: #1d1d16;
+  --color-muted: #6f6c5c;
+  --color-line: #ddd7c6;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-michroma), var(--font-inter), sans-serif;
+
+  --animate-fade-up: fade-up 0.6s ease-out both;
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: none; }
+  }
+}
+
+@layer base {
+  html { -webkit-tap-highlight-color: transparent; }
+  body {
+    background: var(--color-cream);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--color-olive-500); color: var(--color-paper); }
+  input, select, textarea, button { font: inherit; }
+}
+
+@utility container-x { @apply mx-auto w-full max-w-7xl px-5 sm:px-8; }
+@utility eyebrow { @apply font-display text-[10px] uppercase tracking-[0.3em] text-muted; }
+@utility display-title { @apply font-display uppercase tracking-[0.06em] leading-[1.05]; }
+@utility btn { @apply inline-flex items-center justify-center gap-2 px-6 h-12 text-[11px] font-medium uppercase tracking-[0.2em] transition-colors disabled:opacity-50 disabled:pointer-events-none cursor-pointer; }
+@utility btn-primary { @apply btn bg-olive-800 text-sand hover:bg-olive-950; }
+@utility btn-accent { @apply btn bg-olive-500 text-olive-950 hover:bg-olive-400; }
+@utility btn-outline { @apply btn border border-olive-800 text-olive-800 hover:bg-olive-800 hover:text-sand; }
+@utility btn-ghost { @apply btn text-olive-800 hover:bg-sand; }
+@utility btn-sm { @apply h-9! px-4! text-[10px]!; }
+@utility field { @apply block w-full h-11 border border-line bg-paper px-3.5 text-sm text-ink outline-none transition-colors placeholder:text-muted/60 focus:border-olive-800; }
+@utility label { @apply mb-1.5 block text-[11px] font-medium uppercase tracking-[0.14em] text-muted; }
+@utility card { @apply border border-line bg-paper; }
+@utility link-underline { @apply underline decoration-line underline-offset-4 hover:decoration-olive-800; }
+textarea.field { height: auto; padding-top: 0.75rem; padding-bottom: 0.75rem; }
+
+.logo-mask {
+  background-color: currentColor;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+}
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { scrollbar-width: none; }
