@@ -17,7 +17,7 @@ npm run dev
 1. Create a project at supabase.com (region: Mumbai / closest to your users). Use a database password
    with only letters and numbers — symbols like `@ # / ?` break the connection string.
 2. Click **Connect** in the Supabase dashboard:
-   - *Transaction pooler* (port 6543) → `DATABASE_URL`, and append `?pgbouncer=true&connection_limit=1`
+   - *Transaction pooler* (port 6543) → `DATABASE_URL`, and append `?pgbouncer=true&connection_limit=5&pool_timeout=20`
    - *Session pooler* (port 5432) → `DIRECT_URL`
    - Replace `[YOUR-PASSWORD]` in both with the database password.
 3. Optional — **Project Settings → API**: Project URL → `SUPABASE_URL`, `service_role` key →
