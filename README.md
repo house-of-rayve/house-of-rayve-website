@@ -25,6 +25,19 @@ npm run dev
    Storage; the `product-images` bucket is created automatically.
 4. Run `npm run setup`, then restart `npm run dev`. Tables appear under **Table Editor** in Supabase.
 
+### Google sign-in
+
+1. In Google Cloud Console (project **House of rayve**) open **Google Auth Platform**:
+   - **Branding**: app name `RAYVE`, support email, and add `vercel.app` (or your domain) under authorised domains.
+   - **Audience**: User type *External*. While in *Testing*, only listed test users can sign in — click
+     **Publish app** to open it to everyone.
+   - **Data access**: scopes `openid`, `.../auth/userinfo.email`, `.../auth/userinfo.profile`.
+2. **Clients → Create client → Web application**:
+   - Authorised JavaScript origins: `http://localhost:3000`, `http://localhost:3001`, `https://house-of-rayve-website.vercel.app`
+   - Authorised redirect URIs: the same origins + `/api/auth/google/callback`
+3. Copy the Client ID / Client secret into `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` (in `.env` and in Vercel),
+   then restart / redeploy. The "Continue with Google" button appears automatically once both are set.
+
 Open http://localhost:3000.
 
 ### Demo accounts (created by the seed)

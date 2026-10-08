@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { api } from "@/components/ui/fetcher";
 import { useToast } from "@/components/ui/Toast";
 
-export default function ProfileForms({ user }) {
+export default function ProfileForms({ user, hasPassword = true, googleLinked = false }) {
   const router = useRouter();
   const { toast } = useToast();
   const [profile, setProfile] = useState({ name: user.name, email: user.email, phone: user.phone ?? "" });
@@ -33,7 +33,8 @@ export default function ProfileForms({ user }) {
     try {
       await api("/api/account/password", { method: "POST", body: pw });
       setPw({ currentPassword: "", newPassword: "", confirm: "" });
-      toast("Password changed.");
+      toast(hasPassword ? "Password changed." : "Password set. You can now also sign in with email.");
+      router.refresh();
     } catch (err) {
       toast(err.message, { type: "error" });
     } finally {
@@ -65,12 +66,19 @@ export default function ProfileForms({ user }) {
       </form>
 
       <form onSubmit={savePassword} className="card p-6 sm:p-8">
-        <h2 className="font-display text-xs uppercase tracking-[0.25em]">Change password</h2>
-        <div className="mt-6 grid gap-5 sm:grid-cols-3">
-          <div>
-            <label className="label">Current</label>
-            <input type="password" className="field" required autoComplete="current-password" value={pw.currentPassword} onChange={(e) => setPw({ ...pw, currentPassword: e.target.value })} />
-          </div>
+        <h2 className="font-display text-xs uppercase tracking-[0.25em]">{hasPassword ? "Change password" : "Set a password"}</h2>
+        {googleLinked && (
+          <p className="mt-3 text-sm text-muted">
+            Your account is connected to Google.{!hasPassword && " Set a password to also sign in with your email."}
+          </p>
+        )}
+        <div className={`mt-6 grid gap-5 ${hasPassword ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
+          {hasPassword && (
+            <div>
+              <label className="label">Current</label>
+              <input type="password" className="field" required autoComplete="current-password" value={pw.currentPassword} onChange={(e) => setPw({ ...pw, currentPassword: e.target.value })} />
+            </div>
+          )}
           <div>
             <label className="label">New</label>
             <input type="password" className="field" required minLength={8} autoComplete="new-password" value={pw.newPassword} onChange={(e) => setPw({ ...pw, newPassword: e.target.value })} />
@@ -81,7 +89,7 @@ export default function ProfileForms({ user }) {
           </div>
         </div>
         <button disabled={busy === "password"} className="btn-outline mt-6">
-          {busy === "password" ? "Updating…" : "Update password"}
+          {busy === "password" ? "Updating…" : hasPassword ? "Update password" : "Set password"}
         </button>
       </form>
     </div>

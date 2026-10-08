@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import AuthForm from "@/components/account/AuthForm";
 import { getCurrentUser } from "@/lib/auth";
+import { googleConfigured } from "@/lib/google";
 
 export const metadata = { title: "Sign in" };
 
@@ -23,7 +24,7 @@ export default async function LoginPage({ searchParams }) {
         </p>
       )}
       <Suspense>
-        <AuthForm mode="login" />
+        <AuthForm mode="login" googleEnabled={googleConfigured()} />
       </Suspense>
     </>
   );

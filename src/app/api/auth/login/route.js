@@ -9,6 +9,9 @@ export async function POST(request) {
   if (!email || !password) return error("Email and password are required.");
 
   const user = await prisma.user.findUnique({ where: { email } });
+  if (user && !user.passwordHash) {
+    return error("This account uses Google sign-in. Please continue with Google.", 401);
+  }
   if (!user || !(await checkPassword(password, user.passwordHash))) {
     return error("Incorrect email or password.", 401);
   }
