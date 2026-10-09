@@ -17,6 +17,7 @@ const COLUMNS = [
     links: [
       ["The brand", "/about"],
       ["My account", "/account"],
+      ["Wishlist", "/wishlist"],
       ["Order history", "/account/orders"],
     ],
   },

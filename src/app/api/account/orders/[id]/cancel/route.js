@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { json, error, authorize } from "@/lib/api";
 import { restockOrder } from "@/lib/orders";
 import { publish } from "@/lib/events";
+import { invalidateCatalog } from "@/lib/products";
 
 export async function POST(_request, { params }) {
   const [user, denied] = await authorize();
@@ -19,6 +20,7 @@ export async function POST(_request, { params }) {
       data: { status: "CANCELLED", paymentStatus: order.paymentStatus === "PAID" ? "REFUNDED" : order.paymentStatus },
     });
   });
+  invalidateCatalog();
   publish("order:updated", { id, orderNumber: order.orderNumber, status: "CANCELLED" });
   return json({ order: updated });
 }

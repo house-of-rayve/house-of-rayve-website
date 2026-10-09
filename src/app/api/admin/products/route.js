@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { json, error, readJson, authorize } from "@/lib/api";
-import { parseProductInput, serializeProduct } from "@/lib/products";
+import { parseProductInput, serializeProduct, invalidateCatalog } from "@/lib/products";
 import { publish } from "@/lib/events";
 
 export async function GET(request) {
@@ -23,6 +23,7 @@ export async function POST(request) {
     return error("A product with this URL slug already exists.", 409);
   }
   const product = await prisma.product.create({ data });
+  invalidateCatalog();
   publish("product:changed", { id: product.id });
   return json({ product: serializeProduct(product) }, 201);
 }

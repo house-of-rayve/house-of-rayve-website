@@ -1,4 +1,5 @@
 import "server-only";
+import { unstable_cache, revalidateTag } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { parseImages, slugify } from "@/lib/format";
 import { CATEGORIES } from "@/lib/constants";
@@ -13,35 +14,52 @@ export function serializeProduct(p) {
   };
 }
 
-const SORTS = {
-  newest: { createdAt: "desc" },
-  "price-asc": { price: "asc" },
-  "price-desc": { price: "desc" },
-  name: { name: "asc" },
+export const CATALOG_TAG = "catalog";
+
+// All visible products, cached across requests. Invalidated by invalidateCatalog()
+// whenever products, stock or orders change, so the storefront never hits the database per view.
+const getCatalog = unstable_cache(
+  async () => {
+    const products = await prisma.product.findMany({
+      where: { isActive: true },
+      orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
+    });
+    return products.map(serializeProduct);
+  },
+  ["catalog-v1"],
+  { tags: [CATALOG_TAG], revalidate: 600 },
+);
+
+export function invalidateCatalog() {
+  revalidateTag(CATALOG_TAG, { expire: 0 });
+}
+
+const SORTERS = {
+  newest: (a, b) => b.createdAt.localeCompare(a.createdAt),
+  "price-asc": (a, b) => a.price - b.price,
+  "price-desc": (a, b) => b.price - a.price,
+  name: (a, b) => a.name.localeCompare(b.name),
 };
 
-export async function listProducts({ category, shape, q, sort = "featured", featured, take } = {}) {
-  const where = { isActive: true };
-  if (category && CATEGORIES.includes(category)) where.category = category;
-  if (shape) where.shape = shape;
-  if (featured) where.featured = true;
+export async function listProducts({ category, shape, q, sort, featured, take } = {}) {
+  let products = await getCatalog();
+  if (category && CATEGORIES.includes(category)) products = products.filter((p) => p.category === category);
+  if (shape) products = products.filter((p) => p.shape === shape);
+  if (featured) products = products.filter((p) => p.featured);
   if (q) {
-    where.OR = [
-      { name: { contains: q, mode: "insensitive" } },
-      { tagline: { contains: q, mode: "insensitive" } },
-      { description: { contains: q, mode: "insensitive" } },
-      { frameColor: { contains: q, mode: "insensitive" } },
-    ];
+    const needle = q.toLowerCase();
+    products = products.filter((p) =>
+      [p.name, p.tagline, p.description, p.frameColor, p.shape, p.lensColor]
+        .filter(Boolean)
+        .some((v) => v.toLowerCase().includes(needle)),
+    );
   }
-  const orderBy = SORTS[sort] ?? [{ featured: "desc" }, { createdAt: "desc" }];
-  const products = await prisma.product.findMany({ where, orderBy, take });
-  return products.map(serializeProduct);
+  if (SORTERS[sort]) products = [...products].sort(SORTERS[sort]);
+  return take ? products.slice(0, take) : products;
 }
 
 export async function getProductBySlug(slug) {
-  const product = await prisma.product.findUnique({ where: { slug } });
-  if (!product || !product.isActive) return null;
-  return serializeProduct(product);
+  return (await getCatalog()).find((p) => p.slug === slug) ?? null;
 }
 
 // Validates admin input; returns { data } or { error }

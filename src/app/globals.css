@@ -23,6 +23,27 @@
     from { opacity: 0; transform: translateY(12px); }
     to { opacity: 1; transform: none; }
   }
+  --animate-fade-in: fade-in 0.3s ease-out both;
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  --animate-pop: pop 0.45s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+  @keyframes pop {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.35); }
+    100% { transform: scale(1); }
+  }
+  --animate-marquee: marquee 32s linear infinite;
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  --animate-ken-burns: ken-burns 9s ease-out both;
+  @keyframes ken-burns {
+    from { transform: scale(1.08); }
+    to { transform: scale(1); }
+  }
 }
 
 @layer base {
@@ -61,3 +82,12 @@ textarea.field { height: auto; padding-top: 0.75rem; padding-bottom: 0.75rem; }
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { scrollbar-width: none; }
+
+/* Scroll reveal (see components/ui/Reveal.js) */
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1); }
+.reveal.is-visible { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  .reveal { opacity: 1; transform: none; }
+}

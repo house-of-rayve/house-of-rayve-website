@@ -3,6 +3,7 @@ import { json, error, readJson, authorize } from "@/lib/api";
 import { ORDER_STATUSES, PAYMENT_STATUSES } from "@/lib/constants";
 import { restockOrder } from "@/lib/orders";
 import { publish } from "@/lib/events";
+import { invalidateCatalog } from "@/lib/products";
 
 export async function GET(_request, { params }) {
   const [, denied] = await authorize("ADMIN");
@@ -49,6 +50,7 @@ export async function PATCH(request, { params }) {
       include: { items: true, user: { select: { id: true, name: true, email: true, phone: true } } },
     });
   });
+  invalidateCatalog();
   publish("order:updated", { id, orderNumber: order.orderNumber, status: updated.status });
   return json({ order: updated });
 }

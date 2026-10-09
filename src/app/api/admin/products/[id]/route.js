@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { json, error, readJson, authorize } from "@/lib/api";
-import { parseProductInput, serializeProduct } from "@/lib/products";
+import { parseProductInput, serializeProduct, invalidateCatalog } from "@/lib/products";
 import { publish } from "@/lib/events";
 
 export async function GET(_request, { params }) {
@@ -27,6 +27,7 @@ export async function PATCH(request, { params }) {
     }
   }
   const product = await prisma.product.update({ where: { id }, data });
+  invalidateCatalog();
   publish("product:changed", { id });
   return json({ product: serializeProduct(product) });
 }
@@ -39,6 +40,7 @@ export async function DELETE(_request, { params }) {
   if (!existing) return error("Product not found.", 404);
   // Past orders keep their own snapshot of name/price/image, so deleting is safe.
   await prisma.product.delete({ where: { id } });
+  invalidateCatalog();
   publish("product:changed", { id });
   return json({ ok: true });
 }

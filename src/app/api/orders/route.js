@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { json, error, readJson, authorize } from "@/lib/api";
 import { createOrder, parseAddress, OrderError } from "@/lib/orders";
 import { publish } from "@/lib/events";
+import { invalidateCatalog } from "@/lib/products";
 
 export async function GET() {
   const [user, denied] = await authorize();
@@ -40,6 +41,7 @@ export async function POST(request) {
       paymentMethod: body.paymentMethod,
       notes: typeof body.notes === "string" ? body.notes.trim().slice(0, 500) : "",
     });
+    invalidateCatalog();
     publish("order:created", { id: order.id, orderNumber: order.orderNumber, total: order.total, customer: user.name });
     return json({ order }, 201);
   } catch (e) {
