@@ -97,7 +97,7 @@ export default function LiveDashboard({ initial }) {
         <Panel
           title="Revenue · last 14 days"
           action={<span className="text-sm font-medium tabular-nums text-ink">{formatPrice(range)}</span>}
-          className="xl:col-span-2"
+          className="min-w-0 xl:col-span-2"
         >
           <div className="p-4 sm:p-5">
             <RevenueChart data={series} />
@@ -124,7 +124,7 @@ export default function LiveDashboard({ initial }) {
       </div>
 
       <div className="grid gap-4 xl:grid-cols-3">
-        <Panel title="Recent orders" action={<Link href="/admin/orders" className="text-xs text-olive-700 hover:underline">View all</Link>} className="xl:col-span-2">
+        <Panel title="Recent orders" action={<Link href="/admin/orders" className="text-xs text-olive-700 hover:underline">View all</Link>} className="min-w-0 xl:col-span-2">
           <div className="overflow-x-auto">
             <table className="w-full whitespace-nowrap text-sm">
               <thead>

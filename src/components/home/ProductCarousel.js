@@ -18,10 +18,10 @@ export default function ProductCarousel({ eyebrow, title, tabs }) {
 
   return (
     <div>
-      <div className="mb-8 flex flex-wrap items-end justify-between gap-6">
+      <div className="section-head flex flex-wrap items-end justify-between gap-6">
         <div>
           {eyebrow && <p className="eyebrow">{eyebrow}</p>}
-          <h2 className="display-title mt-3 text-2xl sm:text-3xl">{title}</h2>
+          <h2 className="display-title mt-4 text-2xl sm:text-3xl lg:text-4xl">{title}</h2>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={() => scroll(-1)} className="grid size-10 place-items-center rounded-full border border-line transition-colors hover:border-olive-800 hover:bg-olive-800 hover:text-sand" aria-label="Scroll left">

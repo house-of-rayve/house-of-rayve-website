@@ -7,13 +7,14 @@ import { Plus, X } from "lucide-react";
 import { useCart } from "@/components/cart/CartProvider";
 import Price from "@/components/ui/Price";
 
-// Hotspot positions (percent of the image) for the frames in collection.jpg
+// Hotspot positions for the frames in collection.jpg (a 3:4 photo), in percent of the original image.
+// It is shown in a square crop centred vertically, so 12.5% is trimmed from the top and bottom.
 const SPOTS = [
   { slug: "toro", x: 19, y: 58 },
   { slug: "matador", x: 40, y: 59 },
   { slug: "arena", x: 57, y: 46 },
   { slug: "sevilla", x: 76, y: 53 },
-];
+].map((s) => ({ ...s, y: ((s.y - 12.5) / 75) * 100 }));
 
 export default function ShopTheLook({ products }) {
   const { add } = useCart();
@@ -23,9 +24,9 @@ export default function ShopTheLook({ products }) {
   const active = open && bySlug[open];
 
   return (
-    <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-16">
-      <div className="relative aspect-[3/4] overflow-hidden bg-mist lg:col-span-7">
-        <Image src="/images/collection.jpg" alt="RAYVE Collection 01 frames" fill sizes="(min-width:1024px) 58vw, 100vw" className="object-cover" />
+    <div className="grid items-center gap-10 md:grid-cols-12 md:gap-10 lg:gap-16">
+      <div className="relative aspect-square overflow-hidden bg-mist md:col-span-6 lg:col-span-6">
+        <Image src="/images/collection.jpg" alt="RAYVE Collection 01 frames" fill sizes="(min-width:768px) 50vw, 100vw" className="object-cover" />
         {spots.map((s) => (
           <button
             key={s.slug}
@@ -46,9 +47,9 @@ export default function ShopTheLook({ products }) {
         ))}
       </div>
 
-      <div className="lg:col-span-5">
+      <div className="md:col-span-6 lg:col-span-5 lg:col-start-8">
         <p className="eyebrow">Shop the look</p>
-        <h2 className="display-title mt-3 text-3xl sm:text-4xl">Collection 01</h2>
+        <h2 className="display-title mt-4 text-2xl sm:text-3xl lg:text-4xl">Collection 01</h2>
         <p className="mt-4 max-w-md text-sm leading-relaxed text-muted">
           Four silhouettes, one attitude. Tap a frame in the image to see the details.
         </p>

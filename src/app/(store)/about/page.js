@@ -23,7 +23,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="container-x grid gap-12 py-24 lg:grid-cols-2 lg:gap-20">
+      <section className="container-x section-y grid gap-12 lg:grid-cols-2 lg:gap-20">
         <div>
           <LogoMark className="h-10 w-16 text-olive-800" />
           <h2 className="display-title mt-8 text-2xl sm:text-3xl">A different way of seeing the familiar</h2>
@@ -45,7 +45,7 @@ export default function AboutPage() {
         <div className="relative aspect-square">
           <Image src="/images/bull-shadow.jpg" alt="" fill sizes="(min-width:1024px) 50vw, 100vw" className="object-cover" />
         </div>
-        <div className="flex flex-col justify-center bg-olive-800 px-6 py-16 text-sand sm:px-16">
+        <div className="flex flex-col justify-center bg-olive-800 px-5 py-20 text-sand sm:px-8 md:px-16 lg:px-20">
           <p className="eyebrow text-olive-400">The symbol</p>
           <h2 className="display-title mt-5 text-3xl">Not aggression — control</h2>
           <p className="mt-6 max-w-md leading-relaxed text-sand/75">
@@ -56,7 +56,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="container-x py-24">
+      <section className="container-x section-y">
         <h2 className="display-title text-3xl sm:text-4xl">Tone of voice</h2>
         <div className="mt-12 grid gap-px bg-line sm:grid-cols-2 lg:grid-cols-4">
           {VOICE.map(([t, d], i) => (
@@ -70,7 +70,7 @@ export default function AboutPage() {
       </section>
 
       <section id="care" className="border-t border-line bg-sand/50">
-        <div className="container-x grid gap-10 py-20 md:grid-cols-3">
+        <div className="container-x section-y grid gap-10 md:grid-cols-3">
           {[
             ["Shipping", "Complimentary shipping on orders above ₹2,999. Orders are dispatched within 24 hours and delivered in 3–5 working days."],
             ["Returns", "Changed your mind? Return or exchange unworn frames within 7 days of delivery, from your account."],
@@ -84,7 +84,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="container-x py-24 text-center">
+      <section className="container-x section-y text-center">
         <p className="eyebrow">Premium, in the everyday</p>
         <h2 className="display-title mx-auto mt-4 max-w-xl text-3xl">The pair you reach for without thinking</h2>
         <Link href="/shop" className="btn-primary mt-10">Shop the collection</Link>

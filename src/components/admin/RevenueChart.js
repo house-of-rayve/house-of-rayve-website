@@ -19,7 +19,7 @@ const compact = (v) => (v >= 1000 ? `₹${Math.round(v / 1000)}k` : `₹${v}`);
 
 export default function RevenueChart({ data }) {
   return (
-    <div className="h-64 w-full">
+    <div className="h-64 w-full min-w-0 overflow-hidden">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 8, right: 8, left: -8, bottom: 0 }} barCategoryGap={4}>
           <CartesianGrid vertical={false} stroke="#ebe8dd" />
