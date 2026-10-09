@@ -100,3 +100,12 @@ model OrderItem {
   price     Int
   quantity  Int
 }
+
+// Product images uploaded from the admin panel when Supabase Storage isn't configured
+model Upload {
+  id          String   @id @default(cuid())
+  contentType String
+  size        Int
+  data        Bytes
+  createdAt   DateTime @default(now())
+}

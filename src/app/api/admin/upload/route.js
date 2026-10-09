@@ -18,7 +18,12 @@ export async function POST(request) {
     if (!ext) return error("Only JPG, PNG, WEBP or AVIF images are allowed.");
     if (file.size > MAX_BYTES) return error("Each image must be under 5 MB.");
     const name = `${randomUUID()}${ext}`;
-    urls.push(await saveImage(name, Buffer.from(await file.arrayBuffer()), file.type));
+    try {
+      urls.push(await saveImage(name, Buffer.from(await file.arrayBuffer()), file.type));
+    } catch (e) {
+      console.error("[upload]", e);
+      return error("Could not save the image. Please try again.", 500);
+    }
   }
   return json({ urls }, 201);
 }

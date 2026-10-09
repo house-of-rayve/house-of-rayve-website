@@ -8,6 +8,26 @@ import { api } from "@/components/ui/fetcher";
 import { useToast } from "@/components/ui/Toast";
 import { CATEGORIES, SHAPES } from "@/lib/constants";
 
+// Downscale photos in the browser before upload: keeps each request well under hosting body limits
+// (Vercel allows ~4.5 MB) and makes product images load faster.
+const MAX_SIDE = 2000;
+async function compressImage(file) {
+  try {
+    const bitmap = await createImageBitmap(file);
+    const scale = Math.min(1, MAX_SIDE / Math.max(bitmap.width, bitmap.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(bitmap.width * scale);
+    canvas.height = Math.round(bitmap.height * scale);
+    canvas.getContext("2d").drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    bitmap.close?.();
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.86));
+    if (!blob) throw new Error("encode failed");
+    return new File([blob], file.name.replace(/\.[^.]+$/, "") + ".jpg", { type: "image/jpeg" });
+  } catch {
+    return file; // the server still validates type and size
+  }
+}
+
 const input = "h-10 w-full rounded-md border border-line bg-white px-3 text-sm outline-none focus:border-olive-700 focus:ring-2 focus:ring-olive-500/20";
 const lbl = "mb-1.5 block text-xs font-medium text-ink/80";
 
@@ -40,12 +60,16 @@ export default function ProductForm({ product }) {
 
   const upload = async (files) => {
     if (!files?.length) return;
-    const body = new FormData();
-    for (const f of files) body.append("files", f);
     setUploading(true);
     try {
-      const { urls } = await api("/api/admin/upload", { method: "POST", body });
-      setForm((f) => ({ ...f, images: [...f.images, ...urls] }));
+      // One image per request so a batch never exceeds the request size limit
+      for (const original of Array.from(files)) {
+        const body = new FormData();
+        body.append("files", await compressImage(original));
+        const { urls } = await api("/api/admin/upload", { method: "POST", body });
+        setForm((f) => ({ ...f, images: [...f.images, ...urls] }));
+      }
+      toast(files.length > 1 ? `${files.length} images uploaded.` : "Image uploaded.");
     } catch (e) {
       toast(e.message, { type: "error" });
     } finally {
@@ -154,7 +178,7 @@ export default function ProductForm({ product }) {
               {uploading ? "Uploading" : "Upload"}
             </button>
           </div>
-          <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp,image/avif" multiple hidden onChange={(e) => upload(e.target.files)} />
+          <input ref={fileRef} type="file" accept="image/*" multiple hidden onChange={(e) => upload(e.target.files)} />
           <div className="mt-4 flex gap-2">
             <input className={input} value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="…or add an existing path, e.g. /images/toro.jpg" />
             <button type="button" onClick={addUrl} className="h-10 shrink-0 rounded-md border border-line px-4 text-sm hover:bg-stone-50">Add</button>

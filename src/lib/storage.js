@@ -1,7 +1,6 @@
 import "server-only";
-import { writeFile, mkdir } from "node:fs/promises";
-import path from "node:path";
 import { createClient } from "@supabase/supabase-js";
+import { prisma } from "@/lib/prisma";
 
 const BUCKET = process.env.SUPABASE_STORAGE_BUCKET || "product-images";
 
@@ -25,8 +24,11 @@ async function ensureBucket(sb) {
   bucketReady = true;
 }
 
+const EXT = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/avif": "avif" };
+
 // Saves an uploaded image and returns its public URL.
-// Uses Supabase Storage when configured, otherwise the local /uploads folder.
+// Uses Supabase Storage when configured; otherwise stores the image in the database, which works the
+// same locally and on serverless hosting (where the filesystem is read-only).
 export async function saveImage(name, buffer, contentType) {
   const sb = supabase();
   if (sb) {
@@ -35,8 +37,9 @@ export async function saveImage(name, buffer, contentType) {
     if (error) throw error;
     return sb.storage.from(BUCKET).getPublicUrl(name).data.publicUrl;
   }
-  const dir = path.join(process.cwd(), "uploads");
-  await mkdir(dir, { recursive: true });
-  await writeFile(path.join(dir, name), buffer);
-  return `/api/uploads/${name}`;
+  const upload = await prisma.upload.create({
+    data: { contentType, size: buffer.length, data: buffer },
+    select: { id: true },
+  });
+  return `/api/uploads/${upload.id}.${EXT[contentType] ?? "jpg"}`;
 }
