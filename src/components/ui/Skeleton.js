@@ -1,5 +1,5 @@
 export function Bone({ className = "" }) {
-  return <div className={`animate-pulse bg-sand ${className}`} />;
+  return <div className={`animate-pulse bg-mist ${className}`} />;
 }
 
 export function ProductGridSkeleton({ count = 8 }) {

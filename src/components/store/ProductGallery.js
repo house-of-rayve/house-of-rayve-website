@@ -25,7 +25,7 @@ export default function ProductGallery({ images, name, badge }) {
     };
   }, [lightbox, images.length]);
 
-  if (!images.length) return <div className="aspect-[4/5] bg-sand" />;
+  if (!images.length) return <div className="aspect-[4/5] bg-mist" />;
 
   const select = (i) => {
     setActive(i);
@@ -43,7 +43,7 @@ export default function ProductGallery({ images, name, badge }) {
                 key={src + i}
                 onClick={() => select(i)}
                 onMouseEnter={() => setActive(i)}
-                className={`relative aspect-[4/5] w-full overflow-hidden bg-sand transition-all ${active === i ? "ring-1 ring-olive-800 ring-offset-2 ring-offset-cream" : "opacity-50 hover:opacity-100"}`}
+                className={`relative aspect-[4/5] w-full overflow-hidden bg-mist transition-all ${active === i ? "ring-1 ring-olive-800 ring-offset-2 ring-offset-canvas" : "opacity-50 hover:opacity-100"}`}
                 aria-label={`View image ${i + 1}`}
               >
                 <Image src={src} alt="" fill sizes="80px" className="object-cover" />
@@ -54,7 +54,7 @@ export default function ProductGallery({ images, name, badge }) {
 
         {/* Desktop: hover-to-zoom main image */}
         <div
-          className="relative hidden aspect-[4/5] flex-1 cursor-zoom-in overflow-hidden bg-sand lg:block"
+          className="relative hidden aspect-[4/5] flex-1 cursor-zoom-in overflow-hidden bg-mist lg:block"
           onMouseMove={(e) => {
             const r = e.currentTarget.getBoundingClientRect();
             setZoom({ x: ((e.clientX - r.left) / r.width) * 100, y: ((e.clientY - r.top) / r.height) * 100 });
@@ -82,11 +82,11 @@ export default function ProductGallery({ images, name, badge }) {
         <div className="relative lg:hidden">
           <div
             ref={rail}
-            className="no-scrollbar -mx-5 flex snap-x snap-mandatory overflow-x-auto sm:-mx-8"
+            className="no-scrollbar -mx-5 flex snap-x snap-mandatory overflow-x-auto sm:-mx-8 lg:mx-0"
             onScroll={(e) => setActive(Math.round(e.currentTarget.scrollLeft / e.currentTarget.clientWidth))}
           >
             {images.map((src, i) => (
-              <button key={src + i} onClick={() => setLightbox(true)} className="relative aspect-[4/5] w-full shrink-0 snap-center bg-sand" aria-label="Expand image">
+              <button key={src + i} onClick={() => setLightbox(true)} className="relative aspect-[4/5] w-full shrink-0 snap-center bg-mist" aria-label="Expand image">
                 <Image src={src} alt={i === 0 ? name : ""} fill priority={i === 0} sizes="100vw" className="object-cover" />
               </button>
             ))}

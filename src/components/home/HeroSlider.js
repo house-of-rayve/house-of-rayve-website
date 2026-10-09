@@ -48,7 +48,7 @@ export default function HeroSlider() {
 
   return (
     <section
-      className="relative isolate -mt-16 h-[92svh] min-h-[560px] overflow-hidden bg-olive-950"
+      className="relative isolate -mt-16 h-[88svh] min-h-[560px] overflow-hidden bg-olive-950"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       aria-roledescription="carousel"
@@ -68,37 +68,35 @@ export default function HeroSlider() {
             style={{ objectPosition: s.position }}
             className={`object-cover ${i === index ? "animate-ken-burns" : ""}`}
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-olive-950/80 via-olive-950/35 to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-olive-950/60 to-transparent" />
+          <div className="absolute inset-0 bg-olive-950/40" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(34,34,26,0.35),transparent_70%)]" />
         </div>
       ))}
 
-      <div className="container-x relative flex h-full flex-col justify-end pb-24 sm:pb-28">
+      <div className="container-x relative flex h-full flex-col items-center justify-center pt-16 text-center">
         {SLIDES.map(
           (s, i) =>
             i === index && (
-              <div key={s.title} className="max-w-2xl text-sand">
-                <p className="eyebrow animate-fade-up text-sand/70">{s.eyebrow}</p>
-                <h1 className="display-title mt-5 animate-fade-up text-4xl [animation-delay:100ms] sm:text-6xl lg:text-7xl">{s.title}</h1>
-                <p className="mt-6 max-w-md animate-fade-up text-base leading-relaxed text-sand/80 [animation-delay:200ms]">{s.text}</p>
-                <div className="mt-9 flex animate-fade-up flex-wrap gap-3 [animation-delay:300ms]">
-                  <Link href={s.cta[1]} className="btn-accent">
-                    {s.cta[0]}
-                  </Link>
-                  <Link href="/about" className="btn border border-sand/40 text-sand hover:bg-sand hover:text-olive-900">
-                    Our story
-                  </Link>
-                </div>
+              <div key={s.title} className="flex max-w-3xl flex-col items-center text-sand">
+                <p className="eyebrow animate-fade-up text-sand/80">{s.eyebrow}</p>
+                <h1 className="display-title mt-6 animate-fade-up text-4xl [animation-delay:100ms] sm:text-6xl lg:text-7xl">{s.title}</h1>
+                <p className="mt-6 max-w-md animate-fade-up text-base leading-relaxed text-sand/85 [animation-delay:200ms]">{s.text}</p>
+                <Link href={s.cta[1]} className="btn mt-10 animate-fade-up bg-sand text-olive-950 [animation-delay:300ms] hover:bg-paper">
+                  {s.cta[0]}
+                </Link>
               </div>
             ),
         )}
       </div>
 
-      <div className="container-x absolute inset-x-0 bottom-8 flex items-center gap-6">
-        <div className="flex flex-1 gap-2">
+      <div className="absolute inset-x-0 bottom-8 flex items-center justify-center gap-5">
+        <button onClick={() => go(-1)} className="grid size-9 place-items-center rounded-full text-sand/70 transition-colors hover:text-sand max-sm:hidden" aria-label="Previous slide">
+          <ArrowLeft className="size-4" />
+        </button>
+        <div className="flex gap-2">
           {SLIDES.map((s, i) => (
-            <button key={s.title} onClick={() => setIndex(i)} className="group h-6 flex-1 sm:max-w-24" aria-label={`Show slide ${i + 1}`}>
-              <span className="block h-0.5 overflow-hidden bg-sand/25">
+            <button key={s.title} onClick={() => setIndex(i)} className="grid h-6 w-12 place-items-center" aria-label={`Show slide ${i + 1}`} aria-current={i === index}>
+              <span className="block h-0.5 w-full overflow-hidden bg-sand/30">
                 <span
                   key={`${index}-${paused}`}
                   className="block h-full origin-left bg-sand"
@@ -111,14 +109,9 @@ export default function HeroSlider() {
             </button>
           ))}
         </div>
-        <div className="flex gap-2 text-sand">
-          <button onClick={() => go(-1)} className="grid size-10 place-items-center rounded-full border border-sand/30 hover:bg-sand hover:text-olive-900" aria-label="Previous slide">
-            <ArrowLeft className="size-4" />
-          </button>
-          <button onClick={() => go(1)} className="grid size-10 place-items-center rounded-full border border-sand/30 hover:bg-sand hover:text-olive-900" aria-label="Next slide">
-            <ArrowRight className="size-4" />
-          </button>
-        </div>
+        <button onClick={() => go(1)} className="grid size-9 place-items-center rounded-full text-sand/70 transition-colors hover:text-sand max-sm:hidden" aria-label="Next slide">
+          <ArrowRight className="size-4" />
+        </button>
       </div>
       <style>{`@keyframes hero-progress { from { transform: scaleX(0) } to { transform: scaleX(1) } }`}</style>
     </section>

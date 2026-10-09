@@ -25,7 +25,7 @@ export default function ProductCard({ product, priority = false, sizes }) {
 
   return (
     <Link href={`/product/${product.slug}`} className="group block">
-      <div className="relative aspect-[4/5] overflow-hidden bg-sand">
+      <div className="relative aspect-[4/5] overflow-hidden bg-mist">
         {primary && (
           <Image
             src={primary}
@@ -46,26 +46,15 @@ export default function ProductCard({ product, priority = false, sizes }) {
           />
         )}
 
-        <div className="absolute left-3 top-3 flex flex-col items-start gap-1.5">
-          {soldOut ? (
-            <span className="bg-paper px-2 py-1 text-[9px] uppercase tracking-[0.2em] text-muted">Sold out</span>
-          ) : (
-            <>
-              {onSale && (
-                <span className="bg-olive-800 px-2 py-1 text-[9px] uppercase tracking-[0.2em] text-sand">
-                  −{Math.round((1 - product.price / product.comparePrice) * 100)}%
-                </span>
-              )}
-              {product.stock <= 5 && (
-                <span className="bg-paper/90 px-2 py-1 text-[9px] uppercase tracking-[0.2em] text-olive-800">Only {product.stock} left</span>
-              )}
-            </>
-          )}
-        </div>
+        {(soldOut || onSale) && (
+          <span className="absolute left-3 top-3 bg-paper/90 px-2 py-1 text-[10px] uppercase tracking-[0.18em] text-ink">
+            {soldOut ? "Sold out" : `−${Math.round((1 - product.price / product.comparePrice) * 100)}%`}
+          </span>
+        )}
 
         <WishlistButton
           product={product}
-          className="absolute right-2.5 top-2.5 size-9 rounded-full bg-paper/80 text-ink backdrop-blur hover:bg-paper"
+          className="absolute right-2.5 top-2.5 size-9 rounded-full bg-paper/85 text-ink backdrop-blur transition hover:bg-paper lg:opacity-0 lg:group-hover:opacity-100 lg:focus-visible:opacity-100 lg:aria-pressed:opacity-100"
         />
 
         {!soldOut && (
@@ -80,18 +69,10 @@ export default function ProductCard({ product, priority = false, sizes }) {
         )}
       </div>
 
-      <div className="mt-4 flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h3 className="font-display text-xs uppercase tracking-[0.18em] transition-colors group-hover:text-olive-700">{product.name}</h3>
-          <p className="mt-1.5 truncate text-xs text-muted">
-            {[product.shape, product.frameColor].filter(Boolean).join(" · ")}
-          </p>
-        </div>
-        <Price
-          price={product.price}
-          comparePrice={product.comparePrice}
-          className="shrink-0 flex-col items-end gap-0 text-sm sm:flex-row sm:items-baseline sm:gap-2"
-        />
+      <div className="mt-4 space-y-1">
+        <h3 className="font-display text-[11px] uppercase tracking-[0.18em] transition-colors group-hover:text-olive-700">{product.name}</h3>
+        <p className="truncate text-xs text-muted">{[product.shape, product.frameColor].filter(Boolean).join(" · ")}</p>
+        <Price price={product.price} comparePrice={product.comparePrice} className="pt-1 text-sm" />
       </div>
     </Link>
   );

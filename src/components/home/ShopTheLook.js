@@ -24,7 +24,7 @@ export default function ShopTheLook({ products }) {
 
   return (
     <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-16">
-      <div className="relative aspect-[3/4] overflow-hidden bg-sand lg:col-span-7">
+      <div className="relative aspect-[3/4] overflow-hidden bg-mist lg:col-span-7">
         <Image src="/images/collection.jpg" alt="RAYVE Collection 01 frames" fill sizes="(min-width:1024px) 58vw, 100vw" className="object-cover" />
         {spots.map((s) => (
           <button
@@ -63,7 +63,7 @@ export default function ShopTheLook({ products }) {
                   className={`flex items-center gap-4 py-4 transition-colors ${isActive ? "" : "opacity-60 hover:opacity-100"}`}
                   onMouseEnter={() => setOpen(s.slug)}
                 >
-                  <Link href={`/product/${p.slug}`} className="relative size-16 shrink-0 overflow-hidden bg-sand">
+                  <Link href={`/product/${p.slug}`} className="relative size-16 shrink-0 overflow-hidden bg-mist">
                     <Image src={p.images[0]} alt={p.name} fill sizes="64px" className="object-cover" />
                   </Link>
                   <div className="min-w-0 flex-1">

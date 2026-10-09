@@ -13,7 +13,7 @@ export default function WishlistView() {
   if (!items.length) {
     return (
       <div className="flex flex-col items-center py-24 text-center">
-        <span className="grid size-16 place-items-center rounded-full bg-sand">
+        <span className="grid size-16 place-items-center rounded-full bg-mist">
           <Heart className="size-7 text-olive-800" strokeWidth={1.25} />
         </span>
         <p className="mt-6 text-sm text-muted">Tap the heart on any frame to save it here.</p>

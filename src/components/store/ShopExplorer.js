@@ -44,7 +44,7 @@ function Option({ checked, onChange, label, count, type = "checkbox" }) {
           type === "radio" ? "rounded-full" : ""
         } ${checked ? "border-olive-800 bg-olive-800 text-sand" : "border-line bg-paper group-hover:border-olive-800"}`}
       >
-        {checked && (type === "radio" ? <span className="size-1.5 rounded-full bg-sand" /> : <Check className="size-3" strokeWidth={3} />)}
+        {checked && (type === "radio" ? <span className="size-1.5 rounded-full bg-mist" /> : <Check className="size-3" strokeWidth={3} />)}
       </span>
       <span className="flex-1">{label}</span>
       {count !== undefined && <span className="text-xs text-muted">{count}</span>}
@@ -183,7 +183,7 @@ export default function ShopExplorer({ products, initial }) {
       </aside>
 
       <div>
-        <div className="sticky top-16 z-20 -mx-5 flex items-center gap-3 border-b border-line bg-cream/95 px-5 py-3 backdrop-blur sm:-mx-8 sm:px-8 lg:static lg:mx-0 lg:bg-transparent lg:px-0 lg:pt-0 lg:backdrop-blur-none">
+        <div className="sticky top-16 z-20 -mx-5 flex items-center gap-3 border-b border-line bg-canvas/95 px-5 py-3 backdrop-blur sm:-mx-8 sm:px-8 lg:static lg:mx-0 lg:bg-transparent lg:px-0 lg:pt-0 lg:backdrop-blur-none">
           <button onClick={() => setDrawer(true)} className="flex h-9 items-center gap-2 border border-line bg-paper px-3 text-xs lg:hidden">
             <SlidersHorizontal className="size-3.5" /> Filters {chips.length > 0 && <span className="grid size-4 place-items-center rounded-full bg-olive-800 text-[9px] text-sand">{chips.length}</span>}
           </button>
@@ -242,7 +242,7 @@ export default function ShopExplorer({ products, initial }) {
       {/* Mobile filter drawer */}
       <div className={`fixed inset-0 z-50 lg:hidden ${drawer ? "" : "pointer-events-none"}`}>
         <div onClick={() => setDrawer(false)} className={`absolute inset-0 bg-olive-950/40 transition-opacity ${drawer ? "opacity-100" : "opacity-0"}`} />
-        <div className={`absolute inset-y-0 left-0 flex w-[88%] max-w-sm flex-col bg-cream transition-transform duration-300 ${drawer ? "translate-x-0" : "-translate-x-full"}`}>
+        <div className={`absolute inset-y-0 left-0 flex w-[88%] max-w-sm flex-col bg-canvas transition-transform duration-300 ${drawer ? "translate-x-0" : "-translate-x-full"}`}>
           <div className="flex h-16 items-center justify-between border-b border-line px-5">
             <p className="font-display text-xs uppercase tracking-[0.25em]">Filters</p>
             <button onClick={() => setDrawer(false)} aria-label="Close filters">

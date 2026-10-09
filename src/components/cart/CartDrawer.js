@@ -34,7 +34,7 @@ function Upsell({ onNavigate }) {
       <div className="no-scrollbar -mx-6 mt-4 flex gap-3 overflow-x-auto px-6">
         {picks.map((p) => (
           <div key={p.id} className="w-32 shrink-0">
-            <Link href={`/product/${p.slug}`} onClick={onNavigate} className="relative block aspect-[4/5] overflow-hidden bg-sand">
+            <Link href={`/product/${p.slug}`} onClick={onNavigate} className="relative block aspect-[4/5] overflow-hidden bg-mist">
               <Image src={p.images[0]} alt={p.name} fill sizes="128px" className="object-cover" />
             </Link>
             <div className="mt-2 flex items-start justify-between gap-1">
@@ -81,7 +81,7 @@ export default function CartDrawer() {
       <aside
         role="dialog"
         aria-label="Shopping bag"
-        className={`absolute right-0 top-0 flex h-full w-full max-w-md flex-col bg-cream shadow-2xl transition-transform duration-300 ease-out ${open ? "translate-x-0" : "translate-x-full"}`}
+        className={`absolute right-0 top-0 flex h-full w-full max-w-md flex-col bg-canvas shadow-2xl transition-transform duration-300 ease-out ${open ? "translate-x-0" : "translate-x-full"}`}
       >
         <div className="flex h-16 items-center justify-between border-b border-line px-6">
           <p className="font-display text-xs uppercase tracking-[0.25em]">Your bag ({count})</p>
@@ -92,7 +92,7 @@ export default function CartDrawer() {
 
         {items.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-5 px-6 text-center">
-            <span className="grid size-16 place-items-center rounded-full bg-sand">
+            <span className="grid size-16 place-items-center rounded-full bg-mist">
               <ShoppingBag className="size-7 text-olive-800" strokeWidth={1.25} />
             </span>
             <div>

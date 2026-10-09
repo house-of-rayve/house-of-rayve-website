@@ -16,7 +16,7 @@ export default function CartLines({ onNavigate }) {
           <Link
             href={`/product/${item.slug}`}
             onClick={onNavigate}
-            className="relative aspect-[4/5] w-20 shrink-0 overflow-hidden bg-sand"
+            className="relative aspect-[4/5] w-20 shrink-0 overflow-hidden bg-mist"
           >
             {item.image && <Image src={item.image} alt={item.name} fill sizes="80px" className="object-cover" />}
           </Link>

@@ -11,6 +11,8 @@
   --color-sand: #e9e2d0; /* brand light */
   --color-cream: #f5f2ea;
   --color-paper: #fbfaf6;
+  --color-canvas: #fdfcf9; /* page background */
+  --color-mist: #f1efe8; /* image wells */
   --color-ink: #1d1d16;
   --color-muted: #6f6c5c;
   --color-line: #ddd7c6;
@@ -49,7 +51,7 @@
 @layer base {
   html { -webkit-tap-highlight-color: transparent; }
   body {
-    background: var(--color-cream);
+    background: var(--color-canvas);
     color: var(--color-ink);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
@@ -58,7 +60,7 @@
   input, select, textarea, button { font: inherit; }
 }
 
-@utility container-x { @apply mx-auto w-full max-w-7xl px-5 sm:px-8; }
+@utility container-x { @apply mx-auto w-full max-w-[1440px] px-5 sm:px-8 lg:px-12; }
 @utility eyebrow { @apply font-display text-[10px] uppercase tracking-[0.3em] text-muted; }
 @utility display-title { @apply font-display uppercase tracking-[0.06em] leading-[1.05]; }
 @utility btn { @apply inline-flex items-center justify-center gap-2 px-6 h-12 text-[11px] font-medium uppercase tracking-[0.2em] transition-colors disabled:opacity-50 disabled:pointer-events-none cursor-pointer; }

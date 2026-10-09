@@ -83,7 +83,7 @@ function SearchPanel({ onClose }) {
   };
 
   return (
-    <div className="absolute inset-x-0 top-full border-b border-line bg-cream shadow-xl animate-fade-up">
+    <div className="absolute inset-x-0 top-full border-b border-line bg-canvas shadow-xl animate-fade-up">
       <form onSubmit={submit} className="container-x flex h-16 items-center gap-3 border-b border-line">
         <Search className="size-4 text-muted" />
         <input
@@ -131,7 +131,7 @@ function SearchPanel({ onClose }) {
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
               {shown.slice(0, 6).map((p) => (
                 <Link key={p.id} href={`/product/${p.slug}`} onClick={onClose} className="group">
-                  <div className="relative aspect-[4/5] overflow-hidden bg-sand">
+                  <div className="relative aspect-[4/5] overflow-hidden bg-mist">
                     {p.images[0] && (
                       <Image src={p.images[0]} alt={p.name} fill sizes="200px" className="object-cover transition-transform duration-500 group-hover:scale-105" />
                     )}
@@ -150,7 +150,7 @@ function SearchPanel({ onClose }) {
 
 function MegaMenu({ onNavigate }) {
   return (
-    <div className="absolute inset-x-0 top-full border-b border-line bg-cream shadow-xl animate-fade-up">
+    <div className="absolute inset-x-0 top-full border-b border-line bg-canvas shadow-xl animate-fade-up">
       <div className="container-x grid grid-cols-12 gap-8 py-10">
         <div className="col-span-3">
           <p className="eyebrow">Shop</p>
@@ -187,7 +187,7 @@ function MegaMenu({ onNavigate }) {
           { title: "Sunglasses", sub: "Collection 01", href: "/shop?category=Sunglasses", img: "/images/collection.jpg" },
           { title: "Optical", sub: "Everyday clarity", href: "/shop?category=Optical", img: "/images/malaga.jpg" },
         ].map((tile) => (
-          <Link key={tile.title} href={tile.href} onClick={onNavigate} className="group relative col-span-3 block aspect-[4/3] overflow-hidden bg-sand">
+          <Link key={tile.title} href={tile.href} onClick={onNavigate} className="group relative col-span-3 block aspect-[4/3] overflow-hidden bg-mist">
             <Image src={tile.img} alt={tile.title} fill sizes="25vw" className="object-cover transition-transform duration-700 group-hover:scale-105" />
             <div className="absolute inset-0 bg-gradient-to-t from-olive-950/60 to-transparent" />
             <div className="absolute bottom-4 left-4 text-sand">
@@ -242,7 +242,7 @@ export default function Header({ user }) {
       <Announcements />
       <header
         className={`sticky top-0 z-40 transition-colors duration-300 ${
-          overlay ? "border-b border-transparent bg-transparent text-sand" : "border-b border-line bg-cream/95 text-ink backdrop-blur-md"
+          overlay ? "border-b border-transparent bg-transparent text-sand" : "border-b border-line bg-canvas/95 text-ink backdrop-blur-md"
         }`}
         onMouseLeave={leaveShop}
       >
@@ -324,7 +324,7 @@ export default function Header({ user }) {
       <div className={`fixed inset-0 z-50 lg:hidden ${menu ? "" : "pointer-events-none"}`}>
         <div onClick={() => setMenu(false)} className={`absolute inset-0 bg-olive-950/40 transition-opacity ${menu ? "opacity-100" : "opacity-0"}`} />
         <div
-          className={`absolute left-0 top-0 flex h-full w-[85%] max-w-sm flex-col bg-cream transition-transform duration-300 ${menu ? "translate-x-0" : "-translate-x-full"}`}
+          className={`absolute left-0 top-0 flex h-full w-[85%] max-w-sm flex-col bg-canvas transition-transform duration-300 ${menu ? "translate-x-0" : "-translate-x-full"}`}
         >
           <div className="flex h-16 items-center justify-between border-b border-line px-5">
             <Logo className="text-olive-800" />

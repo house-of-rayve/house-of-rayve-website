@@ -54,7 +54,7 @@ export default function ProductCarousel({ eyebrow, title, tabs }) {
         </div>
       )}
 
-      <div ref={rail} key={tab.label} className="no-scrollbar -mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-px-5 px-5 animate-fade-in sm:-mx-8 sm:gap-6 sm:scroll-px-8 sm:px-8">
+      <div ref={rail} key={tab.label} className="no-scrollbar -mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-px-5 px-5 animate-fade-in sm:-mx-8 sm:gap-6 sm:scroll-px-8 sm:px-8 lg:-mx-12 lg:scroll-px-12 lg:px-12">
         {tab.products.map((p, i) => (
           <div key={p.id} className="w-[68%] shrink-0 snap-start sm:w-[calc((100%-3rem)/3)] lg:w-[calc((100%-4.5rem)/4)]">
             <ProductCard product={p} priority={i < 2} sizes="(min-width:1024px) 25vw, (min-width:640px) 33vw, 68vw" />

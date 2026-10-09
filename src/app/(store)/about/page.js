@@ -60,7 +60,7 @@ export default function AboutPage() {
         <h2 className="display-title text-3xl sm:text-4xl">Tone of voice</h2>
         <div className="mt-12 grid gap-px bg-line sm:grid-cols-2 lg:grid-cols-4">
           {VOICE.map(([t, d], i) => (
-            <div key={t} className="bg-cream p-8">
+            <div key={t} className="bg-canvas p-8">
               <span className="font-display text-xs text-olive-500">/0{i + 1}</span>
               <h3 className="display-title mt-6 text-sm">{t}</h3>
               <p className="mt-3 text-sm leading-relaxed text-muted">{d}</p>

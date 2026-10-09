@@ -43,7 +43,7 @@ function DeliveryCheck() {
           inputMode="numeric"
           placeholder="Enter PIN code"
           aria-label="PIN code"
-          className="h-10 min-w-0 flex-1 border border-r-0 border-line bg-cream px-3 text-sm outline-none focus:border-olive-800"
+          className="h-10 min-w-0 flex-1 border border-r-0 border-line bg-canvas px-3 text-sm outline-none focus:border-olive-800"
         />
         <button className="h-10 bg-olive-800 px-4 text-[10px] font-medium uppercase tracking-[0.2em] text-sand hover:bg-olive-950">Check</button>
       </form>
@@ -101,11 +101,11 @@ export default function ProductPurchase({ product }) {
       <DeliveryCheck />
 
       <div
-        className={`fixed inset-x-0 bottom-0 z-30 border-t border-line bg-cream/95 backdrop-blur-md transition-transform duration-300 ${stuck ? "translate-y-0" : "translate-y-full"}`}
+        className={`fixed inset-x-0 bottom-0 z-30 border-t border-line bg-canvas/95 backdrop-blur-md transition-transform duration-300 ${stuck ? "translate-y-0" : "translate-y-full"}`}
         aria-hidden={!stuck}
       >
         <div className="container-x flex h-[72px] items-center gap-4">
-          <div className="relative hidden size-12 shrink-0 overflow-hidden bg-sand sm:block">
+          <div className="relative hidden size-12 shrink-0 overflow-hidden bg-mist sm:block">
             {product.images[0] && <Image src={product.images[0]} alt="" fill sizes="48px" className="object-cover" />}
           </div>
           <div className="min-w-0 flex-1">
