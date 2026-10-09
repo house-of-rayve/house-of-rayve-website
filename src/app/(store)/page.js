@@ -65,6 +65,7 @@ export default async function HomePage() {
   const newest = [...all].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   const offers = all.filter((p) => p.comparePrice > p.price || p.stock <= 5);
   const count = (category) => all.filter((p) => p.category === category).length;
+  const frames = (n) => `${n} ${n === 1 ? "frame" : "frames"}`;
   const spotlight = all.find((p) => p.slug === "toro") ?? featured[0] ?? all[0];
   const bySlug = Object.fromEntries(all.map((p) => [p.slug, p]));
 
@@ -72,12 +73,12 @@ export default async function HomePage() {
     <>
       <HeroSlider />
 
-      {/* Perks bar */}
+      {/* Perks bar (height is part of the first-screen calculation in HeroSlider) */}
       <section className="border-b border-line">
-        <div className="container-x no-scrollbar flex gap-8 overflow-x-auto py-5 md:justify-between">
+        <div className="container-x no-scrollbar flex h-16 items-center gap-8 overflow-x-auto md:h-20 md:justify-between">
           {PERKS.map(({ Icon, text }) => (
-            <p key={text} className="flex shrink-0 items-center gap-2.5 text-xs text-muted">
-              <Icon className="size-4 text-olive-500" strokeWidth={1.5} /> {text}
+            <p key={text} className="flex shrink-0 items-center gap-3 text-sm text-ink/80 md:text-[15px]">
+              <Icon className="size-5 text-olive-500" strokeWidth={1.5} /> {text}
             </p>
           ))}
         </div>
@@ -111,8 +112,8 @@ export default async function HomePage() {
       {/* Full-bleed category tiles */}
       <section className="grid gap-1 md:grid-cols-2">
         {[
-          { title: "Sunglasses", sub: `${count("Sunglasses")} frames`, href: "/shop?category=Sunglasses", img: "/images/model-sevilla.jpg" },
-          { title: "Optical", sub: `${count("Optical")} frames`, href: "/shop?category=Optical", img: "/images/malaga.jpg" },
+          { title: "Sunglasses", sub: frames(count("Sunglasses")), href: "/shop?category=Sunglasses", img: "/images/model-sevilla.jpg" },
+          { title: "Optical", sub: frames(count("Optical")), href: "/shop?category=Optical", img: "/images/malaga.jpg" },
         ].map((c) => (
           <Link key={c.title} href={c.href} className="group relative block aspect-[4/5] overflow-hidden bg-mist md:aspect-[4/5] lg:aspect-square">
             <Image src={c.img} alt={c.title} fill sizes="(min-width:768px) 50vw, 100vw" className="object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-105" />
@@ -126,9 +127,21 @@ export default async function HomePage() {
         ))}
       </section>
 
+      {/* New arrivals grid */}
+      <section className="container-x section-y">
+        <SectionHead eyebrow="Just landed" title="New arrivals" href="/shop?sort=newest" />
+        <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 lg:grid-cols-4">
+          {newest.slice(0, 4).map((p, i) => (
+            <Reveal key={p.id} delay={i * 80}>
+              <ProductCard product={p} />
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
       {/* Signature product */}
       {spotlight && (
-        <section className="mt-20 md:mt-24 lg:mt-28">
+        <section>
           <ProductSpotlight product={spotlight} />
         </section>
       )}
@@ -147,18 +160,6 @@ export default async function HomePage() {
         <Reveal>
           <ShopTheLook products={all} />
         </Reveal>
-      </section>
-
-      {/* New arrivals grid */}
-      <section className="container-x pb-20 md:pb-24 lg:pb-28">
-        <SectionHead eyebrow="Just landed" title="New arrivals" href="/shop?sort=newest" />
-        <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 lg:grid-cols-4">
-          {newest.slice(0, 4).map((p, i) => (
-            <Reveal key={p.id} delay={i * 80}>
-              <ProductCard product={p} />
-            </Reveal>
-          ))}
-        </div>
       </section>
 
       {/* Editorial split */}
@@ -231,16 +232,19 @@ export default async function HomePage() {
       </section>
 
       {/* Lifestyle gallery */}
-      <section className="container-x section-y">
-        <SectionHead eyebrow="Worn by you" title="In the everyday" href="/shop" linkLabel="Shop all" />
-        <div className="grid auto-rows-[160px] grid-cols-2 gap-1 sm:auto-rows-[220px] md:grid-cols-4 lg:auto-rows-[260px]">
+      {/* Heading stays in the container; the grid runs edge to edge */}
+      <section className="section-y">
+        <div className="container-x">
+          <SectionHead eyebrow="Worn by you" title="In the everyday" href="/shop" linkLabel="Shop all" />
+        </div>
+        <div className="grid auto-rows-[180px] grid-cols-2 gap-1 sm:auto-rows-[240px] md:grid-cols-4 lg:auto-rows-[300px] xl:auto-rows-[360px]">
           {GALLERY.map(([img, slug, span]) => {
             const p = bySlug[slug];
             return (
               <Link key={img} href={p ? `/product/${slug}` : "/shop"} className={`group relative overflow-hidden bg-mist ${span}`}>
-                <Image src={`/images/${img}.jpg`} alt={p ? `${p.name} worn` : ""} fill sizes="(min-width:768px) 25vw, 50vw" className="object-cover transition-transform duration-700 group-hover:scale-105" />
+                <Image src={`/images/${img}.jpg`} alt={p ? `${p.name} worn` : ""} fill sizes="(min-width:768px) 25vw, 50vw" className="object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-105" />
                 {p && (
-                  <div className="absolute inset-x-0 bottom-0 flex translate-y-2 items-center justify-between bg-gradient-to-t from-olive-950/70 to-transparent p-4 text-sand opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
+                  <div className="absolute inset-x-0 bottom-0 flex translate-y-2 items-center justify-between bg-gradient-to-t from-olive-950/70 to-transparent p-5 text-sand md:p-6 opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
                     <span className="font-display text-[10px] uppercase tracking-[0.2em]">{p.name}</span>
                     <ArrowRight className="size-3.5" />
                   </div>

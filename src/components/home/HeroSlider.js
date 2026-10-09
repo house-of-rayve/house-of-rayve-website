@@ -5,30 +5,39 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
+// HD photography from Unsplash (free to use under the Unsplash License), served at the exact size
+// each screen needs straight from Unsplash's image CDN via the loader below.
+//   https://unsplash.com/photos/jS-vBufwKyY  https://unsplash.com/photos/QoFhXdW_vc8  https://unsplash.com/photos/z3cm1MyYL7o
+const unsplashLoader = ({ src, width, quality }) => `${src}?auto=format&fit=crop&w=${width}&q=${quality ?? 80}`;
+
 const SLIDES = [
   {
-    img: "/images/hero-green.jpg",
-    position: "50% 30%",
+    img: "https://images.unsplash.com/photo-1760446032400-506ec8963e6a",
+    position: "50% 60%",
+    align: "right",
+    split: true, // product shot: image on the left 60%, text on a solid panel (desktop)
     eyebrow: "New season · Collection 01",
     title: "Own the energy",
     text: "A frame you recognise — altered. Distinctive silhouettes, made for ordinary days, not just special ones.",
     cta: ["Shop the collection", "/shop"],
   },
   {
-    img: "/images/campaign-matador.jpg",
-    position: "50% 25%",
+    img: "https://images.unsplash.com/photo-1600076280106-22cb8bd62b22",
+    position: "35% 45%",
+    align: "right",
     eyebrow: "The Sevilla edit",
     title: "Poise. Precision. Command.",
-    text: "Sculpted acetate and quiet confidence — eyewear that commands attention without asking for it.",
+    text: "Eyewear that commands attention without asking for it.",
     cta: ["Explore sunglasses", "/shop?category=Sunglasses"],
   },
   {
-    img: "/images/model-toro.jpg",
-    position: "50% 35%",
-    eyebrow: "Signature frame",
-    title: "Meet Toro",
-    text: "The everyday oval, sharpened. Gloss black acetate with amber-warm lenses.",
-    cta: ["Shop Toro", "/product/toro"],
+    img: "https://images.unsplash.com/photo-1715875892986-10edbca5c6fb",
+    position: "95% 50%",
+    align: "left",
+    eyebrow: "Premium, in the everyday",
+    title: "Golden hour",
+    text: "100% UV400 lenses and hand-polished frames — the pair you reach for without thinking.",
+    cta: ["Shop all frames", "/shop"],
   },
 ];
 
@@ -47,8 +56,10 @@ export default function HeroSlider() {
   const go = (dir) => setIndex((i) => (i + dir + SLIDES.length) % SLIDES.length);
 
   return (
+    // -mt matches the header height (64px + 1px border) so the hero sits flush under the announcement bar.
+    // Height = viewport − announcement bar (32px) − perks bar (64px / 80px), so hero + perks fill the first screen.
     <section
-      className="relative isolate -mt-16 h-[88svh] min-h-[560px] overflow-hidden bg-olive-950"
+      className="relative isolate -mt-[65px] h-[calc(100svh-96px)] min-h-[560px] md:h-[calc(100svh-112px)] overflow-hidden bg-olive-950"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       aria-roledescription="carousel"
@@ -59,25 +70,55 @@ export default function HeroSlider() {
           aria-hidden={i !== index}
           className={`absolute inset-0 transition-opacity duration-1000 ${i === index ? "opacity-100" : "opacity-0"}`}
         >
+          {s.split && <div className="absolute inset-y-0 right-0 hidden w-[40%] bg-olive-950 md:block" />}
+          <div className={`absolute inset-y-0 left-0 overflow-hidden ${s.split ? "w-full md:w-[60%]" : "w-full"}`}>
           <Image
+            loader={unsplashLoader}
             src={s.img}
             alt=""
             fill
             priority={i === 0}
-            sizes="100vw"
+            quality={85}
+            sizes={s.split ? "(min-width:768px) 60vw, 100vw" : "100vw"}
             style={{ objectPosition: s.position }}
             className={`object-cover ${i === index ? "animate-ken-burns" : ""}`}
           />
-          <div className="absolute inset-0 bg-olive-950/40" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(34,34,26,0.35),transparent_70%)]" />
+          </div>
+          {s.split ? (
+            <div className="absolute inset-0 bg-gradient-to-t from-olive-950/90 via-olive-950/45 to-olive-950/10 md:hidden" />
+          ) : (
+            <>
+              <div className="absolute inset-0 bg-olive-950/25" />
+              <div
+                className={`absolute inset-0 ${
+                  s.align === "left" ? "bg-gradient-to-r" : s.align === "right" ? "bg-gradient-to-l" : "bg-gradient-to-b"
+                } from-olive-950/75 via-olive-950/30 to-transparent`}
+              />
+            </>
+          )}
         </div>
       ))}
 
-      <div className="container-x relative flex h-full flex-col items-center justify-center pt-16 text-center">
+      <div
+        className={`container-x relative flex h-full flex-col justify-center pt-16 ${SLIDES[index].split ? "max-md:justify-end max-md:pb-20" : ""} ${
+          SLIDES[index].align === "left"
+            ? "items-center text-center md:items-start md:text-left"
+            : SLIDES[index].align === "right"
+              ? "items-center text-center md:items-end md:text-right"
+              : "items-center text-center"
+        }`}
+      >
         {SLIDES.map(
           (s, i) =>
             i === index && (
-              <div key={s.title} className="flex max-w-3xl flex-col items-center text-sand">
+              <div
+                key={s.title}
+                className={`flex flex-col text-sand ${
+                  s.split
+                    ? "items-center md:w-[calc(40%-3rem)] md:items-start md:text-left"
+                    : `max-w-2xl ${s.align === "left" ? "items-center md:items-start" : s.align === "right" ? "items-center md:items-end" : "items-center"}`
+                }`}
+              >
                 <p className="eyebrow animate-fade-up text-sand/80">{s.eyebrow}</p>
                 <h1 className="display-title mt-6 animate-fade-up text-4xl [animation-delay:100ms] sm:text-6xl lg:text-7xl">{s.title}</h1>
                 <p className="mt-6 max-w-md animate-fade-up text-base leading-relaxed text-sand/85 [animation-delay:200ms]">{s.text}</p>
