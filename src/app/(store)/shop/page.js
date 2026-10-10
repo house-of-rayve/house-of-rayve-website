@@ -6,7 +6,6 @@ export const metadata = { title: "Shop" };
 
 const BANNERS = {
   Sunglasses: { text: "Distinctive silhouettes with 100% UV400 lenses, made for ordinary days." },
-  Optical: { text: "Everyday optical frames in translucent acetate. Bring your own prescription." },
   default: { text: "Premium, in the everyday. Every frame, every shape, in one place." },
 };
 

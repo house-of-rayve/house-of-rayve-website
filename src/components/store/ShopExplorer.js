@@ -107,6 +107,7 @@ export default function ShopExplorer({ products, initial }) {
   if (SORTERS[sort]) results = [...results].sort(SORTERS[sort]);
 
   const countBy = (skip, key, value) => apply(skip).filter((p) => p[key] === value).length;
+  const allCategories = [...new Set(products.map((p) => p.category).filter(Boolean))].sort();
   const allShapes = [...new Set(products.map((p) => p.shape).filter(Boolean))].sort();
   const allMaterials = [...new Set(products.map((p) => p.material).filter(Boolean))].sort();
   const toggle = (arr, set, v) => set(arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v]);
@@ -133,18 +134,20 @@ export default function ShopExplorer({ products, initial }) {
 
   const filters = (
     <>
-      <FilterGroup title="Category">
-        {["", "Sunglasses", "Optical"].map((c) => (
-          <Option
-            key={c || "all"}
-            type="radio"
-            checked={category === c}
-            onChange={() => setCategory(c)}
-            label={c || "All eyewear"}
-            count={c ? countBy("category", "category", c) : apply("category").length}
-          />
-        ))}
-      </FilterGroup>
+      {allCategories.length > 1 && (
+        <FilterGroup title="Category">
+          {["", ...allCategories].map((c) => (
+            <Option
+              key={c || "all"}
+              type="radio"
+              checked={category === c}
+              onChange={() => setCategory(c)}
+              label={c || "All eyewear"}
+              count={c ? countBy("category", "category", c) : apply("category").length}
+            />
+          ))}
+        </FilterGroup>
+      )}
       <FilterGroup title="Shape">
         {allShapes.map((s) => (
           <Option key={s} checked={shapes.includes(s)} onChange={() => toggle(shapes, setShapes, s)} label={s} count={countBy("shape", "shape", s)} />

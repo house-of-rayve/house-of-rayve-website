@@ -19,7 +19,6 @@ const ANNOUNCEMENTS = [
 
 const NAV = [
   { href: "/shop?category=Sunglasses", label: "Sunglasses" },
-  { href: "/shop?category=Optical", label: "Optical" },
   { href: "/about", label: "The brand" },
 ];
 
@@ -158,7 +157,6 @@ function MegaMenu({ onNavigate }) {
             {[
               ["All eyewear", "/shop"],
               ["Sunglasses", "/shop?category=Sunglasses"],
-              ["Optical", "/shop?category=Optical"],
               ["New arrivals", "/shop?sort=newest"],
               ["Wishlist", "/wishlist"],
             ].map(([label, href]) => (
@@ -185,7 +183,7 @@ function MegaMenu({ onNavigate }) {
         </div>
         {[
           { title: "Sunglasses", sub: "Collection 01", href: "/shop?category=Sunglasses", img: "/images/collection.jpg" },
-          { title: "Optical", sub: "Everyday clarity", href: "/shop?category=Optical", img: "/images/malaga.jpg" },
+          { title: "New arrivals", sub: "Just landed", href: "/shop?sort=newest", img: "/images/model-arena.jpg" },
         ].map((tile) => (
           <Link key={tile.title} href={tile.href} onClick={onNavigate} className="group relative col-span-3 block aspect-[4/3] overflow-hidden bg-mist">
             <Image src={tile.img} alt={tile.title} fill sizes="25vw" className="object-cover transition-transform duration-700 group-hover:scale-105" />

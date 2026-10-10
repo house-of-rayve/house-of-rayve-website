@@ -5,7 +5,6 @@ const FAQS = [
   ["Can I pay cash on delivery?", "Yes. Choose cash on delivery at checkout, or pay online by UPI, card or netbanking."],
   ["What is your return policy?", "Return or exchange unworn frames within 7 days of delivery. Start it from your account under Orders."],
   ["Do your sunglasses offer UV protection?", "Every RAYVE sunglass lens blocks 100% of UVA and UVB rays (UV400)."],
-  ["Can I fit prescription lenses?", "Our optical frames ship with demo lenses so any optician can fit your prescription."],
   ["Is there a warranty?", "Every frame carries a 1-year warranty against manufacturing defects in the frame and hinges."],
 ];
 

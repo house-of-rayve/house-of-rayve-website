@@ -113,7 +113,7 @@ export default async function HomePage() {
       <section className="grid gap-1 md:grid-cols-2">
         {[
           { title: "Sunglasses", sub: frames(count("Sunglasses")), href: "/shop?category=Sunglasses", img: "/images/model-sevilla.jpg" },
-          { title: "Optical", sub: frames(count("Optical")), href: "/shop?category=Optical", img: "/images/malaga.jpg" },
+          { title: "New arrivals", sub: "Just landed", href: "/shop?sort=newest", img: "/images/model-arena.jpg" },
         ].map((c) => (
           <Link key={c.title} href={c.href} className="group relative block aspect-[4/5] overflow-hidden bg-mist md:aspect-[4/5] lg:aspect-square">
             <Image src={c.img} alt={c.title} fill sizes="(min-width:768px) 50vw, 100vw" className="object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-105" />

@@ -42,7 +42,7 @@ export default async function ProductPage({ params }) {
     ["Frame", product.frameColor],
     ["Lens", product.lensColor],
     ["Material", product.material],
-    ["Protection", product.category === "Sunglasses" ? "100% UV400" : "Demo lens — add your prescription"],
+    ["Protection", "100% UV400"],
     ["Category", product.category],
   ].filter(([, v]) => v);
 

@@ -148,19 +148,6 @@ const products = [
     stock: 34,
     images: ["/images/bravo.jpg", "/images/model-matador.jpg"],
   },
-  {
-    name: "Málaga",
-    tagline: "Optical frames in translucent olive.",
-    category: "Optical",
-    shape: "Round",
-    frameColor: "Translucent Olive",
-    lensColor: "Clear (demo lens)",
-    material: "Bio-acetate",
-    price: 3990,
-    stock: 40,
-    featured: true,
-    images: ["/images/malaga.jpg", "/images/hero-green.jpg"],
-  },
 ];
 
 const description = (p) =>

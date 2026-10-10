@@ -1,4 +1,4 @@
-export const CATEGORIES = ["Sunglasses", "Optical"];
+export const CATEGORIES = ["Sunglasses"];
 export const SHAPES = ["Rectangle", "Oval", "Round", "Cat-eye", "Square", "Shield", "Aviator"];
 
 export const ORDER_STATUSES = ["PENDING", "CONFIRMED", "SHIPPED", "DELIVERED", "CANCELLED"];

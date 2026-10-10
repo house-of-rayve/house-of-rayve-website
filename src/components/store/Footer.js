@@ -8,7 +8,6 @@ const COLUMNS = [
     links: [
       ["All eyewear", "/shop"],
       ["Sunglasses", "/shop?category=Sunglasses"],
-      ["Optical", "/shop?category=Optical"],
       ["New arrivals", "/shop?sort=newest"],
     ],
   },
