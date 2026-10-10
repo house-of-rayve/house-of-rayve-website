@@ -82,6 +82,17 @@ src/components/           UI components
 public/images, public/brand   photography and logo from the brand kit
 ```
 
+## Coming-soon mode
+
+Until launch, `houseofrayve.com` and `www.houseofrayve.com` show only `/coming-soon` (with a "notify me"
+form that saves to the `Subscriber` table). Every other address — e.g. `house-of-rayve-website.vercel.app` —
+shows the full site, so development continues on the same `main` branch. The `*.vercel.app` link is sent
+with `X-Robots-Tag: noindex`. The switch lives in `src/proxy.js`.
+
+**Launch day:** in Vercel → Settings → Environment Variables add `COMING_SOON_HOSTS` = `off` (Production),
+then redeploy. Any value that isn't one of the domains works — the domain then serves the full store.
+To go back to coming-soon mode, delete the variable and redeploy.
+
 ## Going to production
 
 - Add the same environment variables in your hosting provider (e.g. Vercel → Settings → Environment Variables).

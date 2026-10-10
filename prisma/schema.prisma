@@ -109,3 +109,11 @@ model Upload {
   data        Bytes
   createdAt   DateTime @default(now())
 }
+
+// Newsletter / "notify me" sign-ups (home page and the coming-soon page)
+model Subscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  source    String   @default("newsletter") // newsletter | coming-soon
+  createdAt DateTime @default(now())
+}
