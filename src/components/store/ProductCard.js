@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, ViewTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Plus, Check } from "lucide-react";
@@ -8,7 +8,9 @@ import Price from "@/components/ui/Price";
 import WishlistButton from "@/components/wishlist/WishlistButton";
 import { useCart } from "@/components/cart/CartProvider";
 
-export default function ProductCard({ product, priority = false, sizes }) {
+// `morph`: the main image becomes the product page photo on navigation. Only enable it where each
+// product appears once on the page (duplicate transition names cancel the animation).
+export default function ProductCard({ product, priority = false, sizes, morph = false }) {
   const { add } = useCart();
   const [added, setAdded] = useState(false);
   const [primary, secondary] = product.images;
@@ -18,24 +20,34 @@ export default function ProductCard({ product, priority = false, sizes }) {
 
   const quickAdd = (e) => {
     e.preventDefault();
-    add(product, 1);
+    add(product, 1, e.currentTarget.parentElement);
     setAdded(true);
     setTimeout(() => setAdded(false), 1600);
   };
 
   return (
-    <Link href={`/product/${product.slug}`} className="group block">
+    <Link href={`/product/${product.slug}`} data-cursor="View" className="group block">
       <div className="relative aspect-[4/5] overflow-hidden bg-mist">
-        {primary && (
-          <Image
-            src={primary}
-            alt={product.name}
-            fill
-            priority={priority}
-            sizes={imgSizes}
-            className={`object-cover transition duration-700 ease-out group-hover:scale-[1.04] ${secondary ? "group-hover:opacity-0" : ""}`}
-          />
-        )}
+        {primary &&
+          (() => {
+            const img = (
+              <Image
+                src={primary}
+                alt={product.name}
+                fill
+                priority={priority}
+                sizes={imgSizes}
+                className={`object-cover transition duration-700 ease-out group-hover:scale-[1.04] ${secondary ? "group-hover:opacity-0" : ""}`}
+              />
+            );
+            return morph ? (
+              <ViewTransition name={`product-${product.slug}`} share="morph" default="none">
+                <div className="absolute inset-0">{img}</div>
+              </ViewTransition>
+            ) : (
+              img
+            );
+          })()}
         {secondary && (
           <Image
             src={secondary}

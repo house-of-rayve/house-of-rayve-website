@@ -1,26 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import Magnetic from "@/components/motion/Magnetic";
+import { gsap, useGSAP, prefersReducedMotion } from "@/components/motion/gsap";
 
 // HD photography from Unsplash (free to use under the Unsplash License), served at the exact size
 // each screen needs straight from Unsplash's image CDN via the loader below.
-//   https://unsplash.com/photos/jS-vBufwKyY  https://unsplash.com/photos/QoFhXdW_vc8  https://unsplash.com/photos/z3cm1MyYL7o
+//   https://unsplash.com/photos/QoFhXdW_vc8  https://unsplash.com/photos/z3cm1MyYL7o
 const unsplashLoader = ({ src, width, quality }) => `${src}?auto=format&fit=crop&w=${width}&q=${quality ?? 80}`;
 
 const SLIDES = [
-  {
-    img: "https://images.unsplash.com/photo-1760446032400-506ec8963e6a",
-    position: "50% 60%",
-    align: "right",
-    split: true, // product shot: image on the left 60%, text on a solid panel (desktop)
-    eyebrow: "New season · Collection 01",
-    title: "Own the energy",
-    text: "A frame you recognise — altered. Distinctive silhouettes, made for ordinary days, not just special ones.",
-    cta: ["Shop the collection", "/shop"],
-  },
   {
     img: "https://images.unsplash.com/photo-1600076280106-22cb8bd62b22",
     position: "35% 45%",
@@ -46,6 +38,35 @@ const DURATION = 6500;
 export default function HeroSlider() {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  const current = SLIDES[index] ?? SLIDES[0];
+  const root = useRef(null);
+
+  // Scroll parallax: the imagery sinks and the copy drifts up and fades as you leave the hero
+  useGSAP(
+    () => {
+      if (prefersReducedMotion()) return;
+      const st = { trigger: root.current, start: "top top", end: "bottom top", scrub: true };
+      gsap.to(".hero-media", { yPercent: 18, scale: 1.06, ease: "none", scrollTrigger: st });
+      gsap.to(".hero-copy", { yPercent: -30, opacity: 0, ease: "none", scrollTrigger: st });
+
+      // Mouse parallax (desktop): imagery drifts against the pointer, copy follows it slightly
+      if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+      const mediaX = gsap.quickTo(".hero-media", "x", { duration: 1.2, ease: "power3" });
+      const mediaY = gsap.quickTo(".hero-media", "y", { duration: 1.2, ease: "power3" });
+      const copyX = gsap.quickTo(".hero-copy", "x", { duration: 1.2, ease: "power3" });
+      const onMove = (e) => {
+        const r = root.current.getBoundingClientRect();
+        const nx = (e.clientX - r.left) / r.width - 0.5;
+        const ny = (e.clientY - r.top) / r.height - 0.5;
+        mediaX(nx * -24);
+        mediaY(ny * -16);
+        copyX(nx * 10);
+      };
+      root.current.addEventListener("pointermove", onMove);
+      return () => root.current?.removeEventListener("pointermove", onMove);
+    },
+    { scope: root },
+  );
 
   useEffect(() => {
     if (paused) return;
@@ -57,21 +78,22 @@ export default function HeroSlider() {
 
   return (
     // -mt matches the header height (64px + 1px border) so the hero sits flush under the announcement bar.
-    // Height = viewport − announcement bar (32px) − perks bar (64px / 80px), so hero + perks fill the first screen.
+    // Height = viewport − announcement bar (32px), so the hero fills the first screen.
     <section
-      className="relative isolate -mt-[65px] h-[calc(100svh-96px)] min-h-[560px] md:h-[calc(100svh-112px)] overflow-hidden bg-olive-950"
+      ref={root}
+      className="relative isolate -mt-[65px] h-[calc(100svh-32px)] min-h-[560px] overflow-hidden bg-olive-950"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       aria-roledescription="carousel"
     >
+      <div className="hero-media absolute -inset-6">
       {SLIDES.map((s, i) => (
         <div
           key={s.img}
           aria-hidden={i !== index}
           className={`absolute inset-0 transition-opacity duration-1000 ${i === index ? "opacity-100" : "opacity-0"}`}
         >
-          {s.split && <div className="absolute inset-y-0 right-0 hidden w-[40%] bg-olive-950 md:block" />}
-          <div className={`absolute inset-y-0 left-0 overflow-hidden ${s.split ? "w-full md:w-[60%]" : "w-full"}`}>
+          <div className="absolute inset-0 overflow-hidden">
           <Image
             loader={unsplashLoader}
             src={s.img}
@@ -79,33 +101,28 @@ export default function HeroSlider() {
             fill
             priority={i === 0}
             quality={85}
-            sizes={s.split ? "(min-width:768px) 60vw, 100vw" : "100vw"}
+            sizes="100vw"
             style={{ objectPosition: s.position }}
             className={`object-cover ${i === index ? "animate-ken-burns" : ""}`}
           />
           </div>
-          {s.split ? (
-            <div className="absolute inset-0 bg-gradient-to-t from-olive-950/90 via-olive-950/45 to-olive-950/10 md:hidden" />
-          ) : (
-            <>
-              <div className="absolute inset-0 bg-olive-950/25" />
-              <div
-                className={`absolute inset-0 ${
-                  s.align === "left" ? "bg-gradient-to-r" : s.align === "right" ? "bg-gradient-to-l" : "bg-gradient-to-b"
-                } from-olive-950/75 via-olive-950/30 to-transparent`}
-              />
-            </>
-          )}
+          <div className="absolute inset-0 bg-olive-950/25" />
+          <div
+            className={`absolute inset-0 ${
+              s.align === "left" ? "bg-gradient-to-r" : s.align === "right" ? "bg-gradient-to-l" : "bg-gradient-to-b"
+            } from-olive-950/75 via-olive-950/30 to-transparent`}
+          />
         </div>
       ))}
+      </div>
 
       <div
-        className={`container-x relative flex h-full flex-col justify-center pt-16 ${SLIDES[index].split ? "max-md:justify-end max-md:pb-20" : ""} ${
-          SLIDES[index].align === "left"
-            ? "items-center text-center md:items-start md:text-left"
-            : SLIDES[index].align === "right"
-              ? "items-center text-center md:items-end md:text-right"
-              : "items-center text-center"
+        className={`hero-copy relative flex h-full flex-col justify-center pt-16 ${
+          current.align === "left"
+            ? "container-x items-center text-center md:items-start md:text-left"
+            : current.align === "right"
+              ? "container-x items-center text-center md:items-end md:text-right"
+              : "container-x items-center text-center"
         }`}
       >
         {SLIDES.map(
@@ -113,18 +130,22 @@ export default function HeroSlider() {
             i === index && (
               <div
                 key={s.title}
-                className={`flex flex-col text-sand ${
-                  s.split
-                    ? "items-center md:w-[calc(40%-3rem)] md:items-start md:text-left"
-                    : `max-w-2xl ${s.align === "left" ? "items-center md:items-start" : s.align === "right" ? "items-center md:items-end" : "items-center"}`
+                className={`flex max-w-2xl flex-col text-sand ${
+                  s.align === "left" ? "items-center md:items-start" : s.align === "right" ? "items-center md:items-end" : "items-center"
                 }`}
               >
                 <p className="eyebrow animate-fade-up text-sand/80">{s.eyebrow}</p>
-                <h1 className="display-title mt-6 animate-fade-up text-4xl [animation-delay:100ms] sm:text-6xl lg:text-7xl">{s.title}</h1>
+                <h1
+                  className="display-title mt-6 animate-fade-up text-4xl [animation-delay:100ms] sm:text-6xl lg:text-7xl"
+                >
+                  {s.title}
+                </h1>
                 <p className="mt-6 max-w-md animate-fade-up text-base leading-relaxed text-sand/85 [animation-delay:200ms]">{s.text}</p>
-                <Link href={s.cta[1]} className="btn mt-10 animate-fade-up bg-sand text-olive-950 [animation-delay:300ms] hover:bg-paper">
-                  {s.cta[0]}
-                </Link>
+                <Magnetic className="mt-10">
+                  <Link href={s.cta[1]} className="btn animate-fade-up bg-sand text-olive-950 [animation-delay:300ms] hover:bg-paper">
+                    {s.cta[0]}
+                  </Link>
+                </Magnetic>
               </div>
             ),
         )}

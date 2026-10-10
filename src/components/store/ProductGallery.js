@@ -1,10 +1,29 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, ViewTransition } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Expand, X } from "lucide-react";
 
-export default function ProductGallery({ images, name, badge }) {
+// Desktop and mobile galleries are both in the DOM; only the visible one may carry the shared transition name
+const DESKTOP = "(min-width: 1024px)";
+const subscribeDesktop = (cb) => {
+  const mq = window.matchMedia(DESKTOP);
+  mq.addEventListener("change", cb);
+  return () => mq.removeEventListener("change", cb);
+};
+const useIsDesktop = () => useSyncExternalStore(subscribeDesktop, () => window.matchMedia(DESKTOP).matches, () => true);
+
+function Morph({ slug, enabled, children }) {
+  if (!enabled) return children;
+  return (
+    <ViewTransition name={`product-${slug}`} share="morph" default="none">
+      {children}
+    </ViewTransition>
+  );
+}
+
+export default function ProductGallery({ images, name, badge, slug }) {
+  const isDesktop = useIsDesktop();
   const [active, setActive] = useState(0);
   const [zoom, setZoom] = useState(null); // { x, y } in % while hovering
   const [lightbox, setLightbox] = useState(false);
@@ -54,6 +73,7 @@ export default function ProductGallery({ images, name, badge }) {
 
         {/* Desktop: hover-to-zoom main image */}
         <div
+          data-gallery-main
           className="relative hidden aspect-[4/5] flex-1 cursor-zoom-in overflow-hidden bg-mist lg:block"
           onMouseMove={(e) => {
             const r = e.currentTarget.getBoundingClientRect();
@@ -62,16 +82,21 @@ export default function ProductGallery({ images, name, badge }) {
           onMouseLeave={() => setZoom(null)}
           onClick={() => setLightbox(true)}
         >
-          <Image
-            key={images[active]}
-            src={images[active]}
-            alt={name}
-            fill
-            priority
-            sizes="(min-width: 1024px) 55vw, 100vw"
-            className="animate-fade-in object-cover transition-transform duration-200 ease-out"
-            style={zoom ? { transform: "scale(1.9)", transformOrigin: `${zoom.x}% ${zoom.y}%` } : undefined}
-          />
+          {/* Same transition name as the shop card, so the photo morphs into place */}
+          <Morph slug={slug} enabled={isDesktop}>
+            <div className="absolute inset-0">
+              <Image
+                key={images[active]}
+                src={images[active]}
+                alt={name}
+                fill
+                priority
+                sizes="(min-width: 1024px) 55vw, 100vw"
+                className="animate-fade-in object-cover transition-transform duration-200 ease-out"
+                style={zoom ? { transform: "scale(1.9)", transformOrigin: `${zoom.x}% ${zoom.y}%` } : undefined}
+              />
+            </div>
+          </Morph>
           {badge && <span className="absolute left-4 top-4 bg-olive-800 px-2.5 py-1 text-[10px] uppercase tracking-[0.2em] text-sand">{badge}</span>}
           <span className={`absolute bottom-4 right-4 flex items-center gap-2 bg-paper/90 px-3 py-2 text-[10px] uppercase tracking-[0.2em] backdrop-blur transition-opacity ${zoom ? "opacity-0" : ""}`}>
             <Expand className="size-3.5" /> Hover to zoom · click to expand
@@ -79,7 +104,7 @@ export default function ProductGallery({ images, name, badge }) {
         </div>
 
         {/* Mobile: swipeable rail */}
-        <div className="relative lg:hidden">
+        <div data-gallery-main className="relative lg:hidden">
           <div
             ref={rail}
             className="no-scrollbar -mx-5 flex snap-x snap-mandatory overflow-x-auto sm:-mx-8 lg:mx-0"
@@ -87,7 +112,15 @@ export default function ProductGallery({ images, name, badge }) {
           >
             {images.map((src, i) => (
               <button key={src + i} onClick={() => setLightbox(true)} className="relative aspect-[4/5] w-full shrink-0 snap-center bg-mist" aria-label="Expand image">
-                <Image src={src} alt={i === 0 ? name : ""} fill priority={i === 0} sizes="100vw" className="object-cover" />
+                {i === 0 ? (
+                  <Morph slug={slug} enabled={!isDesktop}>
+                    <div className="absolute inset-0">
+                      <Image src={src} alt={name} fill priority sizes="100vw" className="object-cover" />
+                    </div>
+                  </Morph>
+                ) : (
+                  <Image src={src} alt="" fill sizes="100vw" className="object-cover" />
+                )}
               </button>
             ))}
           </div>

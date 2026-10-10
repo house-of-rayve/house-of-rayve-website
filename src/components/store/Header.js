@@ -1,14 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Search, User, ShoppingBag, Menu, X, LayoutDashboard, Heart, ArrowRight, ChevronDown } from "lucide-react";
-import Logo, { LogoMark, Wordmark } from "@/components/ui/Logo";
+import { LogoMark, Wordmark } from "@/components/ui/Logo";
 import { useCart } from "@/components/cart/CartProvider";
 import { useWishlist } from "@/components/wishlist/WishlistProvider";
 import { formatPrice } from "@/lib/format";
+import RollText from "@/components/motion/RollText";
+import FullscreenMenu from "@/components/motion/FullscreenMenu";
 import { SHAPES } from "@/lib/constants";
 
 const ANNOUNCEMENTS = [
@@ -19,6 +21,7 @@ const ANNOUNCEMENTS = [
 
 const NAV = [
   { href: "/shop?category=Sunglasses", label: "Sunglasses" },
+  { href: "/try-on", label: "Try on" },
   { href: "/about", label: "The brand" },
 ];
 
@@ -98,7 +101,7 @@ function SearchPanel({ onClose }) {
           <X className="size-5" />
         </button>
       </form>
-      <div className="container-x max-h-[70svh] overflow-y-auto py-6">
+      <div data-lenis-prevent className="container-x max-h-[70svh] overflow-y-auto py-6">
         {!shown ? (
           <div>
             <p className="eyebrow">Popular searches</p>
@@ -205,6 +208,7 @@ export default function Header({ user }) {
   const pathname = usePathname();
   const [panel, setPanel] = useState(null); // "shop" | "search" | null
   const [menu, setMenu] = useState(false);
+  const closeMenu = useCallback(() => setMenu(false), []);
   const [scrolled, setScrolled] = useState(false);
   const closeTimer = useRef(null);
 
@@ -239,6 +243,7 @@ export default function Header({ user }) {
     <>
       <Announcements />
       <header
+        style={{ viewTransitionName: "site-header" }}
         className={`sticky top-0 z-40 transition-colors duration-300 ${
           overlay ? "border-b border-transparent bg-transparent text-sand" : "border-b border-line bg-canvas/95 text-ink backdrop-blur-md"
         }`}
@@ -246,26 +251,29 @@ export default function Header({ user }) {
       >
         <div className="container-x grid h-16 grid-cols-[1fr_auto_1fr] items-center">
           <div className="flex items-center gap-6">
-            <button className="-ml-2 grid size-10 place-items-center lg:hidden" onClick={() => setMenu(true)} aria-label="Open menu">
+            <button className="group -ml-2 flex h-10 items-center gap-2 px-2" onClick={() => setMenu(true)} aria-label="Open menu" aria-expanded={menu}>
               <Menu className="size-5" />
+              <span className="hidden text-[11px] uppercase tracking-[0.18em] xl:inline">
+                <RollText>Menu</RollText>
+              </span>
             </button>
             <nav className="hidden items-center gap-6 lg:flex">
               <button
                 onMouseEnter={openShop}
                 onClick={() => setPanel((p) => (p === "shop" ? null : "shop"))}
                 aria-expanded={panel === "shop"}
-                className="flex items-center gap-1 text-[11px] uppercase tracking-[0.18em] opacity-80 transition-opacity hover:opacity-100"
+                className="group flex items-center gap-1 text-[11px] uppercase tracking-[0.18em] opacity-80 transition-opacity hover:opacity-100"
               >
-                Shop <ChevronDown className={`size-3 transition-transform ${panel === "shop" ? "rotate-180" : ""}`} />
+                <RollText>Shop</RollText> <ChevronDown className={`size-3 transition-transform ${panel === "shop" ? "rotate-180" : ""}`} />
               </button>
               {NAV.map((n) => (
                 <Link
                   key={n.href}
                   href={n.href}
                   onMouseEnter={leaveShop}
-                  className="text-[11px] uppercase tracking-[0.18em] opacity-80 transition-opacity hover:opacity-100"
+                  className="group text-[11px] uppercase tracking-[0.18em] opacity-80 transition-opacity hover:opacity-100"
                 >
-                  {n.label}
+                  <RollText>{n.label}</RollText>
                 </Link>
               ))}
             </nav>
@@ -298,7 +306,7 @@ export default function Header({ user }) {
                 </span>
               )}
             </Link>
-            <button onClick={() => setOpen(true)} className={iconBtn} aria-label={`Bag, ${count} items`}>
+            <button data-bag-target onClick={() => setOpen(true)} className={iconBtn} aria-label={`Bag, ${count} items`}>
               <ShoppingBag key={bump} className={`size-[18px] ${bump ? "animate-pop" : ""}`} strokeWidth={1.5} />
               {count > 0 && (
                 <span className="absolute right-1 top-1 grid size-4 place-items-center rounded-full bg-olive-500 text-[9px] font-semibold text-olive-950">
@@ -318,47 +326,7 @@ export default function Header({ user }) {
       </header>
       {panel && <div onClick={close} className="fixed inset-0 z-30 bg-olive-950/30 animate-fade-in" aria-hidden="true" />}
 
-      {/* Mobile menu */}
-      <div className={`fixed inset-0 z-50 lg:hidden ${menu ? "" : "pointer-events-none"}`}>
-        <div onClick={() => setMenu(false)} className={`absolute inset-0 bg-olive-950/40 transition-opacity ${menu ? "opacity-100" : "opacity-0"}`} />
-        <div
-          className={`absolute left-0 top-0 flex h-full w-[85%] max-w-sm flex-col bg-canvas transition-transform duration-300 ${menu ? "translate-x-0" : "-translate-x-full"}`}
-        >
-          <div className="flex h-16 items-center justify-between border-b border-line px-5">
-            <Logo className="text-olive-800" />
-            <button onClick={() => setMenu(false)} aria-label="Close menu">
-              <X className="size-5" />
-            </button>
-          </div>
-          <nav className="flex-1 overflow-y-auto px-5 py-2">
-            {[["Shop all", "/shop"], ...NAV.map((n) => [n.label, n.href]), ["Wishlist", "/wishlist"], [user ? "My account" : "Sign in", user ? "/account" : "/login"], ...(user?.role === "ADMIN" ? [["Admin panel", "/admin"]] : [])].map(
-              ([label, href]) => (
-                <Link
-                  key={href}
-                  href={href}
-                  onClick={() => setMenu(false)}
-                  className="flex items-center justify-between border-b border-line py-4 font-display text-xs uppercase tracking-[0.2em]"
-                >
-                  {label} <ArrowRight className="size-3.5 text-muted" />
-                </Link>
-              ),
-            )}
-            <p className="eyebrow mt-8">By shape</p>
-            <div className="mt-4 flex flex-wrap gap-2 pb-8">
-              {SHAPES.map((s) => (
-                <Link
-                  key={s}
-                  href={`/shop?shape=${encodeURIComponent(s)}`}
-                  onClick={() => setMenu(false)}
-                  className="border border-line bg-paper px-3 py-1.5 text-xs"
-                >
-                  {s}
-                </Link>
-              ))}
-            </div>
-          </nav>
-        </div>
-      </div>
+      <FullscreenMenu open={menu} onClose={closeMenu} user={user} />
     </>
   );
 }

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Logo from "@/components/ui/Logo";
 import NewsletterForm from "./NewsletterForm";
+import FooterMark from "@/components/motion/FooterMark";
 
 const COLUMNS = [
   {
@@ -60,6 +61,7 @@ export default function Footer() {
           <NewsletterForm />
         </div>
       </div>
+      <FooterMark />
       <div className="border-t border-sand/10">
         <div className="container-x flex flex-col gap-2 py-6 text-[11px] uppercase tracking-[0.2em] text-sand/50 sm:flex-row sm:justify-between">
           <span>© {new Date().getFullYear()} Rayve. All rights reserved.</span>

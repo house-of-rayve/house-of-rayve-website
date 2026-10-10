@@ -125,7 +125,7 @@ export default function CartDrawer() {
                 <div className="h-full rounded-full bg-olive-800 transition-all duration-700" style={{ width: `${progress}%` }} />
               </div>
             </div>
-            <div className="flex-1 overflow-y-auto px-6">
+            <div data-lenis-prevent className="flex-1 overflow-y-auto px-6">
               <CartLines onNavigate={close} />
               {open && <Upsell onNavigate={close} />}
             </div>

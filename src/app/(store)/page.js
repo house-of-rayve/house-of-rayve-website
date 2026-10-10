@@ -1,25 +1,20 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Truck, RotateCcw, ShieldCheck, Sparkles, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { listProducts } from "@/lib/products";
 import Reveal from "@/components/ui/Reveal";
 import HeroSlider from "@/components/home/HeroSlider";
-import ProductCarousel from "@/components/home/ProductCarousel";
+import ScrollWords from "@/components/motion/ScrollWords";
+import HorizontalShowcase from "@/components/motion/HorizontalShowcase";
+import FloatingGallery from "@/components/motion/FloatingGallery";
 import ShopTheLook from "@/components/home/ShopTheLook";
-import ProductSpotlight from "@/components/home/ProductSpotlight";
+import ToroShowcase from "@/components/three/ToroShowcase";
 import FrameFinder from "@/components/home/FrameFinder";
 import HomeFAQ from "@/components/home/HomeFAQ";
 import ProductCard from "@/components/store/ProductCard";
 import NewsletterForm from "@/components/store/NewsletterForm";
 
 export const dynamic = "force-dynamic";
-
-const PERKS = [
-  { Icon: Truck, text: "Free shipping above ₹2,999" },
-  { Icon: RotateCcw, text: "7-day easy returns" },
-  { Icon: ShieldCheck, text: "100% UV400 lenses" },
-  { Icon: Sparkles, text: "1-year warranty" },
-];
 
 const CRAFT = [
   { value: "UV400", title: "Full protection", text: "Every sunglass lens blocks 100% of UVA and UVB rays." },
@@ -73,41 +68,15 @@ export default async function HomePage() {
     <>
       <HeroSlider />
 
-      {/* Perks bar (height is part of the first-screen calculation in HeroSlider) */}
-      <section className="border-b border-line">
-        <div className="container-x no-scrollbar flex h-16 items-center gap-8 overflow-x-auto md:h-20 md:justify-between">
-          {PERKS.map(({ Icon, text }) => (
-            <p key={text} className="flex shrink-0 items-center gap-3 text-sm text-ink/80 md:text-[15px]">
-              <Icon className="size-5 text-olive-500" strokeWidth={1.5} /> {text}
-            </p>
-          ))}
-        </div>
-      </section>
+      {/* Statement: pinned, words light up on scroll */}
+      <ScrollWords
+        eyebrow="Premium, in the everyday"
+        text="Most sunglasses live at two extremes. RAYVE was created for everything in between."
+        highlight={["RAYVE", "everything", "in", "between"]}
+      />
 
-      {/* Statement */}
-      <section className="container-x section-y text-center">
-        <Reveal>
-          <p className="eyebrow">Premium, in the everyday</p>
-          <p className="mx-auto mt-8 max-w-3xl text-2xl font-light leading-snug text-olive-900 md:text-3xl lg:text-4xl lg:leading-tight">
-            Most sunglasses live at two extremes. <span className="text-olive-500">RAYVE was created for everything in between.</span>
-          </p>
-        </Reveal>
-      </section>
-
-      {/* Product rail with tabs */}
-      <section className="container-x pb-20 md:pb-24 lg:pb-28">
-        <Reveal>
-          <ProductCarousel
-            eyebrow="Collection 01"
-            title="Shop the collection"
-            tabs={[
-              { label: "Bestsellers", products: featured.length ? featured : all.slice(0, 6), href: "/shop" },
-              { label: "New in", products: newest.slice(0, 8), href: "/shop?sort=newest" },
-              ...(offers.length ? [{ label: "Last pieces", products: offers, href: "/shop" }] : []),
-            ]}
-          />
-        </Reveal>
-      </section>
+      {/* Collection: pins and scrolls sideways on desktop */}
+      <HorizontalShowcase eyebrow="Collection 01" title="Shop the collection" products={featured.length >= 4 ? [...featured, ...all.filter((p) => !p.featured)] : all} />
 
       {/* Full-bleed category tiles */}
       <section className="grid gap-1 md:grid-cols-2">
@@ -139,12 +108,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Signature product */}
-      {spotlight && (
-        <section>
-          <ProductSpotlight product={spotlight} />
-        </section>
-      )}
+      {/* Signature product in 3D: rotates, folds and changes lens tint as you scroll */}
+      <ToroShowcase product={spotlight} />
 
       {/* Frame finder */}
       <section className="border-y border-line bg-mist">
@@ -231,29 +196,18 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Lifestyle gallery */}
-      {/* Heading stays in the container; the grid runs edge to edge */}
-      <section className="section-y">
-        <div className="container-x">
-          <SectionHead eyebrow="Worn by you" title="In the everyday" href="/shop" linkLabel="Shop all" />
-        </div>
-        <div className="grid auto-rows-[180px] grid-cols-2 gap-1 sm:auto-rows-[240px] md:grid-cols-4 lg:auto-rows-[300px] xl:auto-rows-[360px]">
-          {GALLERY.map(([img, slug, span]) => {
-            const p = bySlug[slug];
-            return (
-              <Link key={img} href={p ? `/product/${slug}` : "/shop"} className={`group relative overflow-hidden bg-mist ${span}`}>
-                <Image src={`/images/${img}.jpg`} alt={p ? `${p.name} worn` : ""} fill sizes="(min-width:768px) 25vw, 50vw" className="object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-105" />
-                {p && (
-                  <div className="absolute inset-x-0 bottom-0 flex translate-y-2 items-center justify-between bg-gradient-to-t from-olive-950/70 to-transparent p-5 text-sand md:p-6 opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
-                    <span className="font-display text-[10px] uppercase tracking-[0.2em]">{p.name}</span>
-                    <ArrowRight className="size-3.5" />
-                  </div>
-                )}
-              </Link>
-            );
-          })}
-        </div>
-      </section>
+      {/* Lifestyle: headline holds still while photos drift past */}
+      <FloatingGallery
+        eyebrow="Worn in the everyday"
+        title="Seen in RAYVE"
+        subtitle="A frame you recognise — altered."
+        items={GALLERY.map(([img, slug]) => ({
+          img: `/images/${img}.jpg`,
+          href: bySlug[slug] ? `/product/${slug}` : "/shop",
+          label: bySlug[slug]?.name ?? "RAYVE",
+          caption: bySlug[slug]?.frameColor ?? "",
+        }))}
+      />
 
       {/* FAQ */}
       <section className="border-t border-line">

@@ -5,6 +5,7 @@ import { cartStore } from "./store";
 import { useLocalStore } from "@/components/ui/localStore";
 import { shippingFor } from "@/lib/constants";
 import CartDrawer from "./CartDrawer";
+import { flyToBag } from "@/components/motion/flyToBag";
 
 const CartContext = createContext(null);
 
@@ -13,7 +14,8 @@ export function CartProvider({ children }) {
   const [bump, setBump] = useState(0);
   const [open, setOpen] = useState(false);
 
-  const add = (product, quantity = 1) => {
+  // `from`: element (usually the product photo) that flies into the bag before the drawer opens
+  const add = async (product, quantity = 1, from = null) => {
     const current = cartStore.get();
     const existing = current.find((i) => i.productId === product.id);
     const max = Math.min(product.stock ?? 10, 10);
@@ -38,6 +40,7 @@ export function CartProvider({ children }) {
         },
       ]);
     }
+    await flyToBag(from, product.images?.[0]);
     setBump((b) => b + 1);
     setOpen(true);
   };

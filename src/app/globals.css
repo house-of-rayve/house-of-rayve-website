@@ -96,3 +96,31 @@ textarea.field { height: auto; padding-top: 0.75rem; padding-bottom: 0.75rem; }
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
   .reveal { opacity: 1; transform: none; }
 }
+
+/* ---------- View transitions (page changes, product image morph) ---------- */
+/* Only named parts animate; the rest of the page swaps underneath */
+:root { view-transition-name: none; }
+::view-transition { pointer-events: none; }
+
+/* Header and announcement bar stay put while the page changes */
+::view-transition-group(site-header) { animation: none; z-index: 100; }
+::view-transition-old(site-header) { display: none; }
+::view-transition-new(site-header) { animation: none; }
+
+/* Page content: old lifts away quickly, new rises in softly */
+::view-transition-old(.page-exit) { animation: 220ms cubic-bezier(0.4, 0, 1, 1) both vt-lift-out; }
+::view-transition-new(.page-enter) { animation: 520ms cubic-bezier(0.2, 0.7, 0.2, 1) 120ms both vt-rise-in; }
+@keyframes vt-lift-out { to { opacity: 0; transform: translateY(-24px); filter: blur(4px); } }
+@keyframes vt-rise-in { from { opacity: 0; transform: translateY(32px); filter: blur(6px); } }
+
+/* Product image travels from the shop grid to the product page */
+::view-transition-group(.morph) { animation-duration: 520ms; animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1); }
+::view-transition-image-pair(.morph) { animation-name: vt-via-blur; }
+@keyframes vt-via-blur { 40% { filter: blur(2px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*), ::view-transition-new(*), ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}

@@ -5,15 +5,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import ProductCard from "@/components/store/ProductCard";
 import FrameShapeIcon, { FRAME_SHAPES } from "./FrameShapeIcon";
-
-// General styling guidance: frames that contrast with the face shape tend to balance it
-const FACES = [
-  { id: "round", label: "Round", shapes: ["Rectangle", "Square", "Shield"] },
-  { id: "oval", label: "Oval", shapes: ["Oval", "Round", "Rectangle", "Cat-eye", "Square", "Shield", "Aviator"] },
-  { id: "square", label: "Square", shapes: ["Round", "Oval", "Cat-eye"] },
-  { id: "heart", label: "Heart", shapes: ["Cat-eye", "Oval", "Round", "Aviator"] },
-  { id: "long", label: "Long", shapes: ["Square", "Round", "Shield"] },
-];
+import { FACE_SHAPES as FACES } from "@/lib/constants";
 
 function FaceIcon({ id }) {
   const paths = {
@@ -56,6 +48,9 @@ export default function FrameFinder({ products }) {
         <p className="mt-4 text-sm leading-relaxed text-muted">
           Pick your face shape, then explore the frame shapes that balance it — or browse any shape you like.
         </p>
+        <Link href="/try-on" className="group mt-5 inline-flex items-center gap-2 border-b border-ink pb-1 text-[11px] uppercase tracking-[0.2em]">
+          Not sure? Scan your face with the camera <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-1" />
+        </Link>
       </div>
 
       {/* Step 1: face shape */}

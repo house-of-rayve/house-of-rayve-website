@@ -75,7 +75,7 @@ export default function ShopTheLook({ products }) {
                     <Price price={p.price} comparePrice={p.comparePrice} className="mt-1 text-sm" />
                   </div>
                   <button
-                    onClick={() => add(p, 1)}
+                    onClick={(e) => add(p, 1, e.currentTarget.parentElement.querySelector("img"))}
                     disabled={p.stock <= 0}
                     className="grid size-10 shrink-0 place-items-center rounded-full border border-olive-800 text-olive-800 transition-colors hover:bg-olive-800 hover:text-sand disabled:opacity-30"
                     aria-label={`Add ${p.name} to bag`}

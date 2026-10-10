@@ -19,6 +19,9 @@ function addBusinessDays(date, days) {
   }
   return d;
 }
+// The gallery that is actually showing (desktop and mobile use different markup)
+const visibleGallery = () => [...document.querySelectorAll("[data-gallery-main]")].find((el) => el.offsetParent !== null);
+
 const fmt = (d) => d.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" });
 
 function DeliveryCheck() {
@@ -85,7 +88,7 @@ export default function ProductPurchase({ product }) {
     <div className="space-y-4">
       <div ref={anchor} className="flex gap-3">
         {!soldOut && <QuantityStepper value={qty} max={max} onChange={(q) => setQty(Math.max(1, Math.min(q, max)))} />}
-        <button disabled={soldOut} onClick={() => add(product, qty)} className="btn-primary flex-1">
+        <button disabled={soldOut} onClick={() => add(product, qty, visibleGallery())} className="btn-primary flex-1">
           {soldOut ? "Sold out" : `Add to bag · ${formatPrice(product.price * qty)}`}
         </button>
         <WishlistButton product={product} className="size-12 shrink-0 border border-line bg-paper hover:border-olive-800" />
@@ -114,7 +117,7 @@ export default function ProductPurchase({ product }) {
               {formatPrice(product.price)} {product.frameColor && <span className="max-sm:hidden">· {product.frameColor}</span>}
             </p>
           </div>
-          <button disabled={soldOut} tabIndex={stuck ? 0 : -1} onClick={() => add(product, qty)} className="btn-primary h-11 shrink-0">
+          <button disabled={soldOut} tabIndex={stuck ? 0 : -1} onClick={(e) => add(product, qty, e.currentTarget)} className="btn-primary h-11 shrink-0">
             {soldOut ? "Sold out" : "Add to bag"}
           </button>
         </div>

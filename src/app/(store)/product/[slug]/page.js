@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { Plus, RotateCcw, ShieldCheck, Truck } from "lucide-react";
+import { Plus, RotateCcw, ScanFace, ShieldCheck, Truck } from "lucide-react";
 import { getProductBySlug, listProducts } from "@/lib/products";
 import ProductGallery from "@/components/store/ProductGallery";
 import ProductPurchase from "@/components/store/ProductPurchase";
@@ -60,7 +60,7 @@ export default async function ProductPage({ params }) {
         </nav>
         <div className="grid gap-10 lg:grid-cols-12 lg:gap-14">
           <div className="lg:col-span-7">
-            <ProductGallery images={product.images} name={product.name} badge={discount ? `−${discount}%` : null} />
+            <ProductGallery images={product.images} name={product.name} slug={product.slug} badge={discount ? `−${discount}%` : null} />
           </div>
           <div className="lg:col-span-5">
             <div className="lg:sticky lg:top-24">
@@ -88,6 +88,17 @@ export default async function ProductPage({ params }) {
 
               <div className="mt-6">
                 <ProductPurchase product={product} />
+                {product.category === "Sunglasses" && (
+                  <Link
+                    href={`/try-on?p=${product.slug}`}
+                    className="group mt-3 flex items-center justify-between border border-line px-4 py-3 text-[11px] uppercase tracking-[0.2em] transition-colors hover:border-olive-800"
+                  >
+                    <span className="flex items-center gap-3">
+                      <ScanFace className="size-4 text-olive-500" /> Try it on with your camera
+                    </span>
+                    <span className="text-muted transition-transform group-hover:translate-x-1">→</span>
+                  </Link>
+                )}
               </div>
 
               <div className="mt-8 border-t border-line">

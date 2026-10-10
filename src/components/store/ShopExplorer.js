@@ -182,7 +182,7 @@ export default function ShopExplorer({ products, initial }) {
   return (
     <div className="lg:grid lg:grid-cols-[230px_1fr] lg:gap-12">
       <aside className="hidden lg:block">
-        <div className="sticky top-24 max-h-[calc(100svh-7rem)] overflow-y-auto pb-8 pr-2">{filters}</div>
+        <div data-lenis-prevent className="sticky top-24 max-h-[calc(100svh-7rem)] overflow-y-auto pb-8 pr-2">{filters}</div>
       </aside>
 
       <div>
@@ -235,7 +235,7 @@ export default function ShopExplorer({ products, initial }) {
           <div className={`mt-8 grid gap-x-4 gap-y-12 sm:gap-x-6 ${dense ? "grid-cols-2 md:grid-cols-4 xl:grid-cols-5" : "grid-cols-2 md:grid-cols-3"}`}>
             {results.map((p, i) => (
               <div key={p.id} className="animate-fade-up" style={{ animationDelay: `${Math.min(i, 8) * 40}ms` }}>
-                <ProductCard product={p} priority={i < 3} />
+                <ProductCard product={p} priority={i < 3} morph />
               </div>
             ))}
           </div>
@@ -252,7 +252,7 @@ export default function ShopExplorer({ products, initial }) {
               <X className="size-5" />
             </button>
           </div>
-          <div className="flex-1 overflow-y-auto px-5 py-6">{filters}</div>
+          <div data-lenis-prevent className="flex-1 overflow-y-auto px-5 py-6">{filters}</div>
           <div className="grid grid-cols-2 gap-2 border-t border-line p-4">
             <button onClick={clearAll} className="btn-outline">
               Clear
