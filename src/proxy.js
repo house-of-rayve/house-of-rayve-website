@@ -9,7 +9,7 @@ const COMING_SOON_HOSTS = (process.env.COMING_SOON_HOSTS ?? "houseofrayve.com,ww
   .filter(Boolean);
 
 // When the coming-soon page goes live on those hosts: 12 Oct 2026, 4:00 AM IST (22:30 UTC on the 11th).
-// Until then they show only the logo (/hold). Override with the COMING_SOON_AT env var (an ISO date).
+// Until then they show an empty olive screen (/hold). Override with the COMING_SOON_AT env var (an ISO date).
 const COMING_SOON_AT = Date.parse(process.env.COMING_SOON_AT ?? "2026-10-11T22:30:00Z");
 
 const PROTECTED = /^\/(admin|account|checkout)(\/|$)/;
