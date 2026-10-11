@@ -8,17 +8,27 @@ const COMING_SOON_HOSTS = (process.env.COMING_SOON_HOSTS ?? "houseofrayve.com,ww
   .map((h) => h.trim().toLowerCase())
   .filter(Boolean);
 
+// When the coming-soon page goes live on those hosts: 11 Oct 2026, 11:25 PM IST (17:55 UTC) — test run.
+// Until then they show only the logo (/hold). Override with the COMING_SOON_AT env var (an ISO date).
+const COMING_SOON_AT = Date.parse(process.env.COMING_SOON_AT ?? "2026-10-11T17:55:00Z");
+
 const PROTECTED = /^\/(admin|account|checkout)(\/|$)/;
 
 export async function proxy(request) {
   const { pathname, search } = request.nextUrl;
   const host = (request.headers.get("host") ?? "").split(":")[0].toLowerCase();
 
-  // Public domain before launch: every page shows the coming-soon page, nothing else is reachable
+  // Public domain before launch: every page shows the coming-soon page (or, before its launch time, just
+  // the logo), nothing else is reachable. The time is checked on every request, so it switches by itself.
   if (COMING_SOON_HOSTS.includes(host)) {
-    if (pathname === "/coming-soon" || pathname === "/api/subscribe") return NextResponse.next();
+    const live = Date.now() >= COMING_SOON_AT;
+    if (pathname.startsWith("/banner/")) return live ? NextResponse.next() : new NextResponse("Not found", { status: 404 }); // banner images stay hidden until launch
+    if (pathname === "/api/subscribe" && live) return NextResponse.next();
     if (pathname.startsWith("/api/")) return new NextResponse("Not found", { status: 404 });
-    return NextResponse.rewrite(new URL("/coming-soon", request.url));
+    const page = live ? "/coming-soon" : "/hold";
+    const response = pathname === page ? NextResponse.next() : NextResponse.rewrite(new URL(page, request.url));
+    response.headers.set("Cache-Control", "no-store"); // never serve the logo page from a cache after 4 AM
+    return response;
   }
 
   let response = NextResponse.next();
