@@ -8,6 +8,7 @@ import { formatDateTime, formatPrice } from "@/lib/format";
 import StatusBadge from "@/components/ui/StatusBadge";
 import OrderTimeline from "@/components/account/OrderTimeline";
 import CancelOrderButton from "@/components/account/CancelOrderButton";
+import OrderCelebration from "@/components/motion/OrderCelebration";
 
 export const metadata = { title: "Order details" };
 
@@ -23,6 +24,7 @@ export default async function OrderDetailPage({ params, searchParams }) {
 
   return (
     <div className="space-y-6">
+      {placed && <OrderCelebration id={order.id} />}
       {placed && (
         <div className="flex items-start gap-4 bg-olive-800 p-6 text-sand">
           <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-olive-400" />

@@ -16,8 +16,8 @@ export default function HomeFAQ() {
         <h2 className="display-title mt-4 text-2xl sm:text-3xl lg:text-4xl">Questions, answered</h2>
         <p className="mt-4 text-sm text-muted">
           Still curious? Write to us at{" "}
-          <a href="mailto:hello@rayve.in" className="text-ink underline underline-offset-4">
-            hello@rayve.in
+          <a href="mailto:info@houseofrayve.com" className="text-ink underline underline-offset-4">
+            info@houseofrayve.com
           </a>
         </p>
       </div>

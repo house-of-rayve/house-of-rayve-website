@@ -7,9 +7,11 @@ import HeroSlider from "@/components/home/HeroSlider";
 import ScrollWords from "@/components/motion/ScrollWords";
 import HorizontalShowcase from "@/components/motion/HorizontalShowcase";
 import FloatingGallery from "@/components/motion/FloatingGallery";
-import ShopTheLook from "@/components/home/ShopTheLook";
+import ArenaWall from "@/components/three/ArenaWall";
 import ToroShowcase from "@/components/three/ToroShowcase";
 import FrameFinder from "@/components/home/FrameFinder";
+import LensTintLab from "@/components/motion/LensTintLab";
+import ImageTrail from "@/components/motion/ImageTrail";
 import HomeFAQ from "@/components/home/HomeFAQ";
 import ProductCard from "@/components/store/ProductCard";
 import NewsletterForm from "@/components/store/NewsletterForm";
@@ -32,7 +34,7 @@ const PILLARS = [
 const GALLERY = [
   ["model-toro", "toro", "row-span-2"],
   ["model-sevilla", "sevilla", ""],
-  ["model-cordoba", "cordoba", ""],
+  ["model-valencia", "valencia", ""],
   ["model-granada", "granada", "row-span-2"],
   ["model-ronda", "ronda", ""],
   ["model-alba", "alba", ""],
@@ -111,6 +113,11 @@ export default async function HomePage() {
       {/* Signature product in 3D: rotates, folds and changes lens tint as you scroll */}
       <ToroShowcase product={spotlight} />
 
+      {/* Lens lab: compare tints over a street scene */}
+      <section className="container-x section-y">
+        <LensTintLab />
+      </section>
+
       {/* Frame finder */}
       <section className="border-y border-line bg-mist">
         <div className="container-x section-y">
@@ -120,12 +127,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Shop the look */}
-      <section className="container-x section-y">
-        <Reveal>
-          <ShopTheLook products={all} />
-        </Reveal>
-      </section>
+      {/* The arena: every frame in its own arch, with a quick view on hover */}
+      <ArenaWall products={all.filter((p) => p.category === "Sunglasses")} />
 
       {/* Editorial split */}
       <section className="grid bg-olive-800 text-sand lg:grid-cols-2">
@@ -194,6 +197,23 @@ export default async function HomePage() {
             ))}
           </div>
         </div>
+      </section>
+
+      {/* Image trail: campaign photos follow the cursor */}
+      <section className="bg-olive-950 text-sand">
+        <ImageTrail>
+          <div className="flex min-h-[70svh] flex-col items-center justify-center px-5 py-24 text-center">
+            <p className="eyebrow text-olive-400">Collection 01</p>
+            <p className="display-title mt-6 text-[13vw] leading-[0.9] sm:text-[10vw] lg:text-[8.5vw]" data-no-split>
+              Own the
+              <br />
+              energy
+            </p>
+            <p className="mt-8 text-[10px] uppercase tracking-[0.3em] text-sand/50">
+              <span className="max-lg:hidden">Move your cursor</span>
+            </p>
+          </div>
+        </ImageTrail>
       </section>
 
       {/* Lifestyle: headline holds still while photos drift past */}

@@ -119,7 +119,6 @@ export default function ToroShowcase({ product }) {
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
-          data-cursor="Drag"
         >
           <ToroScene progress={progress} tint={tint} drag={drag} active={inView} />
         </div>

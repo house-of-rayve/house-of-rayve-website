@@ -59,7 +59,6 @@ export default function FloatingGallery({ items, eyebrow, title, subtitle }) {
             <Link
               key={item.img}
               href={item.href}
-              data-cursor="View"
               data-speed={pos.speed}
               style={{ left: pos.left, top: pos.top }}
               className={`fg-photo group absolute z-20 block ${pos.w}`}

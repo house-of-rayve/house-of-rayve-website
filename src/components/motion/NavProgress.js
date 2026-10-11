@@ -3,9 +3,10 @@
 import { useEffect, useRef } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { gsap } from "./gsap";
+import { playBull } from "./bullSound";
 
 // Thin progress line at the top while the next page loads (pages render on the server,
-// and the old page stays visible until the new one is ready).
+// and the old page stays visible until the new one is ready). Also plays the bull sound.
 export default function NavProgress() {
   const bar = useRef(null);
   const pathname = usePathname();
@@ -16,10 +17,12 @@ export default function NavProgress() {
     const onClick = (e) => {
       if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
       const a = e.target.closest?.("a[href]");
+      if (a && e.target.closest("button")?.closest("a") === a) return; // a button inside a link (quick add, wishlist)
       if (!a || a.target === "_blank" || a.hasAttribute("download")) return;
       const url = new URL(a.href, location.href);
       if (url.origin !== location.origin) return;
       if (url.pathname === location.pathname && url.search === location.search) return; // same page / hash
+      playBull();
       gsap.killTweensOf(el);
       gsap.set(el, { opacity: 1, scaleX: 0 });
       gsap.to(el, { scaleX: 0.85, duration: 2.5, ease: "power2.out" });

@@ -224,9 +224,9 @@ export default function TryOn({ products, initialSlug }) {
   const live = mode === "camera" || mode === "photo";
 
   return (
-    <div className="grid gap-8 lg:grid-cols-12 lg:gap-10">
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10">
       {/* Stage */}
-      <div className="lg:col-span-8">
+      <div className="min-w-0 lg:col-span-8">
         <div ref={stage} className="relative aspect-[3/4] overflow-hidden bg-olive-950 text-sand sm:aspect-[4/3]">
           {/* Selfie view is mirrored, like a mirror; the 3D layer flips with it so they stay aligned */}
           <div className="absolute inset-0" style={mode === "camera" ? { transform: "scaleX(-1)" } : undefined}>
@@ -333,7 +333,7 @@ export default function TryOn({ products, initialSlug }) {
       </div>
 
       {/* Panel */}
-      <aside className="lg:col-span-4">
+      <aside className="min-w-0 lg:col-span-4">
         {faceShape && (
           <div className="mb-6 border border-olive-800 bg-olive-800 p-5 text-sand animate-fade-up">
             <div className="flex items-start justify-between gap-3">

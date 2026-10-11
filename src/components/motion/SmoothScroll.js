@@ -15,6 +15,29 @@ export default function SmoothScroll() {
     if (prefersReducedMotion()) return;
     lenis = new Lenis({ lerp: 0.1, smoothWheel: true });
     lenis.on("scroll", ScrollTrigger.update);
+
+    // Scroll-speed skew: [data-skew] elements lean with fast scrolling and straighten when it stops
+    const skew = { v: 0 };
+    const skewTo = gsap.quickTo(skew, "v", { duration: 0.6, ease: "power3" });
+    let lastScroll = 0;
+    let applied = 0;
+    let settling = false;
+    lenis.on("scroll", (l) => {
+      lastScroll = performance.now();
+      settling = false;
+      skewTo(Math.max(-4, Math.min(4, l.velocity * 0.12)));
+    });
+    const applySkew = () => {
+      if (!settling && performance.now() - lastScroll > 120) {
+        settling = true;
+        skewTo(0);
+      }
+      const v = Math.abs(skew.v) < 0.1 ? 0 : skew.v;
+      if (v === applied) return;
+      applied = v;
+      document.querySelectorAll("[data-skew]").forEach((el) => (el.style.transform = v ? `skewY(${v.toFixed(2)}deg)` : ""));
+    };
+    gsap.ticker.add(applySkew);
     const tick = (time) => lenis.raf(time * 1000);
     gsap.ticker.add(tick);
     gsap.ticker.lagSmoothing(0);
@@ -29,6 +52,7 @@ export default function SmoothScroll() {
     return () => {
       observer.disconnect();
       gsap.ticker.remove(tick);
+      gsap.ticker.remove(applySkew);
       lenis.destroy();
       lenis = null;
     };

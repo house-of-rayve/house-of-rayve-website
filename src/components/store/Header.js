@@ -10,7 +10,9 @@ import { useCart } from "@/components/cart/CartProvider";
 import { useWishlist } from "@/components/wishlist/WishlistProvider";
 import { formatPrice } from "@/lib/format";
 import RollText from "@/components/motion/RollText";
+import ScrambleText from "@/components/motion/ScrambleText";
 import FullscreenMenu from "@/components/motion/FullscreenMenu";
+import SoundToggle from "@/components/motion/SoundToggle";
 import { SHAPES } from "@/lib/constants";
 
 const ANNOUNCEMENTS = [
@@ -21,7 +23,7 @@ const ANNOUNCEMENTS = [
 
 const NAV = [
   { href: "/shop?category=Sunglasses", label: "Sunglasses" },
-  { href: "/try-on", label: "Try on" },
+  { href: "/try-on", label: "Try on", wide: true }, // only on wide screens; it is always in the menu
   { href: "/about", label: "The brand" },
 ];
 
@@ -271,22 +273,23 @@ export default function Header({ user }) {
                   key={n.href}
                   href={n.href}
                   onMouseEnter={leaveShop}
-                  className="group text-[11px] uppercase tracking-[0.18em] opacity-80 transition-opacity hover:opacity-100"
+                  className={`group text-[11px] uppercase tracking-[0.18em] opacity-80 transition-opacity hover:opacity-100 ${n.wide ? "hidden xl:inline" : ""}`}
                 >
-                  <RollText>{n.label}</RollText>
+                  <ScrambleText>{n.label}</ScrambleText>
                 </Link>
               ))}
             </nav>
           </div>
 
-          <Link href="/" aria-label="RAYVE home" className={`inline-flex items-center gap-2.5 ${overlay ? "text-sand" : "text-olive-800"}`}>
-            <LogoMark className="h-[22px] w-[37px]" />
+          <Link href="/" aria-label="RAYVE home" className={`group/logo inline-flex items-center gap-2.5 ${overlay ? "text-sand" : "text-olive-800"}`}>
+            <LogoMark className="h-[22px] w-[37px] origin-bottom group-hover/logo:animate-charge motion-reduce:animate-none" />
             <span className="hidden sm:inline-flex">
               <Wordmark className="h-[13px] w-[99px]" />
             </span>
           </Link>
 
           <div className="flex items-center justify-end gap-0.5">
+            <SoundToggle className={`${iconBtn} max-sm:hidden`} />
             <button onClick={() => setPanel((p) => (p === "search" ? null : "search"))} className={iconBtn} aria-label="Search">
               <Search className="size-[18px]" strokeWidth={1.5} />
             </button>

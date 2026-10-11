@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Logo from "@/components/ui/Logo";
 import NewsletterForm from "./NewsletterForm";
+import ScrambleText from "@/components/motion/ScrambleText";
 import FooterMark from "@/components/motion/FooterMark";
 
 const COLUMNS = [
@@ -26,7 +27,7 @@ const COLUMNS = [
     links: [
       ["Shipping & returns", "/about#care"],
       ["Care guide", "/about#care"],
-      ["Contact", "mailto:hello@rayve.in"],
+      ["Contact", "mailto:info@houseofrayve.com"],
     ],
   },
 ];
@@ -48,7 +49,7 @@ export default function Footer() {
               {col.links.map(([label, href]) => (
                 <li key={label}>
                   <Link href={href} className="hover:text-sand">
-                    {label}
+                    <ScrambleText>{label}</ScrambleText>
                   </Link>
                 </li>
               ))}

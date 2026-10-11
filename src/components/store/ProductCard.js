@@ -7,6 +7,7 @@ import { Plus, Check } from "lucide-react";
 import Price from "@/components/ui/Price";
 import WishlistButton from "@/components/wishlist/WishlistButton";
 import { useCart } from "@/components/cart/CartProvider";
+import { liquidHover } from "@/components/motion/liquid";
 
 // `morph`: the main image becomes the product page photo on navigation. Only enable it where each
 // product appears once on the page (duplicate transition names cancel the animation).
@@ -26,8 +27,8 @@ export default function ProductCard({ product, priority = false, sizes, morph = 
   };
 
   return (
-    <Link href={`/product/${product.slug}`} data-cursor="View" className="group block">
-      <div className="relative aspect-[4/5] overflow-hidden bg-mist">
+    <Link href={`/product/${product.slug}`} data-no-curtain={morph || undefined} className="group block">
+      <div data-skew onMouseEnter={(e) => liquidHover(e.currentTarget)} className="relative aspect-[4/5] overflow-hidden bg-mist">
         {primary &&
           (() => {
             const img = (

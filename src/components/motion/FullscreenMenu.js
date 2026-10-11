@@ -6,6 +6,7 @@ import Link from "next/link";
 import { X } from "lucide-react";
 import Logo from "@/components/ui/Logo";
 import RollText from "./RollText";
+import SoundToggle from "./SoundToggle";
 import { SHAPES } from "@/lib/constants";
 import { gsap, useGSAP, prefersReducedMotion } from "./gsap";
 
@@ -23,7 +24,7 @@ export default function FullscreenMenu({ open, onClose, user }) {
     { label: "Try on", href: "/try-on", img: "/images/model-sevilla.jpg" },
     { label: "The brand", href: "/about", img: "/images/campaign-matador.jpg" },
     { label: "Wishlist", href: "/wishlist", img: "/images/model-toro.jpg" },
-    user ? { label: "My account", href: "/account", img: "/images/model-cordoba.jpg" } : { label: "Sign in", href: "/login", img: "/images/model-cordoba.jpg" },
+    user ? { label: "My account", href: "/account", img: "/images/model-ronda.jpg" } : { label: "Sign in", href: "/login", img: "/images/model-ronda.jpg" },
     ...(user?.role === "ADMIN" ? [{ label: "Admin", href: "/admin", img: "/images/cards.jpg" }] : []),
   ];
 
@@ -128,9 +129,12 @@ export default function FullscreenMenu({ open, onClose, user }) {
               </Link>
             ))}
           </div>
-          <a href="mailto:hello@rayve.in" className="text-[11px] uppercase tracking-[0.2em] text-sand/50 hover:text-sand">
-            hello@rayve.in
-          </a>
+          <div className="flex items-center gap-6">
+            <SoundToggle withLabel className="flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-sand/50 hover:text-sand" />
+            <a href="mailto:info@houseofrayve.com" className="text-[11px] uppercase tracking-[0.2em] text-sand/50 hover:text-sand">
+              info@houseofrayve.com
+            </a>
+          </div>
         </div>
       </div>
     </div>

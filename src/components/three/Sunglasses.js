@@ -26,10 +26,11 @@ const lensFor = (shape) => LENS[shape] ?? LENS.Oval;
 
 /** Width and hinge position for a frame shape, so callers can size it to a real face. */
 export function frameMetrics(shape) {
-  const { a } = lensFor(shape);
+  const { a, b, bottom } = lensFor(shape);
   const centerX = GAP + a + RIM * 0.4;
   const hingeX = centerX + a + RIM * 0.6;
-  return { centerX, hingeX, width: hingeX * 2 + 0.3 };
+  // halfBelow: how far the frame reaches below its centre (for resting it on a surface)
+  return { centerX, hingeX, width: hingeX * 2 + 0.3, halfBelow: (bottom ?? b) + RIM + 0.1 };
 }
 
 // Point on the right lens outline (outer side = +x) at angle t, grown outward by `grow`.
@@ -126,20 +127,26 @@ function useTempleGeometry() {
  * @param frameColor hex colour of the acetate / metal
  * @param metal      render the frame as polished metal instead of acetate
  * @param lensGlow   emissive strength that keeps the tint readable on dark backgrounds
+ * @param explodeRef ref whose .current is 0 (assembled) … 1 (parts pulled apart, for the anatomy view)
+ * @param children   extra content (e.g. labels) rendered inside the frame's coordinate space
  */
-export default function Sunglasses({ shape = "Oval", foldRef, lensColor, frameColor = "#0d0d0b", metal = false, lensGlow = 0.35, lensOpacity = 0.78 }) {
+export default function Sunglasses({ shape = "Oval", foldRef, explodeRef, lensColor, frameColor = "#0d0d0b", metal = false, lensGlow = 0.35, lensOpacity = 0.78, children }) {
   const front = useFrontGeometry(shape);
   const lenses = useLensGeometries(shape);
   const temple = useTempleGeometry();
   const temples = useRef([]);
+  const templeWraps = useRef([]);
+  const lensMeshes = useRef([]);
   const { centerX, hingeX } = frameMetrics(shape);
+  const lensZ = 0.02 - centerX * centerX * WRAP;
 
   const frameMat = useMemo(
     () =>
       new THREE.MeshPhysicalMaterial({
         color: frameColor,
-        roughness: metal ? 0.22 : 0.18,
-        metalness: metal ? 1 : 0,
+        // Not fully metallic: a pure metal only mirrors the (mostly dark) studio, so its colour would vanish
+        roughness: metal ? 0.32 : 0.18,
+        metalness: metal ? 0.6 : 0,
         clearcoat: metal ? 0 : 1,
         clearcoatRoughness: 0.08,
       }),
@@ -171,29 +178,38 @@ export default function Sunglasses({ shape = "Oval", foldRef, lensColor, frameCo
     temples.current.forEach((t, i) => {
       if (t) t.rotation.y = (i === 0 ? -1 : 1) * fold; // fold inward, behind the lenses
     });
+    // Exploded view: lenses come forward, arms slide out sideways and back
+    const e = explodeRef?.current ?? 0;
+    lensMeshes.current.forEach((m) => m && (m.position.z = lensZ + e * 1.8));
+    templeWraps.current.forEach((w, i) => {
+      if (!w) return;
+      w.position.x = (i === 0 ? -1 : 1) * e * 2.2;
+      w.position.z = -e * 1.4;
+    });
   });
-
-  const lensZ = 0.02 - centerX * centerX * WRAP;
 
   return (
     <group>
       <mesh geometry={front} material={frameMat} />
-      <mesh geometry={lenses[0]} material={lensMat} position={[-centerX, 0, lensZ]} />
-      <mesh geometry={lenses[1]} material={lensMat} position={[centerX, 0, lensZ]} />
+      <mesh ref={(m) => (lensMeshes.current[0] = m)} geometry={lenses[0]} material={lensMat} position={[-centerX, 0, lensZ]} />
+      <mesh ref={(m) => (lensMeshes.current[1] = m)} geometry={lenses[1]} material={lensMat} position={[centerX, 0, lensZ]} />
 
       {/* Temples pivot at the hinges (index 0 = left) */}
       {[-1, 1].map((side, i) => (
-        <group key={side} ref={(el) => (temples.current[i] = el)} position={[side * hingeX, 0.25, -0.3 - hingeX * hingeX * WRAP]}>
-          <mesh geometry={temple} material={frameMat} />
-          {/* gold horns mark on the outside of each arm */}
-          <mesh position={[side * 0.17, 0.02, -1.6]} material={goldMat}>
-            <boxGeometry args={[0.03, 0.16, 0.55]} />
-          </mesh>
-          <mesh position={[0, 0, 0.22]} material={goldMat}>
-            <cylinderGeometry args={[0.07, 0.07, 0.04, 16]} />
-          </mesh>
+        <group key={side} ref={(el) => (templeWraps.current[i] = el)}>
+          <group ref={(el) => (temples.current[i] = el)} position={[side * hingeX, 0.25, -0.3 - hingeX * hingeX * WRAP]}>
+            <mesh geometry={temple} material={frameMat} />
+            {/* gold horns mark on the outside of each arm */}
+            <mesh position={[side * 0.17, 0.02, -1.6]} material={goldMat}>
+              <boxGeometry args={[0.03, 0.16, 0.55]} />
+            </mesh>
+            <mesh position={[0, 0, 0.22]} material={goldMat}>
+              <cylinderGeometry args={[0.07, 0.07, 0.04, 16]} />
+            </mesh>
+          </group>
         </group>
       ))}
+      {children}
     </group>
   );
 }

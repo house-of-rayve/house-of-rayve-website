@@ -5,6 +5,9 @@ import { getProductBySlug, listProducts } from "@/lib/products";
 import ProductGallery from "@/components/store/ProductGallery";
 import ProductPurchase from "@/components/store/ProductPurchase";
 import RecentlyViewed from "@/components/store/RecentlyViewed";
+import FrameAnatomy from "@/components/three/FrameAnatomy";
+import LensTintLab from "@/components/motion/LensTintLab";
+import { tintIndexFor } from "@/lib/tints";
 import ProductCarousel from "@/components/home/ProductCarousel";
 import Price from "@/components/ui/Price";
 
@@ -130,6 +133,15 @@ export default async function ProductPage({ params }) {
           </div>
         </div>
       </div>
+
+      {product.category === "Sunglasses" && (
+        <>
+          <FrameAnatomy product={product} />
+          <section className="container-x section-y">
+            <LensTintLab initialTint={tintIndexFor(product.lensColor)} />
+          </section>
+        </>
+      )}
 
       {related.length > 0 && (
         <section className="container-x border-t border-line py-20">
