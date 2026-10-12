@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight } from "lucide-react";
@@ -35,9 +35,27 @@ const SLIDES = [
 
 const DURATION = 6500;
 
+// Time-of-day mood, from the visitor's own clock: a tint over the photography and a small greeting.
+// Evening visitors open on the "Golden hour" slide.
+const MOODS = {
+  morning: { label: "Good morning", tint: "bg-gradient-to-b from-[#fff2d6]/25 via-transparent to-transparent mix-blend-soft-light" },
+  afternoon: { label: "Good afternoon", tint: "" },
+  golden: { label: "Golden hour", tint: "bg-gradient-to-t from-[#c4691c]/40 via-[#c9a85b]/15 to-transparent mix-blend-soft-light", startOn: 1 },
+  night: { label: "After dark", tint: "bg-[#0d0d0a]/40" },
+};
+const dayPart = () => {
+  const h = new Date().getHours();
+  return h >= 5 && h < 12 ? "morning" : h < 17 && h >= 12 ? "afternoon" : h >= 17 && h < 20 ? "golden" : "night";
+};
+const noSubscribe = () => () => {};
+
 export default function HeroSlider() {
-  const [index, setIndex] = useState(0);
+  const [step, setStep] = useState(0); // slides advanced since load
   const [paused, setPaused] = useState(false);
+  const part = useSyncExternalStore(noSubscribe, dayPart, () => null); // null while rendering on the server
+  const mood = part ? MOODS[part] : null;
+  const index = (step + (mood?.startOn ?? 0)) % SLIDES.length; // the slide on screen
+  const setIndex = (i) => setStep((i - (mood?.startOn ?? 0) + SLIDES.length) % SLIDES.length);
   const current = SLIDES[index] ?? SLIDES[0];
   const root = useRef(null);
 
@@ -70,18 +88,18 @@ export default function HeroSlider() {
 
   useEffect(() => {
     if (paused) return;
-    const t = setTimeout(() => setIndex((i) => (i + 1) % SLIDES.length), DURATION);
+    const t = setTimeout(() => setStep((i) => (i + 1) % SLIDES.length), DURATION);
     return () => clearTimeout(t);
-  }, [index, paused]);
+  }, [step, paused]);
 
-  const go = (dir) => setIndex((i) => (i + dir + SLIDES.length) % SLIDES.length);
+  const go = (dir) => setStep((i) => (i + dir + SLIDES.length) % SLIDES.length);
 
   return (
-    // -mt matches the header height (64px + 1px border) so the hero sits flush under the announcement bar.
-    // Height = viewport − announcement bar (32px), so the hero fills the first screen.
+    // -mt matches the header height (64px + 1px border) so the hero slides up under the transparent header
+    // and fills the first screen.
     <section
       ref={root}
-      className="relative isolate -mt-[65px] h-[calc(100svh-32px)] min-h-[560px] overflow-hidden bg-olive-950"
+      className="relative isolate -mt-[65px] h-svh min-h-[560px] overflow-hidden bg-olive-950"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       aria-roledescription="carousel"
@@ -114,7 +132,16 @@ export default function HeroSlider() {
           />
         </div>
       ))}
+      {/* time-of-day tint */}
+      {mood?.tint && <div className={`pointer-events-none absolute inset-0 animate-fade-in ${mood.tint}`} aria-hidden="true" />}
       </div>
+
+      {/* time-of-day greeting */}
+      {mood && (
+        <p className="absolute left-5 top-[88px] z-10 flex animate-fade-in items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-sand/70 sm:left-8 lg:left-12">
+          <span className="size-1.5 rounded-full bg-olive-400" /> {mood.label}
+        </p>
+      )}
 
       <div
         className={`hero-copy relative flex h-full flex-col justify-center pt-16 ${

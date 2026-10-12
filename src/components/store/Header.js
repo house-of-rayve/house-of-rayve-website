@@ -16,12 +16,6 @@ import SoundToggle from "@/components/motion/SoundToggle";
 import { playBull } from "@/components/motion/bullSound";
 import { SHAPES } from "@/lib/constants";
 
-const ANNOUNCEMENTS = [
-  "Free shipping on orders above ₹2,999",
-  "Easy 7-day returns & exchanges",
-  "100% UV400 protection on every pair",
-];
-
 const NAV = [
   { href: "/shop?category=Sunglasses", label: "Sunglasses" },
   { href: "/try-on", label: "Try on", wide: true }, // only on wide screens; it is always in the menu
@@ -29,29 +23,6 @@ const NAV = [
 ];
 
 const POPULAR = ["Oval", "Tortoise", "Gold", "Round", "Black"];
-
-function Announcements() {
-  const [i, setI] = useState(0);
-  useEffect(() => {
-    const t = setInterval(() => setI((n) => (n + 1) % ANNOUNCEMENTS.length), 4000);
-    return () => clearInterval(t);
-  }, []);
-  return (
-    <div className="relative h-8 overflow-hidden bg-olive-800 text-[9px] uppercase tracking-[0.18em] text-sand/90 sm:text-[10px] sm:tracking-[0.25em]">
-      {ANNOUNCEMENTS.map((text, n) => (
-        <p
-          key={text}
-          aria-hidden={n !== i}
-          className={`absolute inset-0 flex items-center justify-center px-4 text-center transition-all duration-500 ${
-            n === i ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"
-          }`}
-        >
-          {text}
-        </p>
-      ))}
-    </div>
-  );
-}
 
 function SearchPanel({ onClose }) {
   const router = useRouter();
@@ -244,7 +215,6 @@ export default function Header({ user }) {
 
   return (
     <>
-      <Announcements />
       <header
         style={{ viewTransitionName: "site-header" }}
         className={`sticky top-0 z-40 transition-colors duration-300 ${

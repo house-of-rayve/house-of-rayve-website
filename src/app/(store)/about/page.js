@@ -1,15 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import { LogoMark } from "@/components/ui/Logo";
+import BrandStory from "@/components/motion/BrandStory";
 
 export const metadata = { title: "The brand" };
-
-const VOICE = [
-  ["Precise", "Short. Considered. Purposeful."],
-  ["Effortless", "Premium without trying too hard. Active in attitude. Refined in expression."],
-  ["Progressive", "Forward-looking. Contemporary. Culturally aware."],
-  ["Confident", "Clear. Assured. Self-aware."],
-];
 
 export default function AboutPage() {
   return (
@@ -23,51 +16,8 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="container-x section-y grid gap-12 lg:grid-cols-2 lg:gap-20">
-        <div>
-          <LogoMark className="h-10 w-16 text-olive-800" />
-          <h2 className="display-title mt-8 text-2xl sm:text-3xl">A different way of seeing the familiar</h2>
-        </div>
-        <div className="space-y-5 text-lg font-light leading-relaxed text-ink/80">
-          <p>
-            Rayve is about taking forms, codes and references we already recognise and shifting them through proportion,
-            detail, contrast and attitude.
-          </p>
-          <p>
-            Not creating novelty for its own sake. Not reinventing everything from zero. A frame you recognise — altered.
-            A silhouette you know — reconsidered.
-          </p>
-          <p className="text-olive-700">Where the familiar takes an unexpected form.</p>
-        </div>
-      </section>
-
-      <section className="grid lg:grid-cols-2">
-        <div className="relative aspect-square">
-          <Image src="/images/bull-shadow.jpg" alt="" fill sizes="(min-width:1024px) 50vw, 100vw" className="object-cover" />
-        </div>
-        <div className="flex flex-col justify-center bg-olive-800 px-5 py-20 text-sand sm:px-8 md:px-16 lg:px-20">
-          <p className="eyebrow text-olive-400">The symbol</p>
-          <h2 className="display-title mt-5 text-3xl">Not aggression — control</h2>
-          <p className="mt-6 max-w-md leading-relaxed text-sand/75">
-            The bull is Rayve&apos;s symbol of precision, vision and presence. Not noise — confidence. Its strength lies in
-            stillness, structure and the ability to command attention without asking for it. Familiar in form. Stronger
-            in presence.
-          </p>
-        </div>
-      </section>
-
-      <section className="container-x section-y">
-        <h2 className="display-title text-3xl sm:text-4xl">Tone of voice</h2>
-        <div className="mt-12 grid gap-px bg-line sm:grid-cols-2 lg:grid-cols-4">
-          {VOICE.map(([t, d], i) => (
-            <div key={t} className="bg-canvas p-8">
-              <span className="font-display text-xs text-olive-500">/0{i + 1}</span>
-              <h3 className="display-title mt-6 text-sm">{t}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-muted">{d}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* The story, chapter by chapter: idea, symbol, voice, promise */}
+      <BrandStory />
 
       <section id="care" className="border-t border-line bg-sand/50">
         <div className="container-x section-y grid gap-10 md:grid-cols-3">

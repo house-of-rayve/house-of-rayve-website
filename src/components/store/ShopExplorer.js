@@ -1,9 +1,67 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { SlidersHorizontal, X, LayoutGrid, Grid3x3, Check } from "lucide-react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { SlidersHorizontal, X, LayoutGrid, Grid3x3, Check, RectangleHorizontal, ArrowRight } from "lucide-react";
 import ProductCard from "./ProductCard";
+import CompareBar, { CompareToggle } from "./CompareBar";
+import Price from "@/components/ui/Price";
+import { useCart } from "@/components/cart/CartProvider";
+import { gsap, prefersReducedMotion } from "@/components/motion/gsap";
 import { formatPrice } from "@/lib/format";
+
+const VIEWS = [
+  ["grid", "Large grid", LayoutGrid],
+  ["compact", "Compact grid", Grid3x3],
+  ["editorial", "Editorial view", RectangleHorizontal],
+];
+
+/** Big, magazine-style row for the editorial view. */
+function EditorialRow({ product, index }) {
+  const { add } = useCart();
+  const photo = useRef(null);
+  const [primary, secondary] = product.images;
+  const soldOut = product.stock <= 0;
+  return (
+    <article className="grid items-center gap-6 border-b border-line pb-12 md:grid-cols-12 md:gap-10">
+      <Link
+        ref={photo}
+        href={`/product/${product.slug}`}
+        className={`group relative aspect-[4/3] overflow-hidden bg-mist md:col-span-7 ${index % 2 ? "md:order-2" : ""}`}
+      >
+        {primary && <Image src={primary} alt={product.name} fill sizes="(min-width:768px) 50vw, 100vw" className={`object-cover transition duration-700 group-hover:scale-[1.03] ${secondary ? "group-hover:opacity-0" : ""}`} />}
+        {secondary && <Image src={secondary} alt="" fill sizes="(min-width:768px) 50vw, 100vw" className="object-cover opacity-0 transition duration-700 group-hover:opacity-100" />}
+      </Link>
+      <div className="md:col-span-5">
+        <p className="font-display text-xs text-olive-500">{String(index + 1).padStart(2, "0")}</p>
+        <h3 className="display-title mt-3 text-2xl sm:text-3xl" data-no-split>
+          <Link href={`/product/${product.slug}`} className="hover:text-olive-700">
+            {product.name}
+          </Link>
+        </h3>
+        {product.tagline && <p className="mt-2 text-muted">{product.tagline}</p>}
+        <div className="mt-5 flex flex-wrap gap-2">
+          {[product.shape, product.frameColor, product.lensColor && `${product.lensColor} lens`, product.material].filter(Boolean).map((t) => (
+            <span key={t} className="border border-line px-2.5 py-1 text-[10px] uppercase tracking-[0.15em] text-muted">
+              {t}
+            </span>
+          ))}
+        </div>
+        <Price price={product.price} comparePrice={product.comparePrice} className="mt-5 text-xl font-light" />
+        <div className="mt-6 flex flex-wrap items-center gap-3">
+          <button disabled={soldOut} onClick={() => add(product, 1, photo.current)} className="btn-primary h-11">
+            {soldOut ? "Sold out" : "Add to bag"}
+          </button>
+          <Link href={`/product/${product.slug}`} className="btn h-11 border border-line hover:border-olive-800">
+            Details <ArrowRight className="size-3.5" />
+          </Link>
+          <CompareToggle id={product.id} className="ml-2" />
+        </div>
+      </div>
+    </article>
+  );
+}
 
 const SORTS = [
   ["featured", "Featured"],
@@ -61,7 +119,9 @@ export default function ShopExplorer({ products, initial }) {
   const [onOffer, setOnOffer] = useState(initial.offer === "1");
   const [sort, setSort] = useState(initial.sort ?? "featured");
   const [q, setQ] = useState(initial.q ?? "");
-  const [dense, setDense] = useState(false);
+  const [view, setView] = useState("grid"); // grid | compact | editorial
+  const grid = useRef(null);
+  const rects = useRef(new Map()); // where each product sat after the previous render (page coordinates)
   const [drawer, setDrawer] = useState(false);
 
   // Keep the URL shareable without a server round trip
@@ -179,6 +239,33 @@ export default function ShopExplorer({ products, initial }) {
 
   const priceRange = results.length ? [Math.min(...results.map((p) => p.price)), Math.max(...results.map((p) => p.price))] : null;
 
+  // Animated filtering (FLIP): frames that stay glide from their old spot to the new one, new ones fade up
+  const layoutKey = `${view}|${results.map((p) => p.id).join(",")}`;
+  useLayoutEffect(() => {
+    const el = grid.current;
+    if (!el) return;
+    const items = [...el.children];
+    const next = new Map(items.map((c) => {
+      const r = c.getBoundingClientRect();
+      return [c.dataset.id, { x: r.left + window.scrollX, y: r.top + window.scrollY }];
+    }));
+    if (!prefersReducedMotion()) {
+      let fresh = 0;
+      items.forEach((c) => {
+        const before = rects.current.get(c.dataset.id);
+        const now = next.get(c.dataset.id);
+        if (before) {
+          const dx = before.x - now.x;
+          const dy = before.y - now.y;
+          if (dx || dy) gsap.fromTo(c, { x: dx, y: dy }, { x: 0, y: 0, duration: 0.7, ease: "expo.out", clearProps: "transform" });
+        } else {
+          gsap.fromTo(c, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.55, delay: Math.min(fresh++, 8) * 0.04, ease: "power3.out", clearProps: "opacity,transform" });
+        }
+      });
+    }
+    rects.current = next;
+  }, [layoutKey]);
+
   return (
     <div className="lg:grid lg:grid-cols-[230px_1fr] lg:gap-12">
       <aside className="hidden lg:block">
@@ -202,12 +289,18 @@ export default function ShopExplorer({ products, initial }) {
             ))}
           </select>
           <div className="hidden items-center border border-line bg-paper md:flex">
-            <button onClick={() => setDense(false)} aria-label="Large grid" aria-pressed={!dense} className={`grid size-9 place-items-center ${!dense ? "bg-olive-800 text-sand" : "text-muted"}`}>
-              <LayoutGrid className="size-4" />
-            </button>
-            <button onClick={() => setDense(true)} aria-label="Compact grid" aria-pressed={dense} className={`grid size-9 place-items-center ${dense ? "bg-olive-800 text-sand" : "text-muted"}`}>
-              <Grid3x3 className="size-4" />
-            </button>
+            {VIEWS.map(([id, label, Icon]) => (
+              <button
+                key={id}
+                onClick={() => setView(id)}
+                aria-label={label}
+                title={label}
+                aria-pressed={view === id}
+                className={`grid size-9 place-items-center ${view === id ? "bg-olive-800 text-sand" : "text-muted hover:text-ink"}`}
+              >
+                <Icon className="size-4" />
+              </button>
+            ))}
           </div>
         </div>
 
@@ -232,15 +325,22 @@ export default function ShopExplorer({ products, initial }) {
             </button>
           </div>
         ) : (
-          <div className={`mt-8 grid gap-x-4 gap-y-12 sm:gap-x-6 ${dense ? "grid-cols-2 md:grid-cols-4 xl:grid-cols-5" : "grid-cols-2 md:grid-cols-3"}`}>
+          <div
+            ref={grid}
+            className={`mt-8 grid gap-x-4 gap-y-12 sm:gap-x-6 ${
+              view === "editorial" ? "grid-cols-1" : view === "compact" ? "grid-cols-2 md:grid-cols-4 xl:grid-cols-5" : "grid-cols-2 md:grid-cols-3"
+            }`}
+          >
             {results.map((p, i) => (
-              <div key={p.id} className="animate-fade-up" style={{ animationDelay: `${Math.min(i, 8) * 40}ms` }}>
-                <ProductCard product={p} priority={i < 3} morph />
+              <div key={p.id} data-id={p.id}>
+                {view === "editorial" ? <EditorialRow product={p} index={i} /> : <ProductCard product={p} priority={i < 3} morph compare />}
               </div>
             ))}
           </div>
         )}
       </div>
+
+      <CompareBar products={products} />
 
       {/* Mobile filter drawer */}
       <div className={`fixed inset-0 z-50 lg:hidden ${drawer ? "" : "pointer-events-none"}`}>

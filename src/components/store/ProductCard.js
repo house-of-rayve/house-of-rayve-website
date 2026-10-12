@@ -8,10 +8,12 @@ import Price from "@/components/ui/Price";
 import WishlistButton from "@/components/wishlist/WishlistButton";
 import { useCart } from "@/components/cart/CartProvider";
 import { liquidHover } from "@/components/motion/liquid";
+import { CompareToggle } from "./CompareBar";
 
 // `morph`: the main image becomes the product page photo on navigation. Only enable it where each
 // product appears once on the page (duplicate transition names cancel the animation).
-export default function ProductCard({ product, priority = false, sizes, morph = false }) {
+// `compare`: show a "Compare" toggle under the price (shop page)
+export default function ProductCard({ product, priority = false, sizes, morph = false, compare = false }) {
   const { add } = useCart();
   const [added, setAdded] = useState(false);
   const [primary, secondary] = product.images;
@@ -85,7 +87,10 @@ export default function ProductCard({ product, priority = false, sizes, morph = 
       <div className="mt-4 space-y-1">
         <h3 className="font-display text-[11px] uppercase tracking-[0.18em] transition-colors group-hover:text-olive-700">{product.name}</h3>
         <p className="truncate text-xs text-muted">{[product.shape, product.frameColor].filter(Boolean).join(" · ")}</p>
-        <Price price={product.price} comparePrice={product.comparePrice} className="pt-1 text-sm" />
+        <div className="flex items-center justify-between gap-2 pt-1">
+          <Price price={product.price} comparePrice={product.comparePrice} className="text-sm" />
+          {compare && <CompareToggle id={product.id} />}
+        </div>
       </div>
     </Link>
   );

@@ -22,7 +22,7 @@ export function ToastProvider({ children }) {
   return (
     <ToastContext value={{ toast }}>
       {children}
-      <div className="pointer-events-none fixed inset-x-0 bottom-5 z-[100] flex flex-col items-center gap-2 px-4">
+      <div className="pointer-events-none fixed inset-x-0 bottom-24 z-[100] flex flex-col items-center gap-2 px-4 lg:bottom-5">
         {toasts.map((t) => (
           <div
             key={t.id}

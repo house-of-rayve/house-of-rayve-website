@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { listProducts } from "@/lib/products";
 import Reveal from "@/components/ui/Reveal";
 import HeroSlider from "@/components/home/HeroSlider";
+import LookbookStories from "@/components/home/LookbookStories";
 import ScrollWords from "@/components/motion/ScrollWords";
 import HorizontalShowcase from "@/components/motion/HorizontalShowcase";
 import FloatingGallery from "@/components/motion/FloatingGallery";
@@ -12,6 +13,7 @@ import ToroShowcase from "@/components/three/ToroShowcase";
 import FrameFinder from "@/components/home/FrameFinder";
 import LensTintLab from "@/components/motion/LensTintLab";
 import ImageTrail from "@/components/motion/ImageTrail";
+import FlashlightReveal from "@/components/motion/FlashlightReveal";
 import HomeFAQ from "@/components/home/HomeFAQ";
 import ProductCard from "@/components/store/ProductCard";
 import NewsletterForm from "@/components/store/NewsletterForm";
@@ -69,6 +71,12 @@ export default async function HomePage() {
   return (
     <>
       <HeroSlider />
+
+      {/* Lookbook: Instagram-style stories of the frames on model */}
+      <section className="container-x pb-4 pt-10 sm:pt-12">
+        <p className="eyebrow mb-5 lg:text-center">The lookbook</p>
+        <LookbookStories products={all.filter((p) => p.category === "Sunglasses")} />
+      </section>
 
       {/* Statement: pinned, words light up on scroll */}
       <ScrollWords
@@ -204,7 +212,7 @@ export default async function HomePage() {
         <ImageTrail>
           <div className="flex min-h-[70svh] flex-col items-center justify-center px-5 py-24 text-center">
             <p className="eyebrow text-olive-400">Collection 01</p>
-            <p className="display-title mt-6 text-[13vw] leading-[0.9] sm:text-[10vw] lg:text-[8.5vw]" data-no-split>
+            <p data-kinetic className="display-title mt-6 text-[13vw] leading-[0.9] sm:text-[10vw] lg:text-[8.5vw]" data-no-split>
               Own the
               <br />
               energy
@@ -228,6 +236,9 @@ export default async function HomePage() {
           caption: bySlug[slug]?.frameColor ?? "",
         }))}
       />
+
+      {/* Flashlight: a pool of light follows the pointer and uncovers the campaign photo */}
+      <FlashlightReveal />
 
       {/* FAQ */}
       <section className="border-t border-line">

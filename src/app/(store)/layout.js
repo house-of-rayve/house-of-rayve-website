@@ -7,6 +7,7 @@ import NavProgress from "@/components/motion/NavProgress";
 import HeadingReveal from "@/components/motion/HeadingReveal";
 import { LiquidFilter } from "@/components/motion/liquid";
 import PageCurtain from "@/components/motion/PageCurtain";
+import MobileTabBar from "@/components/store/MobileTabBar";
 import { Suspense } from "react";
 
 export default async function StoreLayout({ children }) {
@@ -24,6 +25,7 @@ export default async function StoreLayout({ children }) {
       <Header user={user && { name: user.name, role: user.role }} />
       <main className="flex-1">{children}</main>
       <Footer />
+      <MobileTabBar />
     </>
   );
 }
