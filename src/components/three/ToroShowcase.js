@@ -31,11 +31,15 @@ export default function ToroShowcase({ product }) {
   const [manual, setManual] = useState(null); // tint chosen with the swatches
   const [added, setAdded] = useState(false);
   const [inView, setInView] = useState(false);
+  const [near, setNear] = useState(false); // the 3D library (~1 MB) only loads once the section is close
   const { add } = useCart();
 
   // Only render the 3D scene while the section is on screen (saves battery/GPU)
   useEffect(() => {
-    const io = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), { rootMargin: "200px 0px" });
+    const io = new IntersectionObserver(([entry]) => {
+      setInView(entry.isIntersecting);
+      if (entry.isIntersecting) setNear(true);
+    }, { rootMargin: "600px 0px" });
     io.observe(root.current);
     return () => io.disconnect();
   }, []);
@@ -120,7 +124,7 @@ export default function ToroShowcase({ product }) {
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
         >
-          <ToroScene progress={progress} tint={tint} drag={drag} active={inView} />
+          {near && <ToroScene progress={progress} tint={tint} drag={drag} active={inView} />}
         </div>
 
         {/* Bottom bar: stage copy, tint swatches, buy */}

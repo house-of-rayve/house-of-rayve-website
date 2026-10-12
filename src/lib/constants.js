@@ -29,3 +29,7 @@ export const SHIPPING_FEE = 149;
 export function shippingFor(subtotal) {
   return subtotal === 0 || subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
 }
+
+// Photos kept out of editorial features (lookbook, stories) because they carry a third-party watermark.
+// Replace the photo in the admin panel, then remove it from this list.
+export const EDITORIAL_EXCLUDE = ["/images/model-cordoba.jpg"];

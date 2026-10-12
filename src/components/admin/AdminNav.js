@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Package, ShoppingCart, Users, Store, Menu, X } from "lucide-react";
+import { LayoutDashboard, Package, ShoppingCart, Users, Store, Menu, X, TicketPercent, MessageSquareQuote } from "lucide-react";
 import Logo from "@/components/ui/Logo";
 import LogoutButton from "@/components/account/LogoutButton";
 
@@ -12,6 +12,8 @@ const LINKS = [
   { href: "/admin/orders", label: "Orders", Icon: ShoppingCart },
   { href: "/admin/products", label: "Products", Icon: Package },
   { href: "/admin/customers", label: "Customers", Icon: Users },
+  { href: "/admin/coupons", label: "Discount codes", Icon: TicketPercent },
+  { href: "/admin/reviews", label: "Reviews", Icon: MessageSquareQuote },
 ];
 
 export default function AdminNav({ user }) {

@@ -18,7 +18,7 @@ export function CompareToggle({ id, className = "" }) {
         toggle(id);
       }}
       aria-pressed={on}
-      className={`flex shrink-0 items-center gap-1.5 text-[10px] uppercase tracking-[0.15em] transition-colors ${on ? "text-olive-800" : "text-muted hover:text-ink"} ${className}`}
+      className={`-my-1.5 flex min-h-8 shrink-0 items-center gap-1.5 py-1.5 text-[10px] uppercase tracking-[0.15em] transition-colors ${on ? "text-olive-800" : "text-muted hover:text-ink"} ${className}`}
     >
       <span className={`grid size-3.5 place-items-center border ${on ? "border-olive-800 bg-olive-800 text-sand" : "border-line bg-paper"}`}>
         {on && <Check className="size-2.5" strokeWidth={3} />}

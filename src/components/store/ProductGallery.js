@@ -13,45 +13,6 @@ const subscribeDesktop = (cb) => {
 };
 const useIsDesktop = () => useSyncExternalStore(subscribeDesktop, () => window.matchMedia(DESKTOP).matches, () => true);
 
-// A large optimised version of a photo for the magnifier (75 is the quality the image optimiser accepts)
-const hiRes = (src) => `/_next/image?url=${encodeURIComponent(src)}&w=1920&q=75`;
-const LOUPE = 190; // px
-const LOUPE_ZOOM = 2.5;
-
-/** Desktop photo with a round magnifying lens that follows the mouse. */
-function LoupeImage({ src, alt, priority, onOpen, children }) {
-  const [lens, setLens] = useState(null); // { x, y, w, h } in px while hovering
-  return (
-    <div
-      className="relative aspect-[4/5] cursor-none overflow-hidden bg-mist"
-      onMouseMove={(e) => {
-        const r = e.currentTarget.getBoundingClientRect();
-        setLens({ x: e.clientX - r.left, y: e.clientY - r.top, w: r.width, h: r.height });
-      }}
-      onMouseLeave={() => setLens(null)}
-      onClick={onOpen}
-    >
-      {children ?? <Image src={src} alt={alt} fill priority={priority} sizes="(min-width: 1024px) 55vw, 100vw" className="object-cover" />}
-      {lens && (
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute z-10 rounded-full border-2 border-paper/90 shadow-[0_12px_40px_rgba(0,0,0,0.35)]"
-          style={{
-            width: LOUPE,
-            height: LOUPE,
-            left: lens.x - LOUPE / 2,
-            top: lens.y - LOUPE / 2,
-            backgroundImage: `url(${hiRes(src)})`,
-            backgroundRepeat: "no-repeat",
-            backgroundSize: `${lens.w * LOUPE_ZOOM}px ${lens.h * LOUPE_ZOOM}px`,
-            backgroundPosition: `${LOUPE / 2 - lens.x * LOUPE_ZOOM}px ${LOUPE / 2 - lens.y * LOUPE_ZOOM}px`,
-          }}
-        />
-      )}
-    </div>
-  );
-}
-
 /** Mobile slide: double-tap to zoom in where you tapped, drag a finger to look around, double-tap again to reset. */
 function ZoomSlide({ src, alt, priority, children }) {
   const [zoom, setZoom] = useState(null); // { x, y } transform-origin in % while zoomed
@@ -121,11 +82,11 @@ export default function ProductGallery({ images, name, badge, slug }) {
   return (
     <>
       <div>
-        {/* Desktop: every photo stacked (the details column beside it stays put), each with a magnifier */}
+        {/* Desktop: every photo stacked (the details column beside it stays put); click to expand */}
         <div data-gallery-main className="hidden flex-col gap-3 lg:flex">
           {images.map((src, i) => (
             <div key={src + i} className="relative">
-              <LoupeImage src={src} alt={i === 0 ? name : ""} priority={i === 0} onOpen={() => (setActive(i), setLightbox(true))}>
+              <button onClick={() => (setActive(i), setLightbox(true))} className="relative block aspect-[4/5] w-full cursor-zoom-in overflow-hidden bg-mist" aria-label={`Expand image ${i + 1}`}>
                 {i === 0 ? (
                   // Same transition name as the shop card, so the photo morphs into place
                   <Morph slug={slug} enabled={isDesktop}>
@@ -133,12 +94,14 @@ export default function ProductGallery({ images, name, badge, slug }) {
                       <Image src={src} alt={name} fill priority sizes="(min-width: 1024px) 55vw, 100vw" className="object-cover" />
                     </div>
                   </Morph>
-                ) : undefined}
-              </LoupeImage>
+                ) : (
+                  <Image src={src} alt="" fill sizes="(min-width: 1024px) 55vw, 100vw" className="object-cover" />
+                )}
+              </button>
               {i === 0 && badge && <span className="pointer-events-none absolute left-4 top-4 bg-olive-800 px-2.5 py-1 text-[10px] uppercase tracking-[0.2em] text-sand">{badge}</span>}
               {i === 0 && (
                 <span className="pointer-events-none absolute bottom-4 right-4 flex items-center gap-2 bg-paper/90 px-3 py-2 text-[10px] uppercase tracking-[0.2em] backdrop-blur">
-                  <Expand className="size-3.5" /> Hover to magnify · click to expand
+                  <Expand className="size-3.5" /> Click to expand
                 </span>
               )}
             </div>
@@ -171,7 +134,10 @@ export default function ProductGallery({ images, name, badge, slug }) {
           {images.length > 1 && (
             <div className="absolute inset-x-0 bottom-4 flex justify-center gap-1.5">
               {images.map((src, i) => (
-                <button key={src + i} onClick={() => select(i)} aria-label={`Image ${i + 1}`} className={`h-1.5 rounded-full transition-all ${active === i ? "w-6 bg-paper" : "w-1.5 bg-paper/50"}`} />
+                // the visible dot is small; the button around it is a full-size touch target
+                <button key={src + i} onClick={() => select(i)} aria-label={`Image ${i + 1}`} className="grid h-6 min-w-6 place-items-center">
+                  <span className={`block h-1.5 rounded-full transition-all ${active === i ? "w-6 bg-paper" : "w-1.5 bg-paper/50"}`} />
+                </button>
               ))}
             </div>
           )}

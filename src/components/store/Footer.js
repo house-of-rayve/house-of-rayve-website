@@ -64,7 +64,7 @@ export default function Footer() {
       </div>
       <FooterMark />
       <div className="border-t border-sand/10">
-        <div className="container-x flex flex-col gap-2 py-6 text-[11px] uppercase tracking-[0.2em] text-sand/50 sm:flex-row sm:justify-between">
+        <div className="container-x flex flex-col gap-2 py-6 text-[11px] uppercase tracking-[0.2em] text-sand/75 sm:flex-row sm:justify-between">
           <span>© {new Date().getFullYear()} Rayve. All rights reserved.</span>
           <span>Own the energy</span>
         </div>

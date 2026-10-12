@@ -1,9 +1,11 @@
+import { after } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { json, error, readJson, authorize } from "@/lib/api";
 import { ORDER_STATUSES, PAYMENT_STATUSES } from "@/lib/constants";
 import { restockOrder } from "@/lib/orders";
 import { publish } from "@/lib/events";
 import { invalidateCatalog } from "@/lib/products";
+import { sendOrderEmails } from "@/lib/email";
 
 export async function GET(_request, { params }) {
   const [, denied] = await authorize("ADMIN");
@@ -52,5 +54,7 @@ export async function PATCH(request, { params }) {
   });
   invalidateCatalog();
   publish("order:updated", { id, orderNumber: order.orderNumber, status: updated.status });
+  // Let the customer know when the order ships, arrives or is cancelled
+  if (data.status && data.status !== order.status) after(() => sendOrderEmails(updated, data.status).catch(() => {})); // after the response, so it never slows the request
   return json({ order: updated });
 }

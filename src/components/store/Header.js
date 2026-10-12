@@ -200,7 +200,7 @@ export default function Header({ user }) {
     return () => document.removeEventListener("keydown", onKey);
   }, [panel]);
 
-  const overlay = pathname === "/" && !scrolled && !panel;
+  const overlay = (pathname === "/" || pathname === "/lookbook") && !scrolled && !panel; // pages whose hero runs under the header
   const close = () => setPanel(null);
   const openShop = () => {
     clearTimeout(closeTimer.current);

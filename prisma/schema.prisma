@@ -22,6 +22,7 @@ model User {
   updatedAt    DateTime  @updatedAt
   addresses    Address[]
   orders       Order[]
+  reviews      Review[]
 }
 
 model Address {
@@ -53,6 +54,9 @@ model Product {
   frameColor   String?
   lensColor    String?
   material     String?
+  lensWidth    Int? // mm — for the size guide
+  bridgeWidth  Int? // mm
+  templeLength Int? // mm
   price        Int
   comparePrice Int?
   stock        Int         @default(0)
@@ -62,31 +66,36 @@ model Product {
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
   orderItems   OrderItem[]
+  reviews      Review[]
 }
 
 model Order {
-  id             String      @id @default(cuid())
-  orderNumber    String      @unique
-  userId         String
-  user           User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  status         String      @default("PENDING") // PENDING | CONFIRMED | SHIPPED | DELIVERED | CANCELLED
-  paymentMethod  String      @default("COD") // COD | ONLINE
-  paymentStatus  String      @default("PENDING") // PENDING | PAID | REFUNDED
-  subtotal       Int
-  shippingFee    Int         @default(0)
-  total          Int
-  shipName       String
-  shipPhone      String
-  shipLine1      String
-  shipLine2      String?
-  shipCity       String
-  shipState      String
-  shipPostalCode String
-  shipCountry    String      @default("India")
-  notes          String?
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
-  items          OrderItem[]
+  id                String      @id @default(cuid())
+  orderNumber       String      @unique
+  userId            String
+  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status            String      @default("PENDING") // PENDING | CONFIRMED | SHIPPED | DELIVERED | CANCELLED
+  paymentMethod     String      @default("COD") // COD | ONLINE
+  paymentStatus     String      @default("PENDING") // PENDING | PAID | REFUNDED
+  subtotal          Int
+  shippingFee       Int         @default(0)
+  discount          Int         @default(0)
+  couponCode        String?
+  total             Int
+  razorpayOrderId   String?
+  razorpayPaymentId String?
+  shipName          String
+  shipPhone         String
+  shipLine1         String
+  shipLine2         String?
+  shipCity          String
+  shipState         String
+  shipPostalCode    String
+  shipCountry       String      @default("India")
+  notes             String?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  items             OrderItem[]
 }
 
 model OrderItem {
@@ -116,4 +125,35 @@ model Subscriber {
   email     String   @unique
   source    String   @default("newsletter") // newsletter | coming-soon
   createdAt DateTime @default(now())
+}
+
+// Discount codes, managed in the admin panel
+model Coupon {
+  id          String    @id @default(cuid())
+  code        String    @unique // stored upper-case
+  type        String    @default("PERCENT") // PERCENT | FLAT
+  value       Int // percent (1–90) or rupees
+  minSubtotal Int       @default(0)
+  maxUses     Int? // null = unlimited
+  usedCount   Int       @default(0)
+  expiresAt   DateTime?
+  active      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+}
+
+// Customer reviews; shown on the product page once approved by an admin
+model Review {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rating    Int // 1–5
+  title     String?
+  body      String
+  photo     String? // uploaded image URL
+  approved  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@unique([productId, userId]) // one review per customer per frame
 }

@@ -8,6 +8,7 @@ import HeadingReveal from "@/components/motion/HeadingReveal";
 import { LiquidFilter } from "@/components/motion/liquid";
 import PageCurtain from "@/components/motion/PageCurtain";
 import MobileTabBar from "@/components/store/MobileTabBar";
+import RevealImages from "@/components/motion/RevealImages";
 import { Suspense } from "react";
 
 export default async function StoreLayout({ children }) {
@@ -22,6 +23,7 @@ export default async function StoreLayout({ children }) {
       <HeadingReveal />
       <LiquidFilter />
       <PageCurtain />
+      <RevealImages />
       <Header user={user && { name: user.name, role: user.role }} />
       <main className="flex-1">{children}</main>
       <Footer />

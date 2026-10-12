@@ -3,16 +3,32 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Check, Banknote, CreditCard } from "lucide-react";
+import { Check, Banknote, CreditCard, TicketPercent, X } from "lucide-react";
 import { useCart } from "@/components/cart/CartProvider";
 import OrderSummary from "@/components/cart/OrderSummary";
 import AddressFields, { EMPTY_ADDRESS } from "@/components/account/AddressFields";
 import { api } from "@/components/ui/fetcher";
 import { formatPrice } from "@/lib/format";
 
-export default function CheckoutForm({ user, addresses }) {
+// Loads Razorpay's checkout script once, when an online payment starts
+function loadRazorpay() {
+  if (window.Razorpay) return Promise.resolve(true);
+  return new Promise((resolve) => {
+    const s = document.createElement("script");
+    s.src = "https://checkout.razorpay.com/v1/checkout.js";
+    s.onload = () => resolve(true);
+    s.onerror = () => resolve(false);
+    document.body.appendChild(s);
+  });
+}
+
+export default function CheckoutForm({ user, addresses, onlinePayments = false }) {
   const router = useRouter();
-  const { items, total, clear } = useCart();
+  const { items, subtotal, total, clear } = useCart();
+  const [codeInput, setCodeInput] = useState("");
+  const [coupon, setCoupon] = useState(null); // { code, amount, label }
+  const [codeError, setCodeError] = useState("");
+  const [checking, setChecking] = useState(false);
   const defaultAddress = addresses.find((a) => a.isDefault) ?? addresses[0];
   const [addressId, setAddressId] = useState(defaultAddress?.id ?? "new");
   const [address, setAddress] = useState({ ...EMPTY_ADDRESS, fullName: user.name, phone: user.phone ?? "" });
@@ -31,6 +47,64 @@ export default function CheckoutForm({ user, addresses }) {
     );
   }
 
+  const applyCode = async () => {
+    setCodeError("");
+    setChecking(true);
+    try {
+      const r = await api("/api/coupons/check", { method: "POST", body: { code: codeInput, subtotal } });
+      setCoupon({ code: r.code, amount: r.discount, label: r.label });
+      setCodeInput("");
+    } catch (err) {
+      setCodeError(err.message);
+    }
+    setChecking(false);
+  };
+
+  const finish = (order) => {
+    clear();
+    router.push(`/account/orders/${order.id}?placed=1`);
+    router.refresh();
+  };
+
+  // Online: open Razorpay; the order only counts as paid once the server verifies the payment signature.
+  // Closing the window cancels the unpaid order so its stock is released.
+  const payOnline = async (order) => {
+    const cancel = (message) => {
+      api(`/api/account/orders/${order.id}/cancel`, { method: "POST" }).catch(() => {});
+      setError(message);
+      setBusy(false);
+    };
+    if (!(await loadRazorpay())) return cancel("Couldn't load the payment window. Check your connection and try again.");
+    let session;
+    try {
+      session = await api("/api/payments/razorpay/order", { method: "POST", body: { orderId: order.id } });
+    } catch (err) {
+      return cancel(err.message);
+    }
+    const rzp = new window.Razorpay({
+      key: session.keyId,
+      order_id: session.razorpayOrderId,
+      amount: session.amount,
+      currency: session.currency,
+      name: "RAYVE",
+      description: `Order ${session.orderNumber}`,
+      prefill: session.customer,
+      theme: { color: "#44442a" },
+      handler: async (response) => {
+        try {
+          await api("/api/payments/razorpay/verify", { method: "POST", body: { orderId: order.id, ...response } });
+          finish(order);
+        } catch (err) {
+          setError(`${err.message} If money was taken, write to info@houseofrayve.com with order ${order.orderNumber}.`);
+          setBusy(false);
+        }
+      },
+      modal: { ondismiss: () => cancel("Payment cancelled — your order wasn't placed. You can try again.") },
+    });
+    rzp.on("payment.failed", (r) => setError(r?.error?.description ?? "The payment failed. Please try again."));
+    rzp.open();
+  };
+
   const submit = async (e) => {
     e.preventDefault();
     setError("");
@@ -42,17 +116,23 @@ export default function CheckoutForm({ user, addresses }) {
           items: items.map((i) => ({ productId: i.productId, quantity: i.quantity })),
           ...(addressId === "new" ? { address, saveAddress } : { addressId }),
           paymentMethod: payment,
+          couponCode: coupon?.code ?? "",
           notes,
         },
       });
-      clear();
-      router.push(`/account/orders/${order.id}?placed=1`);
-      router.refresh();
+      if (order.paymentMethod === "ONLINE") await payOnline(order);
+      else finish(order);
     } catch (err) {
       setError(err.message);
       setBusy(false);
     }
   };
+
+  const payable = total - (coupon?.amount ?? 0);
+  const paymentOptions = [
+    { id: "COD", title: "Cash on delivery", text: "Pay when your order arrives.", Icon: Banknote },
+    ...(onlinePayments ? [{ id: "ONLINE", title: "Pay online", text: "UPI, cards & netbanking, secured by Razorpay.", Icon: CreditCard }] : []),
+  ];
 
   return (
     <form onSubmit={submit} className="grid gap-12 lg:grid-cols-12">
@@ -108,10 +188,7 @@ export default function CheckoutForm({ user, addresses }) {
         <section>
           <h2 className="font-display text-xs uppercase tracking-[0.25em]">3 · Payment</h2>
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
-            {[
-              { id: "COD", title: "Cash on delivery", text: "Pay when your order arrives.", Icon: Banknote },
-              { id: "ONLINE", title: "Pay online", text: "UPI, cards & netbanking (demo — no charge).", Icon: CreditCard },
-            ].map(({ id, title, text, Icon }) => (
+            {paymentOptions.map(({ id, title, text, Icon }) => (
               <button
                 type="button"
                 key={id}
@@ -136,10 +213,45 @@ export default function CheckoutForm({ user, addresses }) {
 
       <div className="lg:col-span-5">
         <div className="lg:sticky lg:top-28">
-          <OrderSummary compact>
+          <OrderSummary
+            compact
+            discount={coupon}
+            couponSlot={
+              <div className="mt-6 border-t border-line pt-5">
+                {coupon ? (
+                  <p className="flex items-center justify-between bg-olive-500/10 px-3 py-2.5 text-sm">
+                    <span className="flex items-center gap-2 text-olive-800">
+                      <TicketPercent className="size-4" /> <strong className="font-medium">{coupon.code}</strong> · {coupon.label}
+                    </span>
+                    <button type="button" onClick={() => setCoupon(null)} className="text-muted hover:text-ink" aria-label="Remove code">
+                      <X className="size-4" />
+                    </button>
+                  </p>
+                ) : (
+                  <>
+                    <label className="label" htmlFor="coupon">Discount code</label>
+                    <div className="flex">
+                      <input
+                        id="coupon"
+                        value={codeInput}
+                        onChange={(e) => setCodeInput(e.target.value.toUpperCase())}
+                        onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), codeInput && applyCode())}
+                        className="field rounded-r-none uppercase"
+                        placeholder="Enter code"
+                      />
+                      <button type="button" disabled={!codeInput || checking} onClick={applyCode} className="btn h-11 shrink-0 border border-l-0 border-line bg-paper px-4 text-[10px] hover:border-olive-800 disabled:opacity-50">
+                        {checking ? "…" : "Apply"}
+                      </button>
+                    </div>
+                    {codeError && <p className="mt-2 text-xs text-red-700">{codeError}</p>}
+                  </>
+                )}
+              </div>
+            }
+          >
             {error && <p className="mt-5 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
             <button disabled={busy} className="btn-primary mt-6 w-full">
-              {busy ? "Placing order…" : `Place order · ${formatPrice(total)}`}
+              {busy ? (payment === "ONLINE" ? "Waiting for payment…" : "Placing order…") : `${payment === "ONLINE" ? "Pay" : "Place order"} · ${formatPrice(payable)}`}
             </button>
             <p className="mt-3 text-center text-[11px] text-muted">By placing this order you agree to our terms of sale.</p>
           </OrderSummary>

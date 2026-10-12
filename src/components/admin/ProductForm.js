@@ -46,6 +46,9 @@ export default function ProductForm({ product }) {
     frameColor: product?.frameColor ?? "",
     lensColor: product?.lensColor ?? "",
     material: product?.material ?? "",
+    lensWidth: product?.lensWidth ?? "",
+    bridgeWidth: product?.bridgeWidth ?? "",
+    templeLength: product?.templeLength ?? "",
     price: product?.price ?? "",
     comparePrice: product?.comparePrice ?? "",
     stock: product?.stock ?? 0,
@@ -208,6 +211,19 @@ export default function ProductForm({ product }) {
               <label className={lbl}>Lens colour</label>
               <input className={input} value={form.lensColor} onChange={set("lensColor")} />
             </div>
+          </div>
+          {/* Frame size (shown as a size guide on the product page when filled in) */}
+          <div className="mt-4 grid grid-cols-3 gap-4">
+            {[
+              ["lensWidth", "Lens width (mm)", "52"],
+              ["bridgeWidth", "Bridge (mm)", "20"],
+              ["templeLength", "Temple (mm)", "145"],
+            ].map(([k, l, ph]) => (
+              <div key={k}>
+                <label className={lbl}>{l}</label>
+                <input type="number" min="0" className={input} value={form[k]} onChange={set(k)} placeholder={ph} />
+              </div>
+            ))}
           </div>
         </section>
       </div>

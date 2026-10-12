@@ -21,6 +21,7 @@ export default function FullscreenMenu({ open, onClose, user }) {
     { label: "Shop all", href: "/shop", img: "/images/collection.jpg" },
     { label: "Sunglasses", href: "/shop?category=Sunglasses", img: "/images/model-sevilla.jpg" },
     { label: "New arrivals", href: "/shop?sort=newest", img: "/images/model-arena.jpg" },
+    { label: "Lookbook", href: "/lookbook", img: "/images/campaign-matador.jpg" },
     { label: "Try on", href: "/try-on", img: "/images/model-sevilla.jpg" },
     { label: "The brand", href: "/about", img: "/images/campaign-matador.jpg" },
     { label: "Wishlist", href: "/wishlist", img: "/images/model-toro.jpg" },
@@ -67,6 +68,7 @@ export default function FullscreenMenu({ open, onClose, user }) {
       aria-modal="true"
       aria-label="Menu"
       aria-hidden={!open}
+      inert={!open}
       className="invisible fixed inset-0 z-[70] flex flex-col bg-olive-950 text-sand"
       style={{ clipPath: "inset(0 0 100% 0)" }}
     >

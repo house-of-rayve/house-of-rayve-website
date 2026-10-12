@@ -139,3 +139,22 @@ textarea.field { height: auto; padding-top: 0.75rem; padding-bottom: 0.75rem; }
     animation-delay: 0s !important;
   }
 }
+
+/* Image reveal on scroll (see RevealImages): a curtain in the page colour lifts off the photo. The curtain is
+   a pseudo-element, so the photo itself stays "visible" to the IntersectionObserver that triggers it. */
+html[data-reveal-ready] [data-reveal] {
+  position: relative;
+}
+html[data-reveal-ready] [data-reveal]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background: var(--color-canvas);
+  transform-origin: 50% 0;
+  transition: transform 1.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+html[data-reveal-ready] [data-reveal].is-revealed::after {
+  transform: scaleY(0);
+}

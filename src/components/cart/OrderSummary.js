@@ -3,7 +3,8 @@
 import { useCart } from "./CartProvider";
 import { formatPrice } from "@/lib/format";
 
-export default function OrderSummary({ children, compact = false }) {
+// `discount`: { code, amount } from an applied discount code (checkout); `couponSlot` renders the code field
+export default function OrderSummary({ children, compact = false, discount = null, couponSlot = null }) {
   const { items, subtotal, shipping, total } = useCart();
   return (
     <div className="card p-6 sm:p-8">
@@ -25,16 +26,23 @@ export default function OrderSummary({ children, compact = false }) {
           <dt className="text-muted">Subtotal</dt>
           <dd>{formatPrice(subtotal)}</dd>
         </div>
+        {discount?.amount > 0 && (
+          <div className="flex justify-between text-olive-700">
+            <dt>Discount ({discount.code})</dt>
+            <dd>−{formatPrice(discount.amount)}</dd>
+          </div>
+        )}
         <div className="flex justify-between">
           <dt className="text-muted">Shipping</dt>
           <dd>{shipping === 0 ? "Complimentary" : formatPrice(shipping)}</dd>
         </div>
         <div className="flex justify-between border-t border-line pt-4 text-base font-medium">
           <dt>Total</dt>
-          <dd>{formatPrice(total)}</dd>
+          <dd>{formatPrice(total - (discount?.amount ?? 0))}</dd>
         </div>
       </dl>
       <p className="mt-2 text-xs text-muted">Inclusive of all taxes.</p>
+      {couponSlot}
       {children}
     </div>
   );

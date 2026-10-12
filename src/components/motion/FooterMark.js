@@ -23,9 +23,7 @@ export default function FooterMark() {
           <LogoMark className="h-[9vw] w-[15vw] text-olive-500 sm:h-[6vw] sm:w-[10vw]" />
         </span>
         <span className="fm-word mt-[3vw] block w-full">
-          <span data-kinetic className="block">
-            <Wordmark className="h-[12.4vw] w-full text-sand/90" />
-          </span>
+          <Wordmark className="h-[12.4vw] w-full text-sand/90" />
         </span>
       </div>
     </div>

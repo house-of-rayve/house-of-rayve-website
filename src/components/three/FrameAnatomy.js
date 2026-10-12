@@ -17,9 +17,13 @@ export default function FrameAnatomy({ product }) {
   const labelEls = useRef([]);
   const listRef = useRef(null);
   const [inView, setInView] = useState(false);
+  const [near, setNear] = useState(false); // the 3D library (~1 MB) only loads once the section is close
 
   useEffect(() => {
-    const io = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), { rootMargin: "200px 0px" });
+    const io = new IntersectionObserver(([entry]) => {
+      setInView(entry.isIntersecting);
+      if (entry.isIntersecting) setNear(true);
+    }, { rootMargin: "600px 0px" });
     io.observe(root.current);
     return () => io.disconnect();
   }, []);
@@ -70,7 +74,7 @@ export default function FrameAnatomy({ product }) {
           <p className="mt-3 max-w-sm text-sm text-sand/60">Keep scrolling to take the frame apart.</p>
         </div>
         <div className="absolute inset-0">
-          <AnatomyScene progress={progress} frame={frame} labelEls={labelEls} active={inView} />
+          {near && <AnatomyScene progress={progress} frame={frame} labelEls={labelEls} active={inView} />}
           {/* Labels: positioned every frame by the scene, from points on the 3D model */}
           {labels.map((l, i) => (
             <div key={l.title} ref={(el) => (labelEls.current[i] = el)} className="pointer-events-none absolute left-0 top-0 opacity-0" aria-hidden="true">

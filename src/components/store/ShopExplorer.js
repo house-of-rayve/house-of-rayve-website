@@ -317,6 +317,7 @@ export default function ShopExplorer({ products, initial }) {
           </div>
         )}
 
+        <h2 className="sr-only">Products</h2>
         {results.length === 0 ? (
           <div className="py-24 text-center">
             <p className="text-muted">No frames match these filters.</p>

@@ -5,6 +5,11 @@ import { getProductBySlug, listProducts } from "@/lib/products";
 import ProductGallery from "@/components/store/ProductGallery";
 import ProductPurchase from "@/components/store/ProductPurchase";
 import RecentlyViewed from "@/components/store/RecentlyViewed";
+import SizeGuide from "@/components/store/SizeGuide";
+import ProductReviews from "@/components/store/ProductReviews";
+import { getProductReviews } from "@/lib/reviews";
+import { getCurrentUser } from "@/lib/auth";
+import { siteUrl } from "@/lib/site";
 import FrameAnatomy from "@/components/three/FrameAnatomy";
 import LensTintLab from "@/components/motion/LensTintLab";
 import { tintIndexFor } from "@/lib/tints";
@@ -14,7 +19,14 @@ import Price from "@/components/ui/Price";
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const product = await getProductBySlug(slug);
-  return product ? { title: product.name, description: product.tagline ?? product.description } : { title: "Product" };
+  if (!product) return { title: "Product" };
+  const description = product.tagline ?? product.description;
+  return {
+    title: product.name,
+    description,
+    alternates: { canonical: `/product/${product.slug}` },
+    openGraph: { title: `${product.name} · RAYVE`, description, images: product.images.slice(0, 1).map((url) => ({ url, alt: product.name })) },
+  };
 }
 
 function Accordion({ title, defaultOpen = false, children }) {
@@ -34,6 +46,7 @@ export default async function ProductPage({ params }) {
   const product = await getProductBySlug(slug);
   if (!product) notFound();
 
+  const [reviews, user] = await Promise.all([getProductReviews(product.id), getCurrentUser()]);
   const all = await listProducts();
   const related = [
     ...all.filter((p) => p.id !== product.id && p.shape === product.shape),
@@ -51,8 +64,28 @@ export default async function ProductPage({ params }) {
 
   const discount = product.comparePrice > product.price ? Math.round((1 - product.price / product.comparePrice) * 100) : 0;
 
+  // Structured data so search engines can show the price, stock and rating
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description: product.tagline ?? product.description,
+    image: product.images.map((src) => (src.startsWith("http") ? src : `${siteUrl}${src}`)),
+    brand: { "@type": "Brand", name: "RAYVE" },
+    sku: product.slug,
+    offers: {
+      "@type": "Offer",
+      url: `${siteUrl}/product/${product.slug}`,
+      priceCurrency: "INR",
+      price: product.price,
+      availability: product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+    },
+    ...(reviews.count ? { aggregateRating: { "@type": "AggregateRating", ratingValue: reviews.average.toFixed(1), reviewCount: reviews.count } } : {}),
+  };
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <div className="container-x pb-12 pt-6 sm:pb-16 sm:pt-8">
         <nav className="mb-6 text-xs text-muted">
           <Link href="/" className="hover:text-ink">Home</Link>
@@ -76,6 +109,12 @@ export default async function ProductPage({ params }) {
                 )}
               </div>
               <h1 className="display-title mt-3 text-3xl sm:text-4xl">{product.name}</h1>
+              {reviews.count > 0 && (
+                <a href="#reviews" className="mt-2 inline-flex items-center gap-2 text-xs text-muted hover:text-ink">
+                  <span className="tracking-[0.15em] text-olive-700">{"★".repeat(Math.round(reviews.average))}{"☆".repeat(5 - Math.round(reviews.average))}</span>
+                  {reviews.average.toFixed(1)} · {reviews.count} review{reviews.count > 1 ? "s" : ""}
+                </a>
+              )}
               {product.tagline && <p className="mt-3 text-muted">{product.tagline}</p>}
               <div className="mt-6 flex items-baseline gap-3">
                 <Price price={product.price} comparePrice={product.comparePrice} className="text-2xl font-light" />
@@ -118,6 +157,7 @@ export default async function ProductPage({ params }) {
                     ))}
                   </dl>
                 </Accordion>
+                <SizeGuide product={product} />
                 <Accordion title="Shipping & returns">
                   <ul className="space-y-3">
                     <li className="flex gap-3"><Truck className="mt-0.5 size-4 shrink-0 text-olive-500" /> Free shipping above ₹2,999. Dispatched within 24 hours, delivered in 2–6 working days.</li>
@@ -142,6 +182,8 @@ export default async function ProductPage({ params }) {
           </section>
         </>
       )}
+
+      <ProductReviews productId={product.id} slug={product.slug} summary={reviews} signedIn={Boolean(user)} />
 
       {related.length > 0 && (
         <section className="container-x border-t border-line py-20">

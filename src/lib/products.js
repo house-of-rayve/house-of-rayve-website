@@ -26,7 +26,7 @@ const getCatalog = unstable_cache(
     });
     return products.map(serializeProduct);
   },
-  ["catalog-v1"],
+  ["catalog-v2"], // bump when the product fields change, so no stale shape is served
   { tags: [CATALOG_TAG], revalidate: 600 },
 );
 
@@ -107,6 +107,13 @@ export function parseProductInput(body, { partial = false } = {}) {
   if (has("images")) {
     const images = Array.isArray(body.images) ? body.images.filter((i) => typeof i === "string" && i) : [];
     data.images = JSON.stringify(images);
+  }
+  // Frame measurements in mm (optional; power the size guide)
+  for (const k of ["lensWidth", "bridgeWidth", "templeLength"]) {
+    if (!has(k)) continue;
+    const v = body[k] === "" || body[k] === null ? null : Number(body[k]);
+    if (v !== null && (!Number.isInteger(v) || v < 5 || v > 200)) return { error: "Frame measurements must be whole millimetres." };
+    data[k] = v;
   }
   if (has("featured")) data.featured = Boolean(body.featured);
   if (has("isActive")) data.isActive = Boolean(body.isActive);

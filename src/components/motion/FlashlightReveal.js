@@ -86,7 +86,7 @@ export default function FlashlightReveal() {
         <h2 className="display-title mt-5 text-4xl mix-blend-difference sm:text-6xl lg:text-7xl" data-no-split>
           Made for the light
         </h2>
-        <p className="mt-5 text-[10px] uppercase tracking-[0.3em] text-sand/50">
+        <p className="mt-5 text-[10px] uppercase tracking-[0.3em] text-sand/75">
           <span className="lg:hidden">Tap to move the light</span>
           <span className="max-lg:hidden">Move your cursor</span>
         </p>

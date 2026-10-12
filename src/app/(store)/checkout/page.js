@@ -1,6 +1,7 @@
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import CheckoutForm from "@/components/store/CheckoutForm";
+import { razorpayEnabled } from "@/lib/razorpay";
 
 export const metadata = { title: "Checkout" };
 
@@ -16,6 +17,7 @@ export default async function CheckoutPage() {
       <CheckoutForm
         user={{ name: user.name, email: user.email, phone: user.phone }}
         addresses={addresses.map(({ createdAt, updatedAt, ...a }) => a)}
+        onlinePayments={razorpayEnabled()}
       />
     </div>
   );

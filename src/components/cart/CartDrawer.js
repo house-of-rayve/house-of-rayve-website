@@ -77,7 +77,7 @@ export default function CartDrawer() {
   const progress = Math.min(100, (subtotal / FREE_SHIPPING_THRESHOLD) * 100);
 
   return (
-    <div className={`fixed inset-0 z-50 ${open ? "" : "pointer-events-none"}`} aria-hidden={!open}>
+    <div className={`fixed inset-0 z-50 ${open ? "" : "pointer-events-none"}`} aria-hidden={!open} inert={!open}>
       <div onClick={close} className={`absolute inset-0 bg-olive-950/40 transition-opacity duration-300 ${open ? "opacity-100" : "opacity-0"}`} />
       <aside
         role="dialog"

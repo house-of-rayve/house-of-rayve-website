@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, X } from "lucide-react";
+import { EDITORIAL_EXCLUDE } from "@/lib/constants";
 
 const DURATION = 5000; // ms per story
 
@@ -13,7 +14,7 @@ const DURATION = 5000; // ms per story
  */
 export default function LookbookStories({ products }) {
   // Stories use the on-model photo (second image) of each frame
-  const stories = products.filter((p) => p.images[1]).slice(0, 10);
+  const stories = products.filter((p) => p.images[1] && !EDITORIAL_EXCLUDE.includes(p.images[1])).slice(0, 10);
   const [open, setOpen] = useState(null); // index of the story being viewed
   const [seen, setSeen] = useState(() => new Set());
   const [progress, setProgress] = useState(0);
@@ -69,19 +70,36 @@ export default function LookbookStories({ products }) {
 
   return (
     <>
-      <div className="no-scrollbar -mx-5 flex gap-4 overflow-x-auto px-5 sm:-mx-8 sm:gap-6 sm:px-8 lg:mx-0 lg:justify-center lg:px-0">
+      {/* Phones/tablets: scrolls from the first story. Desktop: bubbles scale with the screen so all fit in one row */}
+      <div className="no-scrollbar -mx-5 overflow-x-auto px-5 pb-2 pt-1 sm:-mx-8 sm:px-8 lg:mx-0 lg:px-0">
+        <div className="mx-auto flex w-max gap-5 sm:gap-8 lg:gap-[min(40px,1.4vw)]">
         {stories.map((p, i) => (
-          <button key={p.id} onClick={() => go(i)} className="group flex w-[72px] shrink-0 flex-col items-center gap-2 sm:w-20" aria-label={`Open ${p.name} story`}>
-            <span className={`rounded-full p-[2px] ${seen.has(p.id) ? "bg-line" : "bg-[conic-gradient(from_200deg,#a69f4e,#44442a,#c9a85b,#a69f4e)]"}`}>
-              <span className="block rounded-full bg-canvas p-[2px]">
-                <span className="relative block size-16 overflow-hidden rounded-full bg-mist sm:size-[72px]">
-                  <Image src={p.images[1]} alt="" fill sizes="80px" className="object-cover transition-transform duration-500 group-hover:scale-110" />
+          <button
+            key={p.id}
+            onClick={() => go(i)}
+            className="group flex w-20 shrink-0 flex-col items-center sm:w-24 lg:w-[min(122px,calc(6vw+18px))]"
+          >
+            {/* thin brushed-gold ring (grey once seen), a little air, then the photo */}
+            <span
+              className={`rounded-full p-px transition-transform duration-500 ease-out group-hover:-translate-y-1 ${
+                seen.has(p.id) ? "bg-line" : "bg-[conic-gradient(from_210deg,#e3cf8f,#a69f4e,#5c5a35,#c9a85b,#e3cf8f)]"
+              }`}
+            >
+              <span className="block rounded-full bg-canvas p-1 sm:p-1.5">
+                <span className="relative block size-[72px] overflow-hidden rounded-full bg-mist sm:size-[84px] lg:size-[min(104px,6vw)]">
+                  <Image src={p.images[1]} alt="" fill sizes="104px" className="object-cover transition-transform duration-700 ease-out group-hover:scale-110" />
+                  <span className="absolute inset-0 rounded-full ring-1 ring-inset ring-black/5" />
                 </span>
               </span>
             </span>
-            <span className="w-full truncate text-center font-display text-[9px] uppercase tracking-[0.15em]">{p.name}</span>
+            <span className="mt-3 w-full truncate text-center font-display text-[9px] uppercase leading-tight tracking-[0.18em] transition-colors group-hover:text-olive-700 sm:text-[10px]">
+              {p.name}
+            </span>
+            {p.shape && <span className="mt-1 text-[10px] text-muted">{p.shape}</span>}
+            <span className="sr-only">— open story</span>
           </button>
         ))}
+        </div>
       </div>
 
       {story && (

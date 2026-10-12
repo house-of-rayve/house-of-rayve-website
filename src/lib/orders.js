@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { parseImages } from "@/lib/format";
 import { shippingFor } from "@/lib/constants";
 import { isPhone } from "@/lib/api";
+import { checkCoupon } from "@/lib/coupons";
+import { razorpayEnabled } from "@/lib/razorpay";
 
 export function newOrderNumber() {
   return `RV-${Date.now().toString().slice(-6)}${randomInt(10, 99)}`;
@@ -26,7 +28,7 @@ export function parseAddress(input = {}) {
 
 export class OrderError extends Error {}
 
-export async function createOrder(userId, { items, address, paymentMethod, notes }) {
+export async function createOrder(userId, { items, address, paymentMethod, notes, couponCode }) {
   const quantities = new Map();
   for (const item of items) {
     const qty = Number(item.quantity);
@@ -53,18 +55,37 @@ export async function createOrder(userId, { items, address, paymentMethod, notes
       lines.push({ productId: p.id, name: p.name, image: parseImages(p.images)[0] ?? null, price: p.price, quantity });
     }
 
+    // Discount code: checked again here (never trust the browser) and its use counted atomically
+    let discount = 0;
+    let code = null;
+    if (couponCode) {
+      const result = await checkCoupon(couponCode, subtotal, tx);
+      if (result.error) throw new OrderError(result.error);
+      const claimed = await tx.coupon.updateMany({
+        where: { id: result.coupon.id, usedCount: result.coupon.usedCount },
+        data: { usedCount: { increment: 1 } },
+      });
+      if (!claimed.count) throw new OrderError("That code was just used up — please try again.");
+      discount = result.discount;
+      code = result.coupon.code;
+    }
+
     const shippingFee = shippingFor(subtotal);
+    // Online orders wait for a verified Razorpay payment before they count as paid / confirmed
     const online = paymentMethod === "ONLINE";
+    if (online && !razorpayEnabled()) throw new OrderError("Online payment isn't available right now — please choose cash on delivery.");
     return tx.order.create({
       data: {
         orderNumber: newOrderNumber(),
         userId,
-        status: online ? "CONFIRMED" : "PENDING",
+        status: "PENDING",
         paymentMethod: online ? "ONLINE" : "COD",
-        paymentStatus: online ? "PAID" : "PENDING",
+        paymentStatus: "PENDING",
         subtotal,
         shippingFee,
-        total: subtotal + shippingFee,
+        discount,
+        couponCode: code,
+        total: subtotal - discount + shippingFee,
         shipName: address.fullName,
         shipPhone: address.phone,
         shipLine1: address.line1,
@@ -81,8 +102,10 @@ export async function createOrder(userId, { items, address, paymentMethod, notes
   });
 }
 
-// Put stock back when an order is cancelled
+// Put stock back (and give back a used discount code) when an order is cancelled
 export async function restockOrder(tx, orderId) {
+  const order = await tx.order.findUnique({ where: { id: orderId }, select: { couponCode: true } });
+  if (order?.couponCode) await tx.coupon.updateMany({ where: { code: order.couponCode, usedCount: { gt: 0 } }, data: { usedCount: { decrement: 1 } } });
   const items = await tx.orderItem.findMany({ where: { orderId } });
   for (const item of items) {
     if (item.productId) {

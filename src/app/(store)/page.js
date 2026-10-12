@@ -5,10 +5,8 @@ import { listProducts } from "@/lib/products";
 import Reveal from "@/components/ui/Reveal";
 import HeroSlider from "@/components/home/HeroSlider";
 import LookbookStories from "@/components/home/LookbookStories";
-import ScrollWords from "@/components/motion/ScrollWords";
 import HorizontalShowcase from "@/components/motion/HorizontalShowcase";
 import FloatingGallery from "@/components/motion/FloatingGallery";
-import ArenaWall from "@/components/three/ArenaWall";
 import ToroShowcase from "@/components/three/ToroShowcase";
 import FrameFinder from "@/components/home/FrameFinder";
 import LensTintLab from "@/components/motion/LensTintLab";
@@ -73,17 +71,12 @@ export default async function HomePage() {
       <HeroSlider />
 
       {/* Lookbook: Instagram-style stories of the frames on model */}
-      <section className="container-x pb-4 pt-10 sm:pt-12">
-        <p className="eyebrow mb-5 lg:text-center">The lookbook</p>
+      <section className="px-5 pb-6 pt-12 sm:px-8 sm:pt-16 lg:px-12">
+        <p className="eyebrow mb-8 flex items-center gap-4 lg:justify-center">
+          <span className="hidden h-px w-12 bg-line lg:block" /> The lookbook <span className="h-px flex-1 bg-line lg:w-12 lg:flex-none" />
+        </p>
         <LookbookStories products={all.filter((p) => p.category === "Sunglasses")} />
       </section>
-
-      {/* Statement: pinned, words light up on scroll */}
-      <ScrollWords
-        eyebrow="Premium, in the everyday"
-        text="Most sunglasses live at two extremes. RAYVE was created for everything in between."
-        highlight={["RAYVE", "everything", "in", "between"]}
-      />
 
       {/* Collection: pins and scrolls sideways on desktop */}
       <HorizontalShowcase eyebrow="Collection 01" title="Shop the collection" products={featured.length >= 4 ? [...featured, ...all.filter((p) => !p.featured)] : all} />
@@ -94,7 +87,7 @@ export default async function HomePage() {
           { title: "Sunglasses", sub: frames(count("Sunglasses")), href: "/shop?category=Sunglasses", img: "/images/model-sevilla.jpg" },
           { title: "New arrivals", sub: "Just landed", href: "/shop?sort=newest", img: "/images/model-arena.jpg" },
         ].map((c) => (
-          <Link key={c.title} href={c.href} className="group relative block aspect-[4/5] overflow-hidden bg-mist md:aspect-[4/5] lg:aspect-square">
+          <Link key={c.title} href={c.href} data-reveal className="group relative block aspect-[4/5] overflow-hidden bg-mist md:aspect-[4/5] lg:aspect-square">
             <Image src={c.img} alt={c.title} fill sizes="(min-width:768px) 50vw, 100vw" className="object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-105" />
             <div className="absolute inset-0 bg-gradient-to-t from-olive-950/55 via-transparent to-transparent" />
             <div className="absolute inset-x-0 bottom-0 flex flex-col items-center pb-10 text-center text-sand md:pb-12">
@@ -135,12 +128,9 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* The arena: every frame in its own arch, with a quick view on hover */}
-      <ArenaWall products={all.filter((p) => p.category === "Sunglasses")} />
-
       {/* Editorial split */}
       <section className="grid bg-olive-800 text-sand lg:grid-cols-2">
-        <div className="group relative aspect-[4/5] overflow-hidden md:aspect-[16/11] lg:aspect-auto lg:min-h-[640px]">
+        <div data-reveal className="group relative aspect-[4/5] overflow-hidden md:aspect-[16/11] lg:aspect-auto lg:min-h-[640px]">
           <Image src="/images/campaign-matador.jpg" alt="RAYVE campaign at the bullring" fill sizes="(min-width:1024px) 50vw, 100vw" className="object-cover transition-transform duration-[1.5s] group-hover:scale-105" />
         </div>
         <Reveal className="flex flex-col justify-center px-5 py-20 sm:px-8 md:px-16 lg:px-20 xl:px-24">
@@ -210,9 +200,9 @@ export default async function HomePage() {
       {/* Image trail: campaign photos follow the cursor */}
       <section className="bg-olive-950 text-sand">
         <ImageTrail>
-          <div className="flex min-h-[70svh] flex-col items-center justify-center px-5 py-24 text-center">
+          <div className="flex min-h-svh flex-col items-center justify-center px-5 py-24 text-center">
             <p className="eyebrow text-olive-400">Collection 01</p>
-            <p data-kinetic className="display-title mt-6 text-[13vw] leading-[0.9] sm:text-[10vw] lg:text-[8.5vw]" data-no-split>
+            <p className="display-title mt-6 text-[13vw] leading-[0.9] sm:text-[10vw] lg:text-[8.5vw]" data-no-split>
               Own the
               <br />
               energy
