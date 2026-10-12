@@ -61,6 +61,12 @@ export default function ProductCard({ product, priority = false, sizes, morph = 
           />
         )}
 
+        {/* Lens glare: a soft band of light sweeps across the photo on hover, like sun on glass */}
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-y-0 -left-1/2 w-1/2 -skew-x-12 bg-gradient-to-r from-transparent via-white/35 to-transparent opacity-0 mix-blend-soft-light transition-[translate,opacity] duration-0 group-hover:translate-x-[300%] group-hover:opacity-100 group-hover:duration-[1100ms] group-hover:ease-out motion-reduce:hidden"
+        />
+
         {(soldOut || onSale) && (
           <span className="absolute left-3 top-3 bg-paper/90 px-2 py-1 text-[10px] uppercase tracking-[0.18em] text-ink">
             {soldOut ? "Sold out" : `−${Math.round((1 - product.price / product.comparePrice) * 100)}%`}

@@ -12,6 +12,8 @@ import FrameFinder from "@/components/home/FrameFinder";
 import LensTintLab from "@/components/motion/LensTintLab";
 import ImageTrail from "@/components/motion/ImageTrail";
 import FlashlightReveal from "@/components/motion/FlashlightReveal";
+import CollectionIndex from "@/components/motion/CollectionIndex";
+import PhotoInWord from "@/components/motion/PhotoInWord";
 import HomeFAQ from "@/components/home/HomeFAQ";
 import ProductCard from "@/components/store/ProductCard";
 import NewsletterForm from "@/components/store/NewsletterForm";
@@ -99,6 +101,9 @@ export default async function HomePage() {
         ))}
       </section>
 
+      {/* Brand moment: the campaign photo seen through the letters of RAYVE, opening up on scroll */}
+      <PhotoInWord image="/images/campaign-matador.jpg" line="Poise. Tension. Precision. Command." sub="Collection 01 — premium, in the everyday." />
+
       {/* New arrivals grid */}
       <section className="container-x section-y">
         <SectionHead eyebrow="Just landed" title="New arrivals" href="/shop?sort=newest" />
@@ -117,6 +122,20 @@ export default async function HomePage() {
       {/* Lens lab: compare tints over a street scene */}
       <section className="container-x section-y">
         <LensTintLab />
+      </section>
+
+      {/* Collection index: every frame by name; hover floats its photo beside the cursor */}
+      <section className="container-x section-y">
+        <div className="section-head flex items-end justify-between gap-6">
+          <div>
+            <p className="eyebrow">The index</p>
+            <h2 className="display-title mt-4 text-2xl sm:text-3xl lg:text-4xl">Every frame, by name</h2>
+          </div>
+          <Link href="/shop" className="hidden border-b border-ink pb-1 text-[11px] uppercase tracking-[0.2em] sm:block">
+            Shop all
+          </Link>
+        </div>
+        <CollectionIndex products={all.filter((p) => p.category === "Sunglasses")} />
       </section>
 
       {/* Frame finder */}

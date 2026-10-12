@@ -51,7 +51,7 @@ export default async function LookbookPage() {
         </div>
         <div className={`md:col-span-6 lg:col-span-4 ${flip ? "lg:col-start-2" : "lg:col-start-8"}`}>
           <p className="font-display text-[11px] uppercase tracking-[0.3em] text-olive-700">Look {String(i + 1).padStart(2, "0")}</p>
-          <h2 className="display-title mt-5 text-3xl sm:text-4xl">{p.name}</h2>
+          <h2 className="display-title mt-5 text-3xl [overflow-wrap:anywhere] sm:text-4xl">{p.name}</h2>
           {p.tagline && <p className="mt-4 text-lg font-light text-muted">{p.tagline}</p>}
           <p className="mt-6 text-xs uppercase tracking-[0.2em] text-muted">{[p.shape, p.frameColor, p.lensColor && `${p.lensColor} lens`].filter(Boolean).join(" · ")}</p>
           <div className="mt-8">

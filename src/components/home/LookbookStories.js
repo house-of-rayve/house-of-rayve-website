@@ -77,7 +77,7 @@ export default function LookbookStories({ products }) {
           <button
             key={p.id}
             onClick={() => go(i)}
-            className="group flex w-20 shrink-0 flex-col items-center sm:w-24 lg:w-[min(122px,calc(6vw+18px))]"
+            className="group relative flex w-20 shrink-0 flex-col items-center sm:w-24 lg:w-[min(122px,calc(6vw+18px))]"
           >
             {/* thin brushed-gold ring (grey once seen), a little air, then the photo */}
             <span
