@@ -13,6 +13,7 @@ import RollText from "@/components/motion/RollText";
 import ScrambleText from "@/components/motion/ScrambleText";
 import FullscreenMenu from "@/components/motion/FullscreenMenu";
 import SoundToggle from "@/components/motion/SoundToggle";
+import { playBull } from "@/components/motion/bullSound";
 import { SHAPES } from "@/lib/constants";
 
 const ANNOUNCEMENTS = [
@@ -281,7 +282,7 @@ export default function Header({ user }) {
             </nav>
           </div>
 
-          <Link href="/" aria-label="RAYVE home" className={`group/logo inline-flex items-center gap-2.5 ${overlay ? "text-sand" : "text-olive-800"}`}>
+          <Link href="/" onClick={() => playBull()} aria-label="RAYVE home" className={`group/logo inline-flex items-center gap-2.5 ${overlay ? "text-sand" : "text-olive-800"}`}>
             <LogoMark className="h-[22px] w-[37px] origin-bottom group-hover/logo:animate-charge motion-reduce:animate-none" />
             <span className="hidden sm:inline-flex">
               <Wordmark className="h-[13px] w-[99px]" />

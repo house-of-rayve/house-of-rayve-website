@@ -1,6 +1,6 @@
 "use client";
 
-// Bull sound played on page changes. Plays /sounds/bull.mp3 (a licensed recording);
+// Bull sound, played when the RAYVE logo is clicked and in the 404 game. Plays /sounds/bull.mp3 (CC0 recording);
 // stays silent, and the toggle stays hidden, until that file is added.
 const PREF_KEY = "rayve_sound";
 const FILE_URL = "/sounds/bull.mp3";
