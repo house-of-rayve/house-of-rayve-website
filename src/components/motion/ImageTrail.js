@@ -15,7 +15,7 @@ const IMAGES = [
   "/images/matador.jpg",
 ];
 // Small optimised versions via the Next.js image endpoint (the trail never shows them large)
-const small = (src) => `/_next/image?url=${encodeURIComponent(src)}&w=384&q=70`;
+const small = (src) => `/_next/image?url=${encodeURIComponent(src)}&w=384&q=75`; // 75 is the only quality the image optimiser accepts by default
 const STEP = 90; // px the pointer must travel before the next photo drops
 
 /**
