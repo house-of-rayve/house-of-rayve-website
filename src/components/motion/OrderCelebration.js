@@ -2,10 +2,11 @@
 
 import { useEffect } from "react";
 import { gsap, prefersReducedMotion } from "./gsap";
+import { playBull } from "./bullSound";
 
 const COLORS = ["#c9a85b", "#a69f4e", "#e9e2d0", "#44442a", "#d8c27a"];
 
-/** One-off burst when an order is placed: gold confetti and the bull mark flying up. */
+/** One-off burst when an order is placed: gold confetti and the bull mark flying up, with the bull sound. */
 export default function OrderCelebration({ id }) {
   useEffect(() => {
     // Only once per order, even if the page is refreshed
@@ -14,6 +15,7 @@ export default function OrderCelebration({ id }) {
       if (sessionStorage.getItem(key)) return;
       sessionStorage.setItem(key, "1");
     } catch {}
+    playBull();
     if (prefersReducedMotion()) return;
 
     const layer = document.createElement("div");
