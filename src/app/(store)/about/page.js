@@ -1,20 +1,16 @@
 import Image from "next/image";
 import Link from "next/link";
 import BrandStory from "@/components/motion/BrandStory";
+import FullBanner from "@/components/home/FullBanner";
 
 export const metadata = { title: "The brand" };
 
 export default function AboutPage() {
   return (
     <>
-      <section className="relative isolate flex min-h-[70svh] items-end overflow-hidden bg-olive-900">
-        <Image src="/images/bullring.jpg" alt="" fill priority sizes="100vw" className="-z-10 object-cover opacity-70" />
-        <div className="absolute inset-0 -z-10 bg-gradient-to-t from-olive-950/80 to-transparent" />
-        <div className="container-x pb-16 text-sand">
-          <p className="eyebrow text-sand/70">The brand</p>
-          <h1 className="display-title mt-4 max-w-3xl text-4xl sm:text-6xl">Poise. Tension. Precision. Command.</h1>
-        </div>
-      </section>
+      <h1 className="sr-only">The brand</h1>
+      {/* text sits on the left of this artwork, so phones keep the left side in view */}
+      <FullBanner src="/images/banners/the-signal.jpg" alt="RAYVE — The signal has arrived" priority reveal={false} focus="0% 50%" full />
 
       {/* The story, chapter by chapter: idea, symbol, voice, promise */}
       <BrandStory />

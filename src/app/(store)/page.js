@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { listProducts } from "@/lib/products";
 import Reveal from "@/components/ui/Reveal";
-import HeroSlider from "@/components/home/HeroSlider";
+import FullBanner from "@/components/home/FullBanner";
 import LookbookStories from "@/components/home/LookbookStories";
 import HorizontalShowcase from "@/components/motion/HorizontalShowcase";
 import FloatingGallery from "@/components/motion/FloatingGallery";
@@ -70,7 +70,9 @@ export default async function HomePage() {
 
   return (
     <>
-      <HeroSlider />
+      {/* Hero: campaign banner (sits under the transparent header) */}
+      <h1 className="sr-only">RAYVE — the familiar, broken open</h1>
+      <FullBanner src="/images/banners/broken-open.jpg" alt="RAYVE — The familiar, broken open" priority reveal={false} underHeader className="-mt-[65px]" />
 
       {/* Lookbook: Instagram-style stories of the frames on model */}
       <section className="px-5 pb-6 pt-12 sm:px-8 sm:pt-16 lg:px-12">
@@ -115,6 +117,9 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* Campaign banner */}
+      <FullBanner src="/images/banners/break-the-familiar.jpg" alt="RAYVE — Break the familiar" />
 
       {/* Signature product in 3D: rotates, folds and changes lens tint as you scroll */}
       <ToroShowcase product={spotlight} />

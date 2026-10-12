@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { listProducts } from "@/lib/products";
 import { formatPrice } from "@/lib/format";
 import { EDITORIAL_EXCLUDE } from "@/lib/constants";
+import FullBanner from "@/components/home/FullBanner";
 
 export const metadata = {
   title: "Lookbook",
@@ -77,15 +78,8 @@ export default async function LookbookPage() {
 
   return (
     <>
-      <section className="relative isolate -mt-[65px] flex h-svh min-h-[600px] items-end overflow-hidden bg-olive-950 text-sand">
-        <Image src="/images/campaign-matador.jpg" alt="RAYVE Collection 01 campaign" fill priority sizes="100vw" className="-z-10 object-cover" />
-        <div className="absolute inset-0 -z-10 bg-gradient-to-t from-olive-950/80 via-olive-950/20 to-olive-950/30" />
-        <div className="container-x pb-14 sm:pb-20">
-          <p className="eyebrow text-olive-400">The lookbook · Collection 01</p>
-          <h1 className="display-title mt-5 max-w-4xl text-4xl sm:text-6xl lg:text-7xl">Poise. Tension. Precision. Command.</h1>
-          <p className="mt-6 max-w-md text-sand/75">Every frame in the collection, on location — scroll through the looks and shop the pair you see.</p>
-        </div>
-      </section>
+      <h1 className="sr-only">The lookbook — Collection 01</h1>
+      <FullBanner src="/images/banners/something-big.jpg" alt="RAYVE — Something big is coming" priority reveal={false} underHeader className="-mt-[65px]" />
 
       {blocks}
 
