@@ -89,7 +89,7 @@ export default function ProductPurchase({ product }) {
       <div ref={anchor} className="flex gap-3">
         {!soldOut && <QuantityStepper value={qty} max={max} onChange={(q) => setQty(Math.max(1, Math.min(q, max)))} />}
         <button disabled={soldOut} onClick={() => add(product, qty, visibleGallery())} className="btn-primary flex-1">
-          {soldOut ? "Sold out" : `Add to bag · ${formatPrice(product.price * qty)}`}
+          {soldOut ? "Sold out" : "Add to bag"}
         </button>
         <WishlistButton product={product} className="size-12 shrink-0 border border-line bg-paper hover:border-olive-800" />
       </div>

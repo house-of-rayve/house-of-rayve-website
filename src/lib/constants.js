@@ -24,7 +24,8 @@ export const STATUS_LABELS = {
 };
 
 export const FREE_SHIPPING_THRESHOLD = 2999;
-export const SHIPPING_FEE = 149;
+// TEMPORARY: shipping is free on every order while live payments are being tested. Restore to 149 afterwards.
+export const SHIPPING_FEE = 0;
 
 export function shippingFor(subtotal) {
   return subtotal === 0 || subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;

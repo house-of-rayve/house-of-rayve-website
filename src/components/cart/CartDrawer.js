@@ -7,7 +7,7 @@ import { X, ShoppingBag, Plus, Truck, Lock } from "lucide-react";
 import { useCart } from "./CartProvider";
 import CartLines from "./CartLines";
 import { formatPrice } from "@/lib/format";
-import { FREE_SHIPPING_THRESHOLD } from "@/lib/constants";
+import { FREE_SHIPPING_THRESHOLD, SHIPPING_FEE } from "@/lib/constants";
 import { LogoMark } from "@/components/ui/Logo";
 
 function Upsell({ onNavigate }) {
@@ -73,8 +73,9 @@ export default function CartDrawer() {
     };
   }, [open, setOpen]);
 
-  const remaining = FREE_SHIPPING_THRESHOLD - subtotal;
-  const progress = Math.min(100, (subtotal / FREE_SHIPPING_THRESHOLD) * 100);
+  // With no shipping fee, every bag already ships free
+  const remaining = SHIPPING_FEE ? FREE_SHIPPING_THRESHOLD - subtotal : 0;
+  const progress = SHIPPING_FEE ? Math.min(100, (subtotal / FREE_SHIPPING_THRESHOLD) * 100) : 100;
 
   return (
     <div className={`fixed inset-0 z-50 ${open ? "" : "pointer-events-none"}`} aria-hidden={!open} inert={!open}>

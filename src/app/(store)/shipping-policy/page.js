@@ -8,7 +8,14 @@ export const metadata = { title: "Shipping & delivery policy", alternates: { can
 export default function ShippingPolicyPage() {
   const sections = [
     { title: "Where we ship", body: ["We currently deliver across India through our courier partners. We do not ship internationally at the moment."] },
-    { title: "Shipping charges", body: [`Shipping is complimentary on orders of ${formatPrice(FREE_SHIPPING_THRESHOLD)} or more. A flat fee of ${formatPrice(SHIPPING_FEE)} applies to smaller orders. The exact charge is always shown at checkout before you pay.`] },
+    {
+      title: "Shipping charges",
+      body: [
+        SHIPPING_FEE
+          ? `Shipping is complimentary on orders of ${formatPrice(FREE_SHIPPING_THRESHOLD)} or more. A flat fee of ${formatPrice(SHIPPING_FEE)} applies to smaller orders. The exact charge is always shown at checkout before you pay.`
+          : "Shipping is complimentary on every order. Any charge, if it ever applies, is always shown at checkout before you pay.",
+      ],
+    },
     { title: "Dispatch", body: ["Orders are packed and dispatched from New Delhi within 24 hours (excluding Sundays and public holidays). Orders placed after 5 pm or on a Sunday are dispatched the next working day."] },
     { title: "Delivery times", body: ["Metro cities: usually 2–3 working days after dispatch.", "Rest of India: usually 4–6 working days after dispatch.", "You can check an estimate for your PIN code on any product page. Delivery times are estimates and may be longer during sales, festivals, bad weather or for remote locations."] },
     { title: "Tracking", body: ["Once your order ships, we'll email you a tracking link. You can also follow your order's progress from My account → Orders."] },
