@@ -3,7 +3,7 @@ import { siteUrl } from "@/lib/site";
 
 export default async function sitemap() {
   const products = await listProducts();
-  const pages = ["", "/shop", "/lookbook", "/try-on", "/about"].map((path) => ({
+  const pages = ["", "/shop", "/lookbook", "/try-on", "/about", "/contact", "/terms", "/privacy", "/refund-policy", "/shipping-policy"].map((path) => ({
     url: `${siteUrl}${path}`,
     changeFrequency: "weekly",
     priority: path === "" ? 1 : 0.7,

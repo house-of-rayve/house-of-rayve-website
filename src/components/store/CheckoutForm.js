@@ -253,7 +253,12 @@ export default function CheckoutForm({ user, addresses, onlinePayments = false }
             <button disabled={busy} className="btn-primary mt-6 w-full">
               {busy ? (payment === "ONLINE" ? "Waiting for payment…" : "Placing order…") : `${payment === "ONLINE" ? "Pay" : "Place order"} · ${formatPrice(payable)}`}
             </button>
-            <p className="mt-3 text-center text-[11px] text-muted">By placing this order you agree to our terms of sale.</p>
+            <p className="mt-3 text-center text-[11px] text-muted">
+              By placing this order you agree to our{" "}
+              <Link href="/terms" className="underline underline-offset-2">terms</Link>,{" "}
+              <Link href="/shipping-policy" className="underline underline-offset-2">shipping</Link> and{" "}
+              <Link href="/refund-policy" className="underline underline-offset-2">refund</Link> policies.
+            </p>
           </OrderSummary>
         </div>
       </div>

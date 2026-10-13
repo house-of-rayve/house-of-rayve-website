@@ -3,6 +3,7 @@ import Logo from "@/components/ui/Logo";
 import NewsletterForm from "./NewsletterForm";
 import ScrambleText from "@/components/motion/ScrambleText";
 import FooterMark from "@/components/motion/FooterMark";
+import { BUSINESS } from "@/lib/business";
 
 const COLUMNS = [
   {
@@ -25,9 +26,11 @@ const COLUMNS = [
   {
     title: "Help",
     links: [
-      ["Shipping & returns", "/about#care"],
-      ["Care guide", "/about#care"],
-      ["Contact", "mailto:info@houseofrayve.com"],
+      ["Contact us", "/contact"],
+      ["Shipping & delivery", "/shipping-policy"],
+      ["Cancellation & refunds", "/refund-policy"],
+      ["Terms & conditions", "/terms"],
+      ["Privacy policy", "/privacy"],
     ],
   },
 ];
@@ -65,7 +68,7 @@ export default function Footer() {
       <FooterMark />
       <div className="border-t border-sand/10">
         <div className="container-x flex flex-col gap-2 py-6 text-[11px] uppercase tracking-[0.2em] text-sand/75 sm:flex-row sm:justify-between">
-          <span>© {new Date().getFullYear()} Rayve. All rights reserved.</span>
+          <span>© {new Date().getFullYear()} {BUSINESS.name} · GSTIN {BUSINESS.gstin}</span>
           <span>Own the energy</span>
         </div>
       </div>
