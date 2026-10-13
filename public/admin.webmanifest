@@ -1,0 +1,21 @@
+{
+  "name": "RAYVE Admin",
+  "short_name": "RAYVE Admin",
+  "description": "Orders, products, customers and the live dashboard for RAYVE.",
+  "id": "/admin",
+  "start_url": "/admin",
+  "scope": "/admin",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#22221a",
+  "theme_color": "#22221a",
+  "icons": [
+    { "src": "/brand/admin-app/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/brand/admin-app/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/brand/admin-app/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Orders", "url": "/admin/orders", "icons": [{ "src": "/brand/admin-app/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Products", "url": "/admin/products", "icons": [{ "src": "/brand/admin-app/icon-192.png", "sizes": "192x192" }] }
+  ]
+}
