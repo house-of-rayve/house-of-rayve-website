@@ -118,7 +118,7 @@ export async function createShipment(order, courierId) {
     billing_email: order.user?.email ?? "",
     products: order.items.map((i) => ({
       product_name: i.name,
-      product_sku: i.productId ?? i.id,
+      product_sku: i.product?.slug ? `RAYVE-${i.product.slug.toUpperCase()}` : "RAYVE", // shown on the label next to the name
       product_quantity: String(i.quantity),
       product_price: String(i.price),
       product_tax_rate: "",
@@ -196,7 +196,7 @@ async function track(awbs) {
   return out;
 }
 
-const withItems = { items: true, user: { select: { id: true, name: true, email: true, phone: true } } };
+const withItems = { items: { include: { product: { select: { slug: true } } } }, user: { select: { id: true, name: true, email: true, phone: true } } };
 
 // Statuses iThink reports before the courier has collected the parcel
 const BEFORE_PICKUP = /manifest|not picked|pickup|booked|pending/i;

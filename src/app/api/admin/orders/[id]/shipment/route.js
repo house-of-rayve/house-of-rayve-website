@@ -3,7 +3,7 @@ import { json, error, readJson, authorize, str } from "@/lib/api";
 import { publish } from "@/lib/events";
 import { bookShipment, cancelShipment, courierRates, ithinkEnabled, shippingLabel, syncShipments } from "@/lib/ithink";
 
-const include = { items: true, user: { select: { id: true, name: true, email: true, phone: true } } };
+const include = { items: { include: { product: { select: { slug: true } } } }, user: { select: { id: true, name: true, email: true, phone: true } } };
 
 async function load(params) {
   const [, denied] = await authorize("ADMIN");
