@@ -1,11 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { after } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { formatDateTime, formatPrice } from "@/lib/format";
 import PageHeader, { Panel } from "@/components/admin/PageHeader";
 import StatusBadge from "@/components/ui/StatusBadge";
 import OrderControls from "@/components/admin/OrderControls";
+import ShipmentPanel from "@/components/admin/ShipmentPanel";
+import { ithinkEnabled, syncShipments } from "@/lib/ithink";
 
 export const metadata = { title: "Order" };
 
@@ -16,6 +19,7 @@ export default async function AdminOrderPage({ params }) {
     include: { items: true, user: { select: { id: true, name: true, email: true, phone: true } } },
   });
   if (!order) notFound();
+  after(() => syncShipments([order])); // fresh courier status for the next visit
 
   return (
     <>
@@ -77,6 +81,16 @@ export default async function AdminOrderPage({ params }) {
             <div className="p-5">
               <OrderControls key={order.updatedAt.toISOString()} order={{ id: order.id, status: order.status, paymentStatus: order.paymentStatus }} />
             </div>
+          </Panel>
+          <Panel title="Shipping · iThink">
+            <ShipmentPanel
+              key={`${order.updatedAt.toISOString()}-${order.awb}`}
+              enabled={ithinkEnabled()}
+              order={{
+                id: order.id, status: order.status, paymentMethod: order.paymentMethod, paymentStatus: order.paymentStatus, shipPostalCode: order.shipPostalCode,
+                awb: order.awb, courier: order.courier, trackingUrl: order.trackingUrl, shipmentStatus: order.shipmentStatus, shipmentLocation: order.shipmentLocation, trackedAt: order.trackedAt?.toISOString() ?? null,
+              }}
+            />
           </Panel>
           <Panel title="Payment">
             <dl className="space-y-2 p-5 text-sm">

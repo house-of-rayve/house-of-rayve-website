@@ -1,10 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, CheckCircle2 } from "lucide-react";
+import { after } from "next/server";
+import { ArrowLeft, CheckCircle2, ExternalLink, Truck } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { formatDateTime, formatPrice } from "@/lib/format";
+import { syncShipments } from "@/lib/ithink";
 import StatusBadge from "@/components/ui/StatusBadge";
 import OrderTimeline from "@/components/account/OrderTimeline";
 import CancelOrderButton from "@/components/account/CancelOrderButton";
@@ -21,6 +23,7 @@ export default async function OrderDetailPage({ params, searchParams }) {
     include: { items: { include: { product: { select: { slug: true } } } } },
   });
   if (!order) notFound();
+  after(() => syncShipments([order])); // fresh courier status for the next visit
 
   return (
     <div className="space-y-6">
@@ -55,6 +58,25 @@ export default async function OrderDetailPage({ params, searchParams }) {
         <div className="mt-8">
           <OrderTimeline status={order.status} />
         </div>
+        {order.awb && order.status !== "CANCELLED" && (
+          <div className="mt-8 flex flex-col gap-4 border-t border-line pt-6 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-3">
+              <Truck className="mt-0.5 size-5 shrink-0 text-olive-700" />
+              <div className="text-sm">
+                <p className="font-medium">{order.shipmentStatus ?? "Shipped"}{order.shipmentLocation ? ` · ${order.shipmentLocation}` : ""}</p>
+                <p className="mt-1 text-xs text-muted">
+                  <span className="capitalize">{order.courier ?? "Courier"}</span> · AWB {order.awb}
+                  {order.trackedAt ? ` · updated ${formatDateTime(order.trackedAt)}` : ""}
+                </p>
+              </div>
+            </div>
+            {order.trackingUrl && (
+              <a href={order.trackingUrl} target="_blank" rel="noreferrer" className="btn-primary shrink-0">
+                Track your parcel <ExternalLink className="size-3.5" />
+              </a>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">

@@ -6,6 +6,7 @@ import { restockOrder } from "@/lib/orders";
 import { publish } from "@/lib/events";
 import { invalidateCatalog } from "@/lib/products";
 import { sendOrderEmails } from "@/lib/email";
+import { cancelShipment } from "@/lib/ithink";
 
 export async function GET(_request, { params }) {
   const [, denied] = await authorize("ADMIN");
@@ -42,6 +43,16 @@ export async function PATCH(request, { params }) {
   // COD orders are paid on delivery
   if (data.status === "DELIVERED" && order.paymentMethod === "COD" && !data.paymentStatus) {
     data.paymentStatus = "PAID";
+  }
+
+  // A booked courier pickup is cancelled with the order
+  if (data.status === "CANCELLED" && order.awb && order.status !== "DELIVERED") {
+    try {
+      await cancelShipment(order.awb);
+    } catch (e) {
+      return error(`Couldn't cancel the iThink shipment (${e.message}). Cancel it in the iThink dashboard, then try again.`, 502);
+    }
+    Object.assign(data, { shipmentStatus: "Cancelled", trackedAt: new Date() });
   }
 
   const updated = await prisma.$transaction(async (tx) => {

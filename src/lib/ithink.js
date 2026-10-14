@@ -1,0 +1,200 @@
+import "server-only";
+import { prisma } from "@/lib/prisma";
+import { siteUrl } from "@/lib/site";
+import { sendOrderEmails } from "@/lib/email";
+
+// Shipping through iThink Logistics (https://docs.ithinklogistics.com, API v3).
+// Needs ITHINK_ACCESS_TOKEN and ITHINK_SECRET_KEY (dashboard → Store → API); the pickup warehouse and
+// store default to the RAYVE ones and can be overridden with ITHINK_WAREHOUSE_ID / ITHINK_STORE_ID.
+const TOKEN = process.env.ITHINK_ACCESS_TOKEN;
+const SECRET = process.env.ITHINK_SECRET_KEY;
+const WAREHOUSE_ID = process.env.ITHINK_WAREHOUSE_ID ?? "125894"; // Nirman Vihar, New Delhi 110092
+const STORE_ID = process.env.ITHINK_STORE_ID ?? "34067";
+const PICKUP_PINCODE = process.env.ITHINK_PICKUP_PINCODE ?? "110092";
+
+// Packed parcel: one pair in its case and box. Extra pairs add weight and height.
+const PARCEL = { lengthCm: 20, widthCm: 12, heightCm: 8, weightKg: 0.5 };
+const HSN_SUNGLASSES = "9004";
+
+// How long a fetched tracking status is trusted before asking iThink again
+const TRACK_TTL_MS = 20 * 60 * 1000;
+
+export const ithinkEnabled = () => Boolean(TOKEN && SECRET);
+
+async function call(path, data, host = "my") {
+  if (!ithinkEnabled()) throw new Error("iThink Logistics is not set up (ITHINK_ACCESS_TOKEN / ITHINK_SECRET_KEY).");
+  const res = await fetch(`https://${host}.ithinklogistics.com/api_v3/${path}.json`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ data: { ...data, access_token: TOKEN, secret_key: SECRET } }),
+    cache: "no-store",
+  });
+  const body = await res.json().catch(() => null);
+  if (!res.ok || !body) throw new Error(`iThink Logistics did not respond (${res.status}).`);
+  if (body.status === "error") throw new Error(body.html_message || body.message || (typeof body.data === "string" ? body.data : "iThink Logistics returned an error."));
+  return body;
+}
+
+const phone10 = (v) => String(v ?? "").replace(/\D/g, "").slice(-10);
+
+function parcelFor(order) {
+  const pairs = Math.max(1, order.items.reduce((s, i) => s + i.quantity, 0));
+  return {
+    length: PARCEL.lengthCm,
+    width: PARCEL.widthCm,
+    height: PARCEL.heightCm * Math.min(pairs, 4),
+    weight: +(PARCEL.weightKg * pairs).toFixed(2),
+  };
+}
+
+/** Couriers that deliver to `pincode`, cheapest first, with price (₹, incl. GST) and delivery days. */
+export async function courierRates(pincode, { cod = false, value = 1000, pairs = 1 } = {}) {
+  const body = await call("rate/check", {
+    from_pincode: PICKUP_PINCODE,
+    to_pincode: String(pincode),
+    shipping_length_cms: String(PARCEL.lengthCm),
+    shipping_width_cms: String(PARCEL.widthCm),
+    shipping_height_cms: String(PARCEL.heightCm),
+    shipping_weight_kg: String(+(PARCEL.weightKg * Math.max(1, pairs)).toFixed(2)),
+    order_type: "forward",
+    payment_method: cod ? "cod" : "prepaid",
+    product_mrp: String(value),
+  });
+  const rates = (body.data ?? [])
+    .filter((c) => (cod ? c.cod : c.prepaid) === "Y")
+    .map((c) => ({ id: c.logistic_name.toLowerCase(), name: c.logistic_name, rate: Math.round(c.rate), days: Number(c.delivery_tat) || null }))
+    .sort((a, b) => a.rate - b.rate);
+  return { rates, eta: body.expected_delivery_date ?? null };
+}
+
+/** Books the order with iThink. `courier` is an id from courierRates(), or empty to let iThink choose. */
+export async function createShipment(order, courier) {
+  const d = new Date(order.createdAt);
+  const parcel = parcelFor(order);
+  const cod = order.paymentMethod === "COD" && order.paymentStatus !== "PAID";
+  const address = {
+    name: order.shipName,
+    add: order.shipLine1,
+    add2: order.shipLine2 ?? "",
+    pin: order.shipPostalCode,
+    city: order.shipCity,
+    state: order.shipState,
+    country: order.shipCountry || "India",
+    phone: phone10(order.shipPhone),
+  };
+  const shipment = {
+    order: order.orderNumber,
+    order_date: `${String(d.getDate()).padStart(2, "0")}-${String(d.getMonth() + 1).padStart(2, "0")}-${d.getFullYear()}`,
+    total_amount: String(order.total),
+    ...address,
+    email: order.user?.email ?? "",
+    is_billing_same_as_shipping: "yes",
+    billing_name: address.name,
+    billing_add: address.add,
+    billing_add2: address.add2,
+    billing_pin: address.pin,
+    billing_city: address.city,
+    billing_state: address.state,
+    billing_country: address.country,
+    billing_phone: address.phone,
+    billing_email: order.user?.email ?? "",
+    products: order.items.map((i) => ({
+      product_name: i.name,
+      product_quantity: String(i.quantity),
+      product_price: String(i.price),
+      product_hsn_code: HSN_SUNGLASSES,
+      product_img_url: i.image ? new URL(i.image, siteUrl).href : "",
+    })),
+    shipment_length: String(parcel.length),
+    shipment_width: String(parcel.width),
+    shipment_height: String(parcel.height),
+    weight: String(parcel.weight),
+    shipping_charges: String(order.shippingFee),
+    total_discount: String(order.discount),
+    cod_amount: cod ? String(order.total) : "0",
+    payment_mode: cod ? "COD" : "Prepaid",
+    return_address_id: WAREHOUSE_ID,
+    store_id: STORE_ID,
+  };
+  const body = await call("order/add", {
+    shipments: [shipment],
+    pickup_address_id: WAREHOUSE_ID,
+    order_type: "forward",
+    ...(courier ? { logistics: courier } : {}),
+  });
+  const result = Object.values(body.data ?? {})[0];
+  if (!result || String(result.status).toLowerCase() !== "success" || !result.waybill) {
+    throw new Error(result?.remark || body.html_message || "iThink Logistics could not create the shipment.");
+  }
+  return {
+    awb: String(result.waybill),
+    courier: result.logistic_name || courier || null,
+    trackingUrl: result.tracking_url || `https://ithinklogistics.co.in/postship/tracking/${result.waybill}`,
+  };
+}
+
+/** Link to the printable shipping label (PDF) for an AWB. */
+export async function shippingLabel(awb) {
+  const body = await call("shipping/label", { awb_numbers: awb, page_size: "A4", display_cod_prepaid: "1", display_shipper_mobile: "1", display_shipper_address: "1" });
+  if (!body.file_name) throw new Error("iThink Logistics did not return a label.");
+  return body.file_name.replace(/^http:/, "https:");
+}
+
+export async function cancelShipment(awb) {
+  const body = await call("order/cancel", { awb_numbers: awb });
+  const result = Object.values(body.data ?? {})[0];
+  if (result && String(result.status).toLowerCase() !== "success") throw new Error(result.remark || "iThink Logistics could not cancel the shipment.");
+}
+
+/** Latest courier status for up to 10 AWBs: { [awb]: { status, location, delivered, cancelled } } */
+async function track(awbs) {
+  const body = await call("order/track", { awb_number_list: awbs.join(",") }, "api");
+  const out = {};
+  for (const [awb, t] of Object.entries(body.data ?? {})) {
+    if (!t || typeof t !== "object") continue;
+    const status = t.current_status || t.last_scan_details?.status || "";
+    const rto = /rto/i.test(status) || t.current_status_code === "RT";
+    out[awb] = {
+      status,
+      location: t.last_scan_details?.scan_location || null,
+      delivered: t.current_status_code === "DL" && !rto,
+      cancelled: t.current_status_code === "CN",
+    };
+  }
+  return out;
+}
+
+/**
+ * Refreshes the tracking status of shipped orders from iThink (only those not checked in the last few minutes,
+ * unless `force`). Orders the courier reports as delivered are marked DELIVERED and the customer is emailed.
+ */
+export async function syncShipments(orders, { force = false } = {}) {
+  if (!ithinkEnabled()) return [];
+  const due = orders.filter((o) => o.awb && o.status === "SHIPPED" && (force || !o.trackedAt || Date.now() - new Date(o.trackedAt) > TRACK_TTL_MS));
+  for (let i = 0; i < due.length; i += 10) {
+    const batch = due.slice(i, i + 10);
+    let results;
+    try {
+      results = await track(batch.map((o) => o.awb));
+    } catch (e) {
+      console.error("iThink tracking failed", e.message);
+      continue;
+    }
+    for (const o of batch) {
+      const t = results[o.awb];
+      if (!t) {
+        await prisma.order.update({ where: { id: o.id }, data: { trackedAt: new Date() } });
+        continue;
+      }
+      const data = { shipmentStatus: t.status || o.shipmentStatus, shipmentLocation: t.location, trackedAt: new Date() };
+      if (t.delivered) {
+        data.status = "DELIVERED";
+        if (o.paymentMethod === "COD") data.paymentStatus = "PAID";
+        const updated = await prisma.order.update({ where: { id: o.id }, data, include: { items: true, user: { select: { name: true, email: true } } } });
+        await sendOrderEmails(updated, "DELIVERED").catch(() => {});
+      } else {
+        await prisma.order.update({ where: { id: o.id }, data });
+      }
+    }
+  }
+}

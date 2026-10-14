@@ -58,7 +58,11 @@ const MESSAGES = {
     title: "Thank you — your order is placed",
     intro: o.paymentMethod === "COD" ? "We've received your order and will confirm it shortly. You'll pay on delivery." : "Your payment is confirmed and your order is being prepared.",
   }),
-  SHIPPED: (o) => ({ subject: `Your RAYVE order ${o.orderNumber} has shipped`, title: "Your frames are on their way", intro: "Your order has left our studio and is on its way to you." }),
+  SHIPPED: (o) => ({
+    subject: `Your RAYVE order ${o.orderNumber} has shipped`,
+    title: "Your frames are on their way",
+    intro: `Your order has left our studio and is on its way to you.${o.awb ? ` Courier: <span style="text-transform:capitalize">${esc(o.courier ?? "")}</span> · AWB ${esc(o.awb)}.` : ""}`,
+  }),
   DELIVERED: (o) => ({ subject: `Your RAYVE order ${o.orderNumber} was delivered`, title: "Delivered", intro: "Your order has been delivered. We hope you love your new frames." }),
   CANCELLED: (o) => ({ subject: `Your RAYVE order ${o.orderNumber} was cancelled`, title: "Order cancelled", intro: "Your order has been cancelled. If you paid online, the refund will be processed to your original payment method." }),
 };
@@ -70,7 +74,10 @@ const MESSAGES = {
 export async function sendOrderEmails(order, kind) {
   const message = MESSAGES[kind]?.(order);
   if (!message || !API_KEY) return;
-  const link = { href: `${SITE}/account/orders/${order.id}`, label: "View your order" };
+  const link =
+    kind === "SHIPPED" && order.trackingUrl
+      ? { href: order.trackingUrl, label: "Track your parcel" }
+      : { href: `${SITE}/account/orders/${order.id}`, label: "View your order" };
   await send(order.user?.email, message.subject, layout(message.title, message.intro, order, link));
   if (kind === "placed" && ADMIN) {
     await send(

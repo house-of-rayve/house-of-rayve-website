@@ -84,6 +84,14 @@ model Order {
   total             Int
   razorpayOrderId   String?
   razorpayPaymentId String?
+  // Shipment with iThink Logistics, once the admin ships the order
+  awb               String?
+  courier           String?
+  trackingUrl       String?
+  shipmentStatus    String? // the courier's latest status, e.g. "In Transit"
+  shipmentLocation  String?
+  shippedAt         DateTime?
+  trackedAt         DateTime? // when the status was last fetched from iThink
   shipName          String
   shipPhone         String
   shipLine1         String

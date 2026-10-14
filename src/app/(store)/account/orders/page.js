@@ -1,7 +1,9 @@
 import Link from "next/link";
+import { after } from "next/server";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import OrderRow from "@/components/account/OrderRow";
+import { syncShipments } from "@/lib/ithink";
 
 export const metadata = { title: "My orders" };
 
@@ -12,6 +14,7 @@ export default async function OrdersPage() {
     orderBy: { createdAt: "desc" },
     include: { items: true },
   });
+  after(() => syncShipments(orders)); // fresh courier statuses for the next visit
   return (
     <section>
       <h2 className="mb-5 font-display text-xs uppercase tracking-[0.25em]">Order history ({orders.length})</h2>

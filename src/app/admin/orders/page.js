@@ -1,6 +1,8 @@
 import { Suspense } from "react";
 import Link from "next/link";
+import { after } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { syncShipments } from "@/lib/ithink";
 import { ORDER_STATUSES, STATUS_LABELS } from "@/lib/constants";
 import { formatDateTime, formatPrice } from "@/lib/format";
 import PageHeader from "@/components/admin/PageHeader";
@@ -20,6 +22,7 @@ export default async function AdminOrdersPage({ searchParams }) {
     orderBy: { createdAt: "desc" },
     include: { user: { select: { name: true, email: true } }, _count: { select: { items: true } } },
   });
+  after(() => syncShipments(orders)); // keep courier statuses fresh; marks delivered parcels as Delivered
 
   return (
     <>
@@ -59,7 +62,14 @@ export default async function AdminOrdersPage({ searchParams }) {
                       <StatusBadge status={o.paymentStatus} />
                     </div>
                   </td>
-                  <td className="px-5 py-3"><StatusBadge status={o.status} /></td>
+                  <td className="px-5 py-3">
+                    <StatusBadge status={o.status} />
+                    {o.trackingUrl && (
+                      <a href={o.trackingUrl} target="_blank" rel="noreferrer" className="mt-1 block text-xs text-muted hover:text-ink hover:underline">
+                        {o.shipmentStatus ?? "Track"} ↗
+                      </a>
+                    )}
+                  </td>
                   <td className="px-5 py-3 text-right tabular-nums">{formatPrice(o.total)}</td>
                 </tr>
               ))}

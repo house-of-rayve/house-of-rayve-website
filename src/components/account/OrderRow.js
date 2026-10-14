@@ -23,6 +23,9 @@ export default function OrderRow({ order }) {
         <p className="mt-1 truncate text-xs text-muted">
           {formatDate(order.createdAt)} · {count} {count === 1 ? "item" : "items"} · {order.items.map((i) => i.name).join(", ")}
         </p>
+        {order.awb && order.status === "SHIPPED" && (
+          <p className="mt-1 text-xs text-olive-700">{order.shipmentStatus ?? "On its way"} · tap to track</p>
+        )}
       </div>
       <span className="hidden text-sm sm:block">{formatPrice(order.total)}</span>
       <ChevronRight className="size-4 text-muted transition-transform group-hover:translate-x-0.5" />
