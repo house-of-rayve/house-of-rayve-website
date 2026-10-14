@@ -5,6 +5,7 @@ import { restockOrder } from "@/lib/orders";
 import { publish } from "@/lib/events";
 import { invalidateCatalog } from "@/lib/products";
 import { sendOrderEmails } from "@/lib/email";
+import { cancelShipment } from "@/lib/ithink";
 
 export async function POST(_request, { params }) {
   const [user, denied] = await authorize();
@@ -15,11 +16,23 @@ export async function POST(_request, { params }) {
   if (!["PENDING", "CONFIRMED"].includes(order.status)) {
     return error("This order can no longer be cancelled.", 409);
   }
+  // The courier pickup is booked as soon as the order is placed; cancel it first
+  if (order.awb) {
+    try {
+      await cancelShipment(order.awb);
+    } catch {
+      return error("We couldn't cancel the courier pickup. Please contact us at info@houseofrayve.com.", 502);
+    }
+  }
   const updated = await prisma.$transaction(async (tx) => {
     await restockOrder(tx, id);
     return tx.order.update({
       where: { id },
-      data: { status: "CANCELLED", paymentStatus: order.paymentStatus === "PAID" ? "REFUNDED" : order.paymentStatus },
+      data: {
+        status: "CANCELLED",
+        paymentStatus: order.paymentStatus === "PAID" ? "REFUNDED" : order.paymentStatus,
+        ...(order.awb ? { shipmentStatus: "Cancelled", trackedAt: new Date() } : {}),
+      },
       include: { items: true, user: { select: { name: true, email: true } } },
     });
   });

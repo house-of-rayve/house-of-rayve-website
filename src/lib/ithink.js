@@ -174,13 +174,56 @@ async function track(awbs) {
   return out;
 }
 
+const withItems = { items: true, user: { select: { id: true, name: true, email: true, phone: true } } };
+
+// Statuses iThink reports before the courier has collected the parcel
+const BEFORE_PICKUP = /manifest|not picked|pickup|booked|pending/i;
+
 /**
- * Refreshes the tracking status of shipped orders from iThink (only those not checked in the last few minutes,
- * unless `force`). Orders the courier reports as delivered are marked DELIVERED and the customer is emailed.
+ * Books the order with iThink (`courierId` from courierRates(), or empty for the cheapest courier) and saves the AWB
+ * and tracking link. The order stays Confirmed until the courier picks it up; syncShipments() then marks it Shipped.
+ */
+export async function bookShipment(order, courierId) {
+  let pick = courierId;
+  if (!pick) {
+    const cod = order.paymentMethod === "COD" && order.paymentStatus !== "PAID";
+    const pairs = order.items.reduce((s, i) => s + i.quantity, 0);
+    const { rates } = await courierRates(order.shipPostalCode, { cod, value: order.total, pairs });
+    if (!rates.length) throw new Error(`No courier delivers to ${order.shipPostalCode}.`);
+    pick = rates[0].id;
+  }
+  const shipment = await createShipment(order, pick);
+  return prisma.order.update({
+    where: { id: order.id },
+    data: { ...shipment, status: "CONFIRMED", shipmentStatus: "Pickup scheduled", shipmentLocation: null, trackedAt: new Date() },
+    include: withItems,
+  });
+}
+
+/**
+ * Sends a newly placed order straight to iThink (cash on delivery when placed, online once paid). Returns the
+ * updated order, or the order unchanged if it couldn't be booked — the admin can then ship it from the order page.
+ */
+export async function autoShip(orderId) {
+  const order = await prisma.order.findUnique({ where: { id: orderId }, include: withItems });
+  if (!order || !ithinkEnabled() || order.awb || !["PENDING", "CONFIRMED"].includes(order.status)) return order;
+  if (order.paymentMethod === "ONLINE" && order.paymentStatus !== "PAID") return order;
+  try {
+    return await bookShipment(order);
+  } catch (e) {
+    console.error(`iThink auto-ship failed for ${order.orderNumber}:`, e.message);
+    return prisma.order.update({ where: { id: order.id }, data: { shipmentStatus: `Not booked: ${e.message}`.slice(0, 190) }, include: withItems });
+  }
+}
+
+/**
+ * Refreshes the tracking status of booked orders from iThink (only those not checked in the last few minutes,
+ * unless `force`). Once the courier collects the parcel the order becomes Shipped, and Delivered on delivery;
+ * the customer is emailed at each step.
  */
 export async function syncShipments(orders, { force = false } = {}) {
-  if (!ithinkEnabled()) return [];
-  const due = orders.filter((o) => o.awb && o.status === "SHIPPED" && (force || !o.trackedAt || Date.now() - new Date(o.trackedAt) > TRACK_TTL_MS));
+  if (!ithinkEnabled()) return;
+  const due = orders.filter((o) => o.awb && ["CONFIRMED", "SHIPPED"].includes(o.status) && (force || !o.trackedAt || Date.now() - new Date(o.trackedAt) > TRACK_TTL_MS));
   for (let i = 0; i < due.length; i += 10) {
     const batch = due.slice(i, i + 10);
     let results;
@@ -192,19 +235,22 @@ export async function syncShipments(orders, { force = false } = {}) {
     }
     for (const o of batch) {
       const t = results[o.awb];
-      if (!t) {
-        await prisma.order.update({ where: { id: o.id }, data: { trackedAt: new Date() } });
-        continue;
+      const data = { trackedAt: new Date() };
+      let email = null;
+      if (t && !t.cancelled) {
+        Object.assign(data, { shipmentStatus: t.status || o.shipmentStatus, shipmentLocation: t.location });
+        if (t.delivered) {
+          data.status = "DELIVERED";
+          if (o.paymentMethod === "COD") data.paymentStatus = "PAID";
+          email = "DELIVERED";
+        } else if (o.status === "CONFIRMED" && t.status && !BEFORE_PICKUP.test(t.status)) {
+          data.status = "SHIPPED";
+          data.shippedAt = new Date();
+          email = "SHIPPED";
+        }
       }
-      const data = { shipmentStatus: t.status || o.shipmentStatus, shipmentLocation: t.location, trackedAt: new Date() };
-      if (t.delivered) {
-        data.status = "DELIVERED";
-        if (o.paymentMethod === "COD") data.paymentStatus = "PAID";
-        const updated = await prisma.order.update({ where: { id: o.id }, data, include: { items: true, user: { select: { name: true, email: true } } } });
-        await sendOrderEmails(updated, "DELIVERED").catch(() => {});
-      } else {
-        await prisma.order.update({ where: { id: o.id }, data });
-      }
+      const updated = await prisma.order.update({ where: { id: o.id }, data, include: withItems });
+      if (email) await sendOrderEmails(updated, email).catch(() => {});
     }
   }
 }

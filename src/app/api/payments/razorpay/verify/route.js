@@ -4,6 +4,7 @@ import { json, error, readJson, authorize } from "@/lib/api";
 import { verifyRazorpaySignature } from "@/lib/razorpay";
 import { publish } from "@/lib/events";
 import { sendOrderEmails } from "@/lib/email";
+import { autoShip } from "@/lib/ithink";
 
 // Called by the checkout after Razorpay reports success; only a valid signature marks the order paid
 export async function POST(request) {
@@ -23,6 +24,7 @@ export async function POST(request) {
     include: { items: true, user: { select: { name: true, email: true } } },
   });
   publish("order:updated", { id: order.id, orderNumber: order.orderNumber, status: "CONFIRMED" });
-  after(() => sendOrderEmails(updated, "placed").catch(() => {})); // after the response, so it never slows the request
+  // Book the courier, then email the customer with the tracking link — after the response, so it never slows the checkout
+  after(async () => sendOrderEmails((await autoShip(order.id)) ?? updated, "placed").catch(() => {}));
   return json({ order: updated });
 }

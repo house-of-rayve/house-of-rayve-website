@@ -23,7 +23,7 @@ export default function OrderRow({ order }) {
         <p className="mt-1 truncate text-xs text-muted">
           {formatDate(order.createdAt)} · {count} {count === 1 ? "item" : "items"} · {order.items.map((i) => i.name).join(", ")}
         </p>
-        {order.awb && order.status === "SHIPPED" && (
+        {order.awb && ["CONFIRMED", "SHIPPED"].includes(order.status) && (
           <p className="mt-1 text-xs text-olive-700">{order.shipmentStatus ?? "On its way"} · tap to track</p>
         )}
       </div>

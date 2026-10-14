@@ -124,10 +124,13 @@ export default function ShipmentPanel({ order, enabled }) {
         {ratesError && <p className="mt-1.5 text-xs text-red-700">{ratesError}</p>}
         {rates?.length === 0 && !ratesError && <p className="mt-1.5 text-xs text-red-700">No courier delivers to this pincode.</p>}
       </div>
+      {order.shipmentStatus?.startsWith("Not booked") && (
+        <p className="rounded-md bg-amber-50 p-3 text-xs text-amber-900">Automatic booking failed — {order.shipmentStatus.replace(/^Not booked: /, "")}</p>
+      )}
       <button onClick={book} disabled={!!busy || rates?.length === 0} className={primary}>
         <Truck className="size-4" /> {busy === "create" ? "Booking…" : "Ship with iThink"}
       </button>
-      <p className="text-xs text-muted">Books the pickup, marks the order Shipped and emails the customer a tracking link.</p>
+      <p className="text-xs text-muted">New orders are booked automatically. Use this if that didn&apos;t happen — it books the pickup and adds the tracking link.</p>
     </div>
   );
 }

@@ -1,9 +1,7 @@
-import { after } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { json, error, readJson, authorize, str } from "@/lib/api";
 import { publish } from "@/lib/events";
-import { sendOrderEmails } from "@/lib/email";
-import { cancelShipment, courierRates, createShipment, ithinkEnabled, shippingLabel, syncShipments } from "@/lib/ithink";
+import { bookShipment, cancelShipment, courierRates, ithinkEnabled, shippingLabel, syncShipments } from "@/lib/ithink";
 
 const include = { items: true, user: { select: { id: true, name: true, email: true, phone: true } } };
 
@@ -41,14 +39,8 @@ export async function POST(request, { params }) {
       if (order.awb) return error("This order already has a shipment.", 409);
       if (!["PENDING", "CONFIRMED"].includes(order.status)) return error("Only pending or confirmed orders can be shipped.", 409);
       if (order.paymentMethod === "ONLINE" && order.paymentStatus !== "PAID") return error("This online order hasn't been paid.", 409);
-      const shipment = await createShipment(order, str(courier).toLowerCase());
-      const updated = await prisma.order.update({
-        where: { id: order.id },
-        data: { ...shipment, status: "SHIPPED", shippedAt: new Date(), shipmentStatus: "Shipment booked", shipmentLocation: null, trackedAt: new Date() },
-        include,
-      });
+      const updated = await bookShipment(order, str(courier).toLowerCase());
       publish("order:updated", { id: order.id, orderNumber: order.orderNumber, status: updated.status });
-      after(() => sendOrderEmails(updated, "SHIPPED").catch(() => {}));
       return json({ order: updated });
     }
 

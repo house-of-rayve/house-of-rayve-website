@@ -5,6 +5,7 @@ import { createOrder, parseAddress, OrderError } from "@/lib/orders";
 import { publish } from "@/lib/events";
 import { invalidateCatalog } from "@/lib/products";
 import { sendOrderEmails } from "@/lib/email";
+import { autoShip } from "@/lib/ithink";
 
 export async function GET() {
   const [user, denied] = await authorize();
@@ -46,8 +47,9 @@ export async function POST(request) {
     });
     invalidateCatalog();
     publish("order:created", { id: order.id, orderNumber: order.orderNumber, total: order.total, customer: user.name });
-    // Cash on delivery is placed now; online orders get their emails once the payment is verified
-    if (order.paymentMethod === "COD") after(() => sendOrderEmails({ ...order, user: { name: user.name, email: user.email } }, "placed").catch(() => {})); // after the response, so it never slows the request
+    // Cash on delivery goes to the courier now (online orders once paid), then the customer is emailed with the tracking link.
+    // Both run after the response, so they never slow the checkout.
+    if (order.paymentMethod === "COD") after(async () => sendOrderEmails((await autoShip(order.id)) ?? { ...order, user: { name: user.name, email: user.email } }, "placed").catch(() => {}));
     return json({ order }, 201);
   } catch (e) {
     if (e instanceof OrderError) return error(e.message, 409);
