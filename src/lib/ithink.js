@@ -62,13 +62,22 @@ export async function courierRates(pincode, { cod = false, value = 1000, pairs =
   });
   const rates = (body.data ?? [])
     .filter((c) => (cod ? c.cod : c.prepaid) === "Y")
-    .map((c) => ({ id: c.logistic_name.toLowerCase(), name: c.logistic_name, rate: Math.round(c.rate), days: Number(c.delivery_tat) || null }))
+    .map((c) => {
+      const service = (c.service_type || "Surface").toLowerCase();
+      return {
+        id: `${c.logistic_name.toLowerCase()}:${service}`, // courier and service type, both needed to book
+        name: service === "surface" ? c.logistic_name : `${c.logistic_name} (${c.service_type})`,
+        rate: Math.round(c.rate),
+        days: Number(c.delivery_tat) || null,
+      };
+    })
     .sort((a, b) => a.rate - b.rate);
   return { rates, eta: body.expected_delivery_date ?? null };
 }
 
-/** Books the order with iThink. `courier` is an id from courierRates(), or empty to let iThink choose. */
-export async function createShipment(order, courier) {
+/** Books the order with iThink. `courierId` is an id from courierRates(), or empty to let iThink choose. */
+export async function createShipment(order, courierId) {
+  const [courier, service] = (courierId || "").split(":");
   const d = new Date(order.createdAt);
   const parcel = parcelFor(order);
   const cod = order.paymentMethod === "COD" && order.paymentStatus !== "PAID";
@@ -120,6 +129,7 @@ export async function createShipment(order, courier) {
     shipments: [shipment],
     pickup_address_id: WAREHOUSE_ID,
     order_type: "forward",
+    s_type: service || "surface",
     ...(courier ? { logistics: courier } : {}),
   });
   const result = Object.values(body.data ?? {})[0];
