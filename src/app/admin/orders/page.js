@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
+import { FileDown, Printer } from "lucide-react";
 import { after } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { syncShipments } from "@/lib/ithink";
@@ -23,11 +24,18 @@ export default async function AdminOrdersPage({ searchParams }) {
     include: { user: { select: { name: true, email: true } }, _count: { select: { items: true } } },
   });
   after(() => syncShipments(orders)); // keep courier statuses fresh; marks delivered parcels as Delivered
+  const awaitingPickup = await prisma.order.count({ where: { awb: { not: null }, status: "CONFIRMED" } });
 
   return (
     <>
       <AutoRefresh />
-      <PageHeader title="Orders" description={`${orders.length} ${orders.length === 1 ? "order" : "orders"}${status ? ` · ${STATUS_LABELS[status]}` : ""}`} />
+      <PageHeader title="Orders" description={`${orders.length} ${orders.length === 1 ? "order" : "orders"}${status ? ` · ${STATUS_LABELS[status]}` : ""}`}>
+        {awaitingPickup > 0 && (
+          <a href="/api/admin/labels" target="_blank" rel="noreferrer" className="flex h-10 items-center gap-2 rounded-md bg-olive-800 px-4 text-sm font-medium text-sand hover:bg-olive-950">
+            <Printer className="size-4" /> Print {awaitingPickup} {awaitingPickup === 1 ? "label" : "labels"}
+          </a>
+        )}
+      </PageHeader>
       <div className="rounded-lg border border-line bg-white">
         <Suspense>
           <ListToolbar placeholder="Order no., customer…" tabs={[["", "All"], ...ORDER_STATUSES.map((s) => [s, STATUS_LABELS[s]])]} />
@@ -41,6 +49,7 @@ export default async function AdminOrdersPage({ searchParams }) {
                 <th className="px-5 py-3 font-medium">Customer</th>
                 <th className="px-5 py-3 font-medium">Payment</th>
                 <th className="px-5 py-3 font-medium">Status</th>
+                <th className="px-5 py-3 font-medium">Label</th>
                 <th className="px-5 py-3 text-right font-medium">Total</th>
               </tr>
             </thead>
@@ -70,11 +79,20 @@ export default async function AdminOrdersPage({ searchParams }) {
                       </a>
                     )}
                   </td>
+                  <td className="px-5 py-3">
+                    {o.awb ? (
+                      <a href={`/api/admin/labels?order=${o.id}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs font-medium text-olive-800 hover:underline">
+                        <FileDown className="size-3.5" /> PDF
+                      </a>
+                    ) : (
+                      <span className="text-xs text-muted">—</span>
+                    )}
+                  </td>
                   <td className="px-5 py-3 text-right tabular-nums">{formatPrice(o.total)}</td>
                 </tr>
               ))}
               {orders.length === 0 && (
-                <tr><td colSpan={6} className="px-5 py-10 text-center text-muted">No orders found.</td></tr>
+                <tr><td colSpan={7} className="px-5 py-10 text-center text-muted">No orders found.</td></tr>
               )}
             </tbody>
           </table>

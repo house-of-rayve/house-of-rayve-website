@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { json, error, readJson, authorize, str } from "@/lib/api";
 import { publish } from "@/lib/events";
-import { bookShipment, cancelShipment, courierRates, ithinkEnabled, shippingLabel, syncShipments } from "@/lib/ithink";
+import { bookShipment, cancelShipment, courierRates, ithinkEnabled, syncShipments } from "@/lib/ithink";
 
 const include = { items: { include: { product: { select: { slug: true } } } }, user: { select: { id: true, name: true, email: true, phone: true } } };
 
@@ -28,7 +28,7 @@ export async function GET(_request, { params }) {
   }
 }
 
-// { action: "create", courier? } | { action: "label" } | { action: "track" } | { action: "cancel" }
+// { action: "create", courier? } | { action: "track" } | { action: "cancel" }
 export async function POST(request, { params }) {
   const [order, denied] = await load(params);
   if (denied) return denied;
@@ -45,8 +45,6 @@ export async function POST(request, { params }) {
     }
 
     if (!order.awb) return error("This order hasn't been shipped yet.", 409);
-
-    if (action === "label") return json({ url: await shippingLabel(order.awb) });
 
     if (action === "track") {
       await syncShipments([order], { force: true });

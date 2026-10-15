@@ -53,12 +53,6 @@ export default function ShipmentPanel({ order, enabled }) {
       router.refresh();
     }
   };
-  const label = async () => {
-    const win = window.open("", "_blank"); // opened now so pop-up blockers allow it
-    const r = await run("label");
-    if (r?.url && win) win.location.href = r.url;
-    else win?.close();
-  };
   const refresh = async () => {
     if (await run("track")) router.refresh();
   };
@@ -88,9 +82,9 @@ export default function ShipmentPanel({ order, enabled }) {
           </a>
         )}
         <div className="flex flex-wrap gap-2">
-          <button onClick={label} disabled={!!busy} className={secondary}>
-            <FileDown className="size-3.5" /> {busy === "label" ? "Getting label…" : "Shipping label"}
-          </button>
+          <a href={`/api/admin/labels?order=${order.id}`} target="_blank" rel="noreferrer" className={secondary}>
+            <FileDown className="size-3.5" /> Shipping label
+          </a>
           <button onClick={refresh} disabled={!!busy} className={secondary}>
             <RefreshCw className={`size-3.5 ${busy === "track" ? "animate-spin" : ""}`} /> Refresh status
           </button>

@@ -165,9 +165,9 @@ export async function createShipment(order, courierId) {
   };
 }
 
-/** Link to the printable shipping label (PDF) for an AWB. */
-export async function shippingLabel(awb) {
-  const body = await call("shipping/label", { awb_numbers: awb, page_size: "A4", display_cod_prepaid: "1", display_shipper_mobile: "1", display_shipper_address: "1" });
+/** Link to the printable shipping label PDF for one AWB, or several comma-separated (one label per page). */
+export async function shippingLabel(awbs) {
+  const body = await call("shipping/label", { awb_numbers: awbs, page_size: "A4", display_cod_prepaid: "1", display_shipper_mobile: "1", display_shipper_address: "1" });
   if (!body.file_name) throw new Error("iThink Logistics did not return a label.");
   return body.file_name.replace(/^http:/, "https:");
 }
