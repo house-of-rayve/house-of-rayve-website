@@ -222,7 +222,7 @@ export default function Header({ user }) {
         }`}
         onMouseLeave={leaveShop}
       >
-        <div className="container-x grid h-16 grid-cols-[1fr_auto_1fr] items-center">
+        <div className="grid h-16 w-full grid-cols-[1fr_auto_1fr] items-center px-5 sm:px-8 lg:px-10">
           <div className="flex items-center gap-6">
             <button className="group -ml-2 flex h-10 items-center gap-2 px-2" onClick={() => setMenu(true)} aria-label="Open menu" aria-expanded={menu}>
               <Menu className="size-5" />
