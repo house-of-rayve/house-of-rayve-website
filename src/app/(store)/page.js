@@ -8,7 +8,6 @@ import LookbookStories from "@/components/home/LookbookStories";
 import HorizontalShowcase from "@/components/motion/HorizontalShowcase";
 import FloatingGallery from "@/components/motion/FloatingGallery";
 import ToroShowcase from "@/components/three/ToroShowcase";
-import LensTintLab from "@/components/motion/LensTintLab";
 import ImageTrail from "@/components/motion/ImageTrail";
 import FlashlightReveal from "@/components/motion/FlashlightReveal";
 import PhotoInWord from "@/components/motion/PhotoInWord";
@@ -172,9 +171,6 @@ export default async function HomePage() {
 
       {/* Signature product in 3D: rotates, folds and changes lens tint as you scroll */}
       <ToroShowcase product={spotlight} />
-
-      {/* Lens lab: compare tints over a street scene */}
-      <LensTintLab />
 
       {/* Editorial split */}
       <section className="grid bg-olive-800 text-sand lg:grid-cols-2">
