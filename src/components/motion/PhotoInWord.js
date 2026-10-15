@@ -47,7 +47,7 @@ function measureStem(el) {
   };
 }
 
-export default function PhotoInWord({ image, alt = "", line, sub }) {
+export default function PhotoInWord({ image, alt = "", focus = "50% 50%", line, sub }) {
   const root = useRef(null);
   const maskId = `piw-${useId().replace(/:/g, "")}`;
 
@@ -110,7 +110,7 @@ export default function PhotoInWord({ image, alt = "", line, sub }) {
       <div className="sticky top-0 h-svh overflow-hidden">
         {/* the photograph: one image, full resolution, never stretched */}
         <div className="piw-photo absolute inset-0 will-change-transform">
-          <Image src={image} alt={alt} fill sizes="100vw" quality={75} className="object-cover" />
+          <Image src={image} alt={alt} fill sizes="100vw" quality={75} className="object-cover" style={{ objectPosition: focus }} />
         </div>
         {/* gentle shade so the closing line reads */}
         <div className="piw-shade absolute inset-0 bg-gradient-to-t from-olive-950/70 via-olive-950/20 to-olive-950/10 opacity-0 motion-reduce:opacity-100" />

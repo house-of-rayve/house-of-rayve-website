@@ -103,7 +103,7 @@ export default async function HomePage() {
       </section>
 
       {/* Brand moment: the campaign photo seen through the letters of RAYVE, opening up on scroll */}
-      <PhotoInWord image="/images/campaign-matador.jpg" line="Poise. Tension. Precision. Command." sub="Collection 01 — premium, in the everyday." />
+      <PhotoInWord image="/images/banners/the-signal.jpg" alt="RAYVE sunglasses floating before a sunlit gateway" focus="20% 50%" line="Poise. Tension. Precision. Command." sub="Collection 01 — premium, in the everyday." />
 
       {/* New arrivals grid */}
       <section className="container-x section-y">
