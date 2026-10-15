@@ -248,197 +248,233 @@ export default function TryOn({ products, initialSlug }) {
   ];
 
   return (
-    <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10">
-      <ol className="flex flex-wrap items-center gap-x-6 gap-y-3 lg:col-span-12">
-        {steps.map(([label, state], i) => (
-          <li key={label} className={`flex items-center gap-3 text-[10px] uppercase tracking-[0.22em] ${state === "next" ? "text-muted" : "text-ink"}`}>
-            <span
-              className={`grid size-6 place-items-center rounded-full border font-display text-[9px] ${
-                state === "done" ? "border-olive-800 bg-olive-800 text-sand" : state === "active" ? "border-olive-800 text-olive-800" : "border-line"
-              }`}
-            >
-              {state === "done" ? <Check className="size-3" /> : i + 1}
-            </span>
-            {label}
-            {i < steps.length - 1 && <span className="hidden h-px w-10 bg-line sm:block" />}
-          </li>
-        ))}
-      </ol>
-
+    <div className="grid bg-olive-950 text-sand lg:h-[calc(100svh-4rem)] lg:min-h-[640px] lg:grid-cols-[minmax(0,1fr)_380px] xl:grid-cols-[minmax(0,1fr)_420px]">
       {/* Stage */}
-      <div className="min-w-0 lg:col-span-8">
-        <div ref={stage} className="relative aspect-[3/4] overflow-hidden bg-olive-950 text-sand sm:aspect-[4/3]">
-          {/* Selfie view is mirrored, like a mirror; the 3D layer flips with it so they stay aligned */}
-          <div className="absolute inset-0" style={mode === "camera" ? { transform: "scaleX(-1)" } : undefined}>
-            <video ref={video} playsInline muted className={`absolute inset-0 size-full object-cover ${mode === "camera" ? "" : "hidden"}`} />
-            {photo && mode === "photo" && photoMeta && stageSize && (() => {
-              const { s, ox, oy } = photoView(stageSize.w, stageSize.h, photoMeta.w, photoMeta.h, photoMeta.focus);
-              return (
-                // eslint-disable-next-line @next/next/no-img-element -- local object URL, never optimised
-                <img
-                  ref={photoImg}
-                  src={photo}
-                  alt="Your photo"
-                  className="absolute max-w-none"
-                  style={{ left: ox, top: oy, width: photoMeta.w * s, height: photoMeta.h * s }}
-                />
-              );
-            })()}
-            {live && (
-              <div className="absolute inset-0">
-                <TryOnScene face={face} frame={frame} onCanvas={(c) => (glCanvas.current = c)} />
-              </div>
-            )}
-          </div>
-
-          {/* Start screen */}
-          {!live && (
-            <div className="absolute inset-0 grid place-items-center p-6 text-center">
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,rgba(166,159,78,0.18),transparent_65%)]" />
-              <div className="relative max-w-sm">
-                {mode === "loading" ? (
-                  <>
-                    <Loader2 className="mx-auto size-8 animate-spin text-olive-400" />
-                    <p className="mt-4 text-[11px] uppercase tracking-[0.25em] text-sand/70">Loading face tracking…</p>
-                  </>
-                ) : (
-                  <>
-                    <ScanFace className="mx-auto size-10 text-olive-400" strokeWidth={1.2} />
-                    <p className="display-title mt-5 text-2xl sm:text-3xl" data-no-split>
-                      Find your frame
-                    </p>
-                    <p className="mt-3 text-sm text-sand/60">
-                      We&apos;ll read your face shape, pick the frames that balance it and put them on you — live. Look straight at the camera, or use a front-facing photo.
-                    </p>
-                    <div className="mt-7 flex flex-col justify-center gap-2 sm:flex-row">
-                      <button onClick={startCamera} className="btn h-11 whitespace-nowrap bg-sand text-olive-950 hover:bg-paper">
-                        <Camera className="size-4" /> Scan my face
-                      </button>
-                      <button onClick={() => fileInput.current?.click()} className="btn h-11 whitespace-nowrap border border-sand/30 text-sand hover:border-sand">
-                        <ImageUp className="size-4" /> Upload a photo
-                      </button>
-                    </div>
-                    {error && <p className="mt-5 text-xs text-[#e8b4a0]">{error}</p>}
-                  </>
-                )}
-              </div>
+      <div ref={stage} className="relative h-[72svh] min-h-[460px] overflow-hidden bg-[#1b1b15] lg:h-full">
+        {/* Selfie view is mirrored, like a mirror; the 3D layer flips with it so they stay aligned */}
+        <div className="absolute inset-0" style={mode === "camera" ? { transform: "scaleX(-1)" } : undefined}>
+          <video ref={video} playsInline muted className={`absolute inset-0 size-full object-cover ${mode === "camera" ? "" : "hidden"}`} />
+          {photo && mode === "photo" && photoMeta && stageSize && (() => {
+            const { s, ox, oy } = photoView(stageSize.w, stageSize.h, photoMeta.w, photoMeta.h, photoMeta.focus);
+            return (
+              // eslint-disable-next-line @next/next/no-img-element -- local object URL, never optimised
+              <img
+                ref={photoImg}
+                src={photo}
+                alt="Your photo"
+                className="absolute max-w-none"
+                style={{ left: ox, top: oy, width: photoMeta.w * s, height: photoMeta.h * s }}
+              />
+            );
+          })()}
+          {live && (
+            <div className="absolute inset-0">
+              <TryOnScene face={face} frame={frame} onCanvas={(c) => (glCanvas.current = c)} />
             </div>
           )}
-
-          {/* Live controls */}
-          {live && (
-            <>
-              <div className="absolute left-3 top-3 flex flex-wrap gap-2 sm:left-4 sm:top-4">
-                <span className="flex items-center gap-2 bg-olive-950/70 px-3 py-1.5 text-[10px] uppercase tracking-[0.2em] backdrop-blur">
-                  <span className={`size-1.5 rounded-full ${found ? "bg-olive-400" : "animate-pulse bg-sand/50"}`} />
-                  {found ? product?.name : mode === "camera" ? "Looking for your face…" : "No face found"}
-                </span>
-              </div>
-              <div className="absolute right-3 top-3 flex gap-2 sm:right-4 sm:top-4">
-                <button onClick={snapshot} disabled={!found} className="grid size-10 place-items-center rounded-full bg-olive-950/70 backdrop-blur transition hover:bg-olive-950 disabled:opacity-40" aria-label="Save a picture">
-                  <Download className="size-4" />
-                </button>
-                <button onClick={stop} className="grid size-10 place-items-center rounded-full bg-olive-950/70 backdrop-blur transition hover:bg-olive-950" aria-label="Stop try-on">
-                  <X className="size-4" />
-                </button>
-              </div>
-              {error && mode === "photo" && (
-                <p className="absolute inset-x-3 bottom-3 bg-olive-950/80 p-3 text-center text-xs backdrop-blur sm:inset-x-4 sm:bottom-4">{error}</p>
-              )}
-              {mode === "camera" && !faceShape && found && (
-                <div className="absolute inset-x-3 bottom-3 bg-olive-950/70 p-3 backdrop-blur sm:inset-x-auto sm:bottom-4 sm:left-4 sm:w-72">
-                  <p className="text-[10px] uppercase tracking-[0.2em] text-sand/70">Reading your face shape — look straight ahead</p>
-                  <div className="mt-2 h-px bg-sand/15">
-                    <div className="h-px bg-olive-400 transition-[width] duration-300" style={{ width: `${(scan / SCAN_SAMPLES) * 100}%` }} />
-                  </div>
-                </div>
-              )}
-            </>
-          )}
-
-          <input
-            ref={fileInput}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={(e) => {
-              tryPhoto(e.target.files?.[0]);
-              e.target.value = "";
-            }}
-          />
         </div>
 
-        <p className="mt-3 flex items-start gap-2 text-xs text-muted">
-          <ShieldCheck className="mt-px size-3.5 shrink-0 text-olive-500" />
-          Everything runs on your device — your camera and photos are never uploaded or saved. The preview uses a 3D stand-in for each frame shape, so colours and size are approximate.
-        </p>
+        {/* Start screen */}
+        {!live && (
+          <div className="absolute inset-0 grid place-items-center p-6 pb-36 text-center">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_42%,rgba(166,159,78,0.22),transparent_62%)]" />
+            <div className="relative max-w-md">
+              {mode === "loading" ? (
+                <>
+                  <Loader2 className="mx-auto size-8 animate-spin text-olive-400" />
+                  <p className="mt-4 text-[11px] uppercase tracking-[0.25em] text-sand/70">Loading face tracking…</p>
+                </>
+              ) : (
+                <>
+                  {/* face guide */}
+                  <span className="relative mx-auto grid h-36 w-28 place-items-center rounded-[50%] border border-sand/25 sm:h-44 sm:w-36">
+                    <span className="absolute inset-0 animate-ping rounded-[50%] border border-olive-400/30 [animation-duration:2.6s]" />
+                    <ScanFace className="size-9 text-olive-400" strokeWidth={1.1} />
+                  </span>
+                  <p className="display-title mt-8 text-3xl sm:text-4xl" data-no-split>
+                    Find your frame
+                  </p>
+                  <p className="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-sand/60">
+                    We&apos;ll read your face shape, pick the frames that balance it and put them on you — live.
+                  </p>
+                  <div className="mt-8 flex flex-col justify-center gap-2 sm:flex-row">
+                    <button onClick={startCamera} className="btn h-12 whitespace-nowrap bg-sand text-olive-950 hover:bg-paper">
+                      <Camera className="size-4" /> Scan my face
+                    </button>
+                    <button onClick={() => fileInput.current?.click()} className="btn h-12 whitespace-nowrap border border-sand/30 text-sand hover:border-sand">
+                      <ImageUp className="size-4" /> Upload a photo
+                    </button>
+                  </div>
+                  {error && <p className="mt-5 text-xs text-[#e8b4a0]">{error}</p>}
+                </>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Live controls */}
+        {live && (
+          <>
+            <div className="absolute left-4 top-4 flex flex-wrap gap-2 sm:left-6 sm:top-6">
+              <span className="flex items-center gap-2 bg-olive-950/70 px-3 py-1.5 text-[10px] uppercase tracking-[0.2em] backdrop-blur">
+                <span className={`size-1.5 rounded-full ${found ? "bg-olive-400" : "animate-pulse bg-sand/50"}`} />
+                {found ? product?.name : mode === "camera" ? "Looking for your face…" : "No face found"}
+              </span>
+            </div>
+            <div className="absolute right-4 top-4 flex gap-2 sm:right-6 sm:top-6">
+              <button onClick={snapshot} disabled={!found} className="grid size-10 place-items-center rounded-full bg-olive-950/70 backdrop-blur transition hover:bg-olive-950 disabled:opacity-40" aria-label="Save a picture">
+                <Download className="size-4" />
+              </button>
+              <button onClick={stop} className="grid size-10 place-items-center rounded-full bg-olive-950/70 backdrop-blur transition hover:bg-olive-950" aria-label="Stop try-on">
+                <X className="size-4" />
+              </button>
+            </div>
+            {error && mode === "photo" && (
+              <p className="absolute inset-x-4 top-16 bg-olive-950/80 p-3 text-center text-xs backdrop-blur sm:inset-x-6">{error}</p>
+            )}
+            {mode === "camera" && !faceShape && found && (
+              <div className="absolute inset-x-4 bottom-36 mx-auto max-w-xs bg-olive-950/70 p-3 text-center backdrop-blur">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-sand/70">Reading your face shape — look straight ahead</p>
+                <div className="mt-2 h-px bg-sand/15">
+                  <div className="h-px bg-olive-400 transition-[width] duration-300" style={{ width: `${(scan / SCAN_SAMPLES) * 100}%` }} />
+                </div>
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Frame rail: tap a frame to put it on */}
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-olive-950 via-olive-950/70 to-transparent pb-4 pt-12">
+          <p className="mb-3 px-4 text-[10px] uppercase tracking-[0.25em] text-sand/60 sm:px-6">
+            {list.length} {list.length === 1 ? "frame" : "frames"}
+            {shapeFilter ? ` · ${shapeFilter}` : onlyMatches && faceShape ? " that suit you" : " to try"}
+          </p>
+          <div className="no-scrollbar flex gap-3 overflow-x-auto px-4 sm:px-6">
+            {list.map((p) => {
+              const active = p.slug === product?.slug;
+              const suits = faceShape?.shapes.includes(p.shape);
+              return (
+                <button key={p.id} onClick={() => setSlug(p.slug)} aria-pressed={active} className="group w-16 shrink-0 text-center sm:w-[72px]">
+                  <span
+                    className={`relative block aspect-square overflow-hidden rounded-full bg-mist transition-all duration-300 ${
+                      active ? "ring-2 ring-sand ring-offset-2 ring-offset-olive-950" : "opacity-60 group-hover:opacity-100"
+                    }`}
+                  >
+                    {p.images[0] && <Image src={p.images[0]} alt="" fill sizes="72px" className="object-cover" />}
+                  </span>
+                  <span className={`mt-2 flex items-center justify-center gap-1 truncate font-display text-[8px] uppercase tracking-[0.14em] ${active ? "text-sand" : "text-sand/55"}`}>
+                    {suits && <span className="size-1 shrink-0 rounded-full bg-olive-400" />}
+                    {p.name}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <input
+          ref={fileInput}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => {
+            tryPhoto(e.target.files?.[0]);
+            e.target.value = "";
+          }}
+        />
       </div>
 
       {/* Panel */}
-      <aside className="min-w-0 lg:col-span-4">
-        {faceShape ? (
-          <div className="mb-6 border border-olive-800 bg-olive-800 p-5 text-sand animate-fade-up">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-[10px] uppercase tracking-[0.25em] text-sand/60">Your face shape</p>
-                <p className="display-title mt-2 text-3xl" data-no-split>
-                  {faceShape.label}
-                </p>
+      <aside className="flex min-w-0 flex-col border-sand/10 px-5 py-8 sm:px-8 lg:overflow-y-auto lg:border-l lg:py-10">
+        <p className="eyebrow text-sand/60">Virtual try-on</p>
+        <h1 className="display-title mt-3 text-2xl sm:text-3xl">What suits your face?</h1>
+
+        <ol className="mt-7 space-y-3">
+          {steps.map(([label, state], i) => (
+            <li key={label} className={`flex items-center gap-3 text-[10px] uppercase tracking-[0.22em] ${state === "next" ? "text-sand/40" : "text-sand"}`}>
+              <span
+                className={`grid size-6 place-items-center rounded-full border font-display text-[9px] ${
+                  state === "done" ? "border-olive-400 bg-olive-400 text-olive-950" : state === "active" ? "border-sand" : "border-sand/20"
+                }`}
+              >
+                {state === "done" ? <Check className="size-3" /> : i + 1}
+              </span>
+              {label}
+            </li>
+          ))}
+        </ol>
+
+        <div className="mt-8 border-t border-sand/10 pt-8">
+          {faceShape ? (
+            <div className="animate-fade-up">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.25em] text-sand/50">Your face shape</p>
+                  <p className="display-title mt-2 text-4xl" data-no-split>
+                    {faceShape.label}
+                  </p>
+                </div>
+                {mode === "camera" && (
+                  <button onClick={resetScan} className="flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em] text-sand/50 hover:text-sand">
+                    <RefreshCw className="size-3" /> Rescan
+                  </button>
+                )}
               </div>
-              {mode === "camera" && (
-                <button onClick={resetScan} className="flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em] text-sand/60 hover:text-sand">
-                  <RefreshCw className="size-3" /> Rescan
-                </button>
-              )}
+              <p className="mt-3 text-sm leading-relaxed text-sand/65">{faceShape.why}</p>
+              <p className="mt-6 text-[10px] uppercase tracking-[0.25em] text-sand/50">Frames that suit you</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {faceShape.shapes.map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => setShapeFilter(shapeFilter === s ? null : s)}
+                    disabled={!counts[s]}
+                    aria-pressed={shapeFilter === s}
+                    className={`border px-3 py-1.5 text-[10px] uppercase tracking-[0.18em] transition-colors disabled:opacity-30 ${
+                      shapeFilter === s ? "border-sand bg-sand text-olive-950" : "border-sand/25 hover:border-sand"
+                    }`}
+                  >
+                    {s} <span className={shapeFilter === s ? "text-olive-950/60" : "text-sand/45"}>{counts[s] ?? 0}</span>
+                  </button>
+                ))}
+              </div>
+              <label className="mt-4 flex cursor-pointer items-center gap-2 text-xs text-sand/70">
+                <input
+                  type="checkbox"
+                  checked={onlyMatches}
+                  onChange={(e) => {
+                    setOnlyMatches(e.target.checked);
+                    setShapeFilter(null);
+                  }}
+                  className="accent-olive-400"
+                />
+                Only show frames that suit me
+              </label>
             </div>
-            <p className="mt-3 text-sm leading-relaxed text-sand/75">{faceShape.why}</p>
-            <p className="mt-5 text-[10px] uppercase tracking-[0.25em] text-sand/60">Frames that suit you</p>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {faceShape.shapes.map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setShapeFilter(shapeFilter === s ? null : s)}
-                  disabled={!counts[s]}
-                  aria-pressed={shapeFilter === s}
-                  className={`border px-3 py-1.5 text-[10px] uppercase tracking-[0.18em] transition-colors disabled:opacity-35 ${
-                    shapeFilter === s ? "border-sand bg-sand text-olive-950" : "border-sand/30 hover:border-sand"
-                  }`}
-                >
-                  {s} <span className={shapeFilter === s ? "text-olive-950/60" : "text-sand/50"}>{counts[s] ?? 0}</span>
-                </button>
-              ))}
+          ) : (
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.25em] text-sand/50">Your face shape</p>
+              <p className="mt-3 text-sm leading-relaxed text-sand/55">
+                {mode === "photo"
+                  ? "We need a clear, front-facing photo to read your face shape."
+                  : live
+                    ? found
+                      ? "Reading it now — keep looking straight ahead…"
+                      : "Show your face to the camera to start."
+                    : "Scan your face and we'll tell you its shape and the frames that balance it."}
+              </p>
             </div>
-            <label className="mt-4 flex cursor-pointer items-center gap-2 text-xs text-sand/80">
-              <input
-                type="checkbox"
-                checked={onlyMatches}
-                onChange={(e) => {
-                  setOnlyMatches(e.target.checked);
-                  setShapeFilter(null);
-                }}
-                className="accent-olive-400"
-              />
-              Only show frames that suit me
-            </label>
-          </div>
-        ) : (
-          live && (
-            <div className="mb-6 border border-line p-5">
-              <p className="text-[10px] uppercase tracking-[0.25em] text-muted">Your face shape</p>
-              <p className="mt-2 text-sm text-muted">{found ? "Reading it now — keep looking straight ahead…" : "Show your face to the camera to start."}</p>
-            </div>
-          )
-        )}
+          )}
+        </div>
 
         {product && (
-          <div className="border-b border-line pb-6">
-            <p className="eyebrow">Now trying</p>
-            <h2 className="display-title mt-3 text-2xl" data-no-split>
+          <div className="mt-8 border-t border-sand/10 pt-8">
+            <p className="text-[10px] uppercase tracking-[0.25em] text-sand/50">Now trying</p>
+            <h2 className="display-title mt-3 text-3xl" data-no-split>
               {product.name}
             </h2>
-            <p className="mt-2 text-xs text-muted">{[product.shape, product.frameColor, product.lensColor && `${product.lensColor} lens`].filter(Boolean).join(" · ")}</p>
+            <p className="mt-2 text-xs text-sand/55">{[product.shape, product.frameColor, product.lensColor && `${product.lensColor} lens`].filter(Boolean).join(" · ")}</p>
             <Price price={product.price} comparePrice={product.comparePrice} className="mt-3 text-lg font-light" />
-            <div className="mt-5 flex gap-2">
+            <div className="mt-6 flex gap-2">
               <button
                 disabled={product.stock <= 0}
                 onClick={(e) => {
@@ -446,7 +482,7 @@ export default function TryOn({ products, initialSlug }) {
                   setAdded(true);
                   setTimeout(() => setAdded(false), 1600);
                 }}
-                className="btn-primary h-11 flex-1"
+                className="btn h-12 flex-1 bg-sand text-olive-950 hover:bg-paper"
               >
                 {product.stock <= 0 ? "Sold out" : added ? (
                   <>
@@ -456,37 +492,17 @@ export default function TryOn({ products, initialSlug }) {
                   "Add to bag"
                 )}
               </button>
-              <Link href={`/product/${product.slug}`} className="btn h-11 border border-line hover:border-olive-800">
+              <Link href={`/product/${product.slug}`} className="btn h-12 border border-sand/25 text-sand hover:border-sand">
                 Details <ArrowRight className="size-3.5" />
               </Link>
             </div>
           </div>
         )}
 
-        <p className="mb-4 mt-6 text-[10px] uppercase tracking-[0.25em] text-muted">
-          {list.length} {list.length === 1 ? "frame" : "frames"} to try
+        <p className="mt-auto flex items-start gap-2 pt-10 text-[11px] leading-relaxed text-sand/45">
+          <ShieldCheck className="mt-px size-3.5 shrink-0 text-olive-400" />
+          Everything runs on your device — your camera and photos are never uploaded or saved. Frames are shown as 3D stand-ins, so colour and size are approximate.
         </p>
-        <div className="grid grid-cols-3 gap-2 sm:grid-cols-6 lg:grid-cols-3">
-          {list.map((p) => {
-            const active = p.slug === product?.slug;
-            const suits = faceShape?.shapes.includes(p.shape);
-            return (
-              <button
-                key={p.id}
-                onClick={() => setSlug(p.slug)}
-                aria-pressed={active}
-                className={`group text-left transition ${active ? "" : "opacity-70 hover:opacity-100"}`}
-              >
-                <span className={`relative block aspect-square overflow-hidden bg-mist ring-offset-2 ring-offset-canvas ${active ? "ring-1 ring-olive-800" : ""}`}>
-                  {p.images[0] && <Image src={p.images[0]} alt="" fill sizes="(min-width:1024px) 10vw, (min-width:640px) 16vw, 33vw" className="object-cover" />}
-                  {suits && <span className="absolute left-1.5 top-1.5 size-1.5 rounded-full bg-olive-500" title="Suits your face shape" />}
-                </span>
-                <span className="mt-1.5 block truncate font-display text-[9px] uppercase tracking-[0.15em]">{p.name}</span>
-                <span className="block truncate text-[10px] text-muted">{p.shape}</span>
-              </button>
-            );
-          })}
-        </div>
       </aside>
     </div>
   );
