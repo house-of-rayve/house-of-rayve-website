@@ -45,6 +45,7 @@ export default function TryOn({ products, initialSlug }) {
   const [scan, setScan] = useState(0); // samples collected so far
   const [faceShape, setFaceShape] = useState(null);
   const [onlyMatches, setOnlyMatches] = useState(false);
+  const [shapeFilter, setShapeFilter] = useState(null); // one recommended frame shape, picked from the result card
   const [added, setAdded] = useState(false);
   const [photoMeta, setPhotoMeta] = useState(null); // { w, h, focus } of the uploaded photo
   const [stageSize, setStageSize] = useState(null);
@@ -62,7 +63,12 @@ export default function TryOn({ products, initialSlug }) {
 
   const product = products.find((p) => p.slug === slug) ?? products[0];
   const frame = { shape: product?.shape ?? "Oval", ...frameColorFor(product?.frameColor), lens: lensColorFor(product?.lensColor) };
-  const list = onlyMatches && faceShape ? products.filter((p) => faceShape.shapes.includes(p.shape)) : products;
+  const list = shapeFilter
+    ? products.filter((p) => p.shape === shapeFilter)
+    : onlyMatches && faceShape
+      ? products.filter((p) => faceShape.shapes.includes(p.shape))
+      : products;
+  const counts = products.reduce((acc, p) => ({ ...acc, [p.shape]: (acc[p.shape] ?? 0) + 1 }), {});
 
   const stopCamera = () => {
     cancelAnimationFrame(raf.current);
@@ -91,6 +97,18 @@ export default function TryOn({ products, initialSlug }) {
     samples.current = [];
     setScan(0);
     setFaceShape(null);
+    setShapeFilter(null);
+  };
+
+  // Once the face is read: show only the frames that suit it, and put the first of them on straight away
+  const applyFaceShape = (shape) => {
+    setFaceShape(shape);
+    setOnlyMatches(true);
+    setShapeFilter(null);
+    setSlug((current) => {
+      const suits = (s) => shape.shapes.includes(products.find((p) => p.slug === s)?.shape);
+      return suits(current) ? current : (products.find((p) => shape.shapes.includes(p.shape))?.slug ?? current);
+    });
   };
 
   // Feeds one detection into the scene and the face-shape estimate
@@ -103,7 +121,7 @@ export default function TryOn({ products, initialSlug }) {
     if (!m) return;
     samples.current.push(m);
     if (samples.current.length === SCAN_SAMPLES || samples.current.length % 5 === 0) setScan(samples.current.length);
-    if (samples.current.length === SCAN_SAMPLES) setFaceShape(classifyFace(samples.current));
+    if (samples.current.length === SCAN_SAMPLES) applyFaceShape(classifyFace(samples.current));
   };
 
   const loadModel = async () => {
@@ -171,7 +189,7 @@ export default function TryOn({ products, initialSlug }) {
       if (m) {
         samples.current = [m];
         setScan(SCAN_SAMPLES);
-        setFaceShape(classifyFace([m]));
+        applyFaceShape(classifyFace([m]));
       }
       if (!lm) setError("We couldn't find a face in that photo. Try a clear, front-facing picture.");
     } catch {
@@ -223,8 +241,30 @@ export default function TryOn({ products, initialSlug }) {
 
   const live = mode === "camera" || mode === "photo";
 
+  const steps = [
+    ["Scan your face", faceShape ? "done" : "active"],
+    ["See what suits you", faceShape ? "done" : "next"],
+    ["Try them on live", faceShape ? "active" : "next"],
+  ];
+
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10">
+      <ol className="flex flex-wrap items-center gap-x-6 gap-y-3 lg:col-span-12">
+        {steps.map(([label, state], i) => (
+          <li key={label} className={`flex items-center gap-3 text-[10px] uppercase tracking-[0.22em] ${state === "next" ? "text-muted" : "text-ink"}`}>
+            <span
+              className={`grid size-6 place-items-center rounded-full border font-display text-[9px] ${
+                state === "done" ? "border-olive-800 bg-olive-800 text-sand" : state === "active" ? "border-olive-800 text-olive-800" : "border-line"
+              }`}
+            >
+              {state === "done" ? <Check className="size-3" /> : i + 1}
+            </span>
+            {label}
+            {i < steps.length - 1 && <span className="hidden h-px w-10 bg-line sm:block" />}
+          </li>
+        ))}
+      </ol>
+
       {/* Stage */}
       <div className="min-w-0 lg:col-span-8">
         <div ref={stage} className="relative aspect-[3/4] overflow-hidden bg-olive-950 text-sand sm:aspect-[4/3]">
@@ -265,12 +305,14 @@ export default function TryOn({ products, initialSlug }) {
                   <>
                     <ScanFace className="mx-auto size-10 text-olive-400" strokeWidth={1.2} />
                     <p className="display-title mt-5 text-2xl sm:text-3xl" data-no-split>
-                      See them on you
+                      Find your frame
                     </p>
-                    <p className="mt-3 text-sm text-sand/60">Turn on your camera to try frames live, or use a front-facing photo.</p>
+                    <p className="mt-3 text-sm text-sand/60">
+                      We&apos;ll read your face shape, pick the frames that balance it and put them on you — live. Look straight at the camera, or use a front-facing photo.
+                    </p>
                     <div className="mt-7 flex flex-col justify-center gap-2 sm:flex-row">
                       <button onClick={startCamera} className="btn h-11 whitespace-nowrap bg-sand text-olive-950 hover:bg-paper">
-                        <Camera className="size-4" /> Start camera
+                        <Camera className="size-4" /> Scan my face
                       </button>
                       <button onClick={() => fileInput.current?.click()} className="btn h-11 whitespace-nowrap border border-sand/30 text-sand hover:border-sand">
                         <ImageUp className="size-4" /> Upload a photo
@@ -334,12 +376,12 @@ export default function TryOn({ products, initialSlug }) {
 
       {/* Panel */}
       <aside className="min-w-0 lg:col-span-4">
-        {faceShape && (
+        {faceShape ? (
           <div className="mb-6 border border-olive-800 bg-olive-800 p-5 text-sand animate-fade-up">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-[10px] uppercase tracking-[0.25em] text-sand/60">Your face shape (estimate)</p>
-                <p className="display-title mt-2 text-2xl" data-no-split>
+                <p className="text-[10px] uppercase tracking-[0.25em] text-sand/60">Your face shape</p>
+                <p className="display-title mt-2 text-3xl" data-no-split>
                   {faceShape.label}
                 </p>
               </div>
@@ -349,12 +391,43 @@ export default function TryOn({ products, initialSlug }) {
                 </button>
               )}
             </div>
-            <p className="mt-3 text-sm text-sand/70">Frames that tend to balance it: {faceShape.shapes.join(", ")}.</p>
-            <label className="mt-4 flex cursor-pointer items-center gap-2 text-xs">
-              <input type="checkbox" checked={onlyMatches} onChange={(e) => setOnlyMatches(e.target.checked)} className="accent-olive-400" />
+            <p className="mt-3 text-sm leading-relaxed text-sand/75">{faceShape.why}</p>
+            <p className="mt-5 text-[10px] uppercase tracking-[0.25em] text-sand/60">Frames that suit you</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {faceShape.shapes.map((s) => (
+                <button
+                  key={s}
+                  onClick={() => setShapeFilter(shapeFilter === s ? null : s)}
+                  disabled={!counts[s]}
+                  aria-pressed={shapeFilter === s}
+                  className={`border px-3 py-1.5 text-[10px] uppercase tracking-[0.18em] transition-colors disabled:opacity-35 ${
+                    shapeFilter === s ? "border-sand bg-sand text-olive-950" : "border-sand/30 hover:border-sand"
+                  }`}
+                >
+                  {s} <span className={shapeFilter === s ? "text-olive-950/60" : "text-sand/50"}>{counts[s] ?? 0}</span>
+                </button>
+              ))}
+            </div>
+            <label className="mt-4 flex cursor-pointer items-center gap-2 text-xs text-sand/80">
+              <input
+                type="checkbox"
+                checked={onlyMatches}
+                onChange={(e) => {
+                  setOnlyMatches(e.target.checked);
+                  setShapeFilter(null);
+                }}
+                className="accent-olive-400"
+              />
               Only show frames that suit me
             </label>
           </div>
+        ) : (
+          live && (
+            <div className="mb-6 border border-line p-5">
+              <p className="text-[10px] uppercase tracking-[0.25em] text-muted">Your face shape</p>
+              <p className="mt-2 text-sm text-muted">{found ? "Reading it now — keep looking straight ahead…" : "Show your face to the camera to start."}</p>
+            </div>
+          )
         )}
 
         {product && (

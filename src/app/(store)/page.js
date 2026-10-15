@@ -8,7 +8,6 @@ import LookbookStories from "@/components/home/LookbookStories";
 import HorizontalShowcase from "@/components/motion/HorizontalShowcase";
 import FloatingGallery from "@/components/motion/FloatingGallery";
 import ToroShowcase from "@/components/three/ToroShowcase";
-import FrameFinder from "@/components/home/FrameFinder";
 import LensTintLab from "@/components/motion/LensTintLab";
 import ImageTrail from "@/components/motion/ImageTrail";
 import FlashlightReveal from "@/components/motion/FlashlightReveal";
@@ -125,15 +124,6 @@ export default async function HomePage() {
 
       {/* Lens lab: compare tints over a street scene */}
       <LensTintLab />
-
-      {/* Frame finder */}
-      <section className="border-y border-line bg-mist">
-        <div className="container-x section-y">
-          <Reveal>
-            <FrameFinder products={all} />
-          </Reveal>
-        </div>
-      </section>
 
       {/* Editorial split */}
       <section className="grid bg-olive-800 text-sand lg:grid-cols-2">
