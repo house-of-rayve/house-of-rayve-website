@@ -36,7 +36,7 @@ export default function HorizontalShowcase({ eyebrow, title, products, href = "/
     el.scrollBy({ left: dir * step, behavior: "smooth" });
   };
 
-  const arrow = "grid size-11 place-items-center rounded-full border border-olive-800 transition-colors hover:bg-olive-800 hover:text-sand disabled:pointer-events-none disabled:opacity-25";
+  const arrow = "grid size-10 place-items-center text-ink transition-[opacity,transform] duration-300 hover:scale-110 disabled:pointer-events-none disabled:opacity-20";
 
   return (
     <section className="section-y">
@@ -45,19 +45,9 @@ export default function HorizontalShowcase({ eyebrow, title, products, href = "/
           <p className="eyebrow">{eyebrow}</p>
           <h2 className="display-title mt-4 text-2xl sm:text-3xl lg:text-4xl">{title}</h2>
         </div>
-        <div className="flex items-center gap-6">
-          <Link href={href} className="group flex items-center gap-2 border-b border-ink pb-1 text-[11px] uppercase tracking-[0.2em]">
-            Shop all <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-1" />
-          </Link>
-          <div className="hidden gap-2 sm:flex">
-            <button type="button" onClick={() => move(-1)} disabled={state.start} className={arrow} aria-label="Previous frames">
-              <ArrowLeft className="size-4" />
-            </button>
-            <button type="button" onClick={() => move(1)} disabled={state.end} className={arrow} aria-label="Next frames">
-              <ArrowRight className="size-4" />
-            </button>
-          </div>
-        </div>
+        <Link href={href} className="group flex items-center gap-2 border-b border-ink pb-1 text-[11px] uppercase tracking-[0.2em]">
+          Shop all <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-1" />
+        </Link>
       </div>
 
       <div ref={track} className={`no-scrollbar snap-x snap-mandatory overflow-x-auto ${edge} scroll-px-5 sm:scroll-px-8 lg:scroll-px-10`}>
@@ -76,9 +66,18 @@ export default function HorizontalShowcase({ eyebrow, title, products, href = "/
         </div>
       </div>
 
-      <div className={`${edge} mt-10`}>
-        <div className="h-px bg-line">
-          <div className="h-px origin-left bg-olive-800 transition-transform duration-300" style={{ transform: `scaleX(${Math.max(0.08, state.progress)})` }} />
+      {/* progress, with the arrows at its end */}
+      <div className={`${edge} mt-10 flex items-center gap-6 sm:gap-8`}>
+        <div className="h-px flex-1 bg-line">
+          <div className="h-px origin-left bg-olive-800 transition-transform duration-500 ease-out" style={{ transform: `scaleX(${Math.max(0.08, state.progress)})` }} />
+        </div>
+        <div className="hidden items-center gap-1 sm:flex">
+          <button type="button" onClick={() => move(-1)} disabled={state.start} className={arrow} aria-label="Previous frames">
+            <ArrowLeft className="size-4" strokeWidth={1.5} />
+          </button>
+          <button type="button" onClick={() => move(1)} disabled={state.end} className={arrow} aria-label="Next frames">
+            <ArrowRight className="size-4" strokeWidth={1.5} />
+          </button>
         </div>
       </div>
     </section>
