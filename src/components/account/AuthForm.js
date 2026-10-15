@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { api } from "@/components/ui/fetcher";
+import PhoneField from "@/components/ui/PhoneField";
 
 const GOOGLE_ERRORS = {
   google_cancelled: "Google sign-in was cancelled.",
@@ -77,7 +78,7 @@ export default function AuthForm({ mode, googleEnabled = false }) {
         {!isLogin && (
           <div>
             <label className="label" htmlFor="phone">Phone (optional)</label>
-            <input id="phone" type="tel" className="field" value={form.phone} onChange={set("phone")} autoComplete="tel" placeholder="+91" />
+            <PhoneField id="phone" value={form.phone} onChange={(phone) => setForm({ ...form, phone })} />
           </div>
         )}
         <div>

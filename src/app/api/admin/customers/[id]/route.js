@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { json, error, readJson, authorize, str, isEmail, isPhone } from "@/lib/api";
 import { parseAddress } from "@/lib/orders";
 import { publish } from "@/lib/events";
+import { normalizePhone, PHONE_ERROR } from "@/lib/phone";
 
 const select = {
   id: true,
@@ -34,10 +35,10 @@ export async function PATCH(request, { params }) {
   const body = await readJson(request);
   const name = str(body.name);
   const email = str(body.email).toLowerCase();
-  const phone = str(body.phone);
+  const phone = normalizePhone(body.phone) ?? str(body.phone); // stored as the plain 10 digits
   if (!name) return error("Name cannot be empty.");
   if (!isEmail(email)) return error("Please enter a valid email address.");
-  if (phone && !isPhone(phone)) return error("Please enter a valid phone number.");
+  if (phone && !isPhone(phone)) return error(PHONE_ERROR);
   if (email !== existing.email && (await prisma.user.findUnique({ where: { email } }))) {
     return error("This email is already in use.", 409);
   }

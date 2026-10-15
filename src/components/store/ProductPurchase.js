@@ -148,7 +148,7 @@ export default function ProductPurchase({ product }) {
         <p className="flex items-center gap-2 text-xs text-olive-800">
           <Sparkles className="size-3.5 shrink-0" />
           <span>
-            Earn <strong className="font-medium">{pointsFor(product.price * qty)} RAYVE points</strong> (₹{pointsFor(product.price * qty)}) with this order
+            Earn <strong className="font-medium">{pointsFor(product.price * qty)} RAYVE points</strong> with this order
           </span>
         </p>
       )}

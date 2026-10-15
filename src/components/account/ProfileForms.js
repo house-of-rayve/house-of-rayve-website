@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/components/ui/fetcher";
 import { useToast } from "@/components/ui/Toast";
+import PhoneField from "@/components/ui/PhoneField";
 
 export default function ProfileForms({ user, hasPassword = true, googleLinked = false }) {
   const router = useRouter();
@@ -57,7 +58,7 @@ export default function ProfileForms({ user, hasPassword = true, googleLinked = 
           </div>
           <div>
             <label className="label">Phone</label>
-            <input type="tel" className="field" value={profile.phone} onChange={(e) => setProfile({ ...profile, phone: e.target.value })} placeholder="+91" />
+            <PhoneField value={profile.phone} onChange={(phone) => setProfile({ ...profile, phone })} />
           </div>
         </div>
         <button disabled={busy === "profile"} className="btn-primary mt-6">

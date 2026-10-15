@@ -59,7 +59,7 @@ export default function OrderSummary({ children, compact = false, discount = nul
         <p className="mt-4 flex items-center gap-2 bg-olive-500/10 px-3 py-2.5 text-xs text-olive-800">
           <Sparkles className="size-3.5 shrink-0" />
           <span>
-            You&apos;ll earn <strong className="font-medium">{pointsFor(value)} RAYVE points</strong> (₹{pointsFor(value)}) once it&apos;s delivered.
+            You&apos;ll earn <strong className="font-medium">{pointsFor(value)} RAYVE points</strong> once it&apos;s delivered.
           </span>
         </p>
       )}

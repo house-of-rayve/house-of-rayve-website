@@ -2,17 +2,18 @@ import { prisma } from "@/lib/prisma";
 import { hashPassword, startSession, publicUserSelect } from "@/lib/auth";
 import { json, error, readJson, str, isEmail, isPhone } from "@/lib/api";
 import { publish } from "@/lib/events";
+import { normalizePhone, PHONE_ERROR } from "@/lib/phone";
 
 export async function POST(request) {
   const body = await readJson(request);
   const name = str(body.name);
   const email = str(body.email).toLowerCase();
-  const phone = str(body.phone);
+  const phone = normalizePhone(body.phone) ?? str(body.phone); // stored as the plain 10 digits
   const password = typeof body.password === "string" ? body.password : "";
 
   if (!name) return error("Please enter your name.");
   if (!isEmail(email)) return error("Please enter a valid email address.");
-  if (phone && !isPhone(phone)) return error("Please enter a valid phone number.");
+  if (phone && !isPhone(phone)) return error(PHONE_ERROR);
   if (password.length < 8) return error("Password must be at least 8 characters.");
 
   const exists = await prisma.user.findUnique({ where: { email } });

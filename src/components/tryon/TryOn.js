@@ -248,9 +248,10 @@ export default function TryOn({ products, initialSlug }) {
   ];
 
   return (
-    <div className="grid bg-olive-950 text-sand lg:h-[calc(100svh-4rem)] lg:min-h-[640px] lg:grid-cols-[minmax(0,1fr)_380px] xl:grid-cols-[minmax(0,1fr)_420px]">
+    // At least a screen tall; the panel can make it taller and the stage stretches with it, so nothing is cut off
+    <div className="grid bg-olive-950 text-sand lg:min-h-[max(640px,calc(100svh-4rem))] lg:grid-cols-[minmax(0,1fr)_380px] xl:grid-cols-[minmax(0,1fr)_420px]">
       {/* Stage */}
-      <div ref={stage} className="relative h-[72svh] min-h-[460px] overflow-hidden bg-[#1b1b15] lg:h-full">
+      <div ref={stage} className="relative h-[72svh] min-h-[460px] overflow-hidden bg-[#1b1b15] lg:h-auto">
         {/* Selfie view is mirrored, like a mirror; the 3D layer flips with it so they stay aligned */}
         <div className="absolute inset-0" style={mode === "camera" ? { transform: "scaleX(-1)" } : undefined}>
           <video ref={video} playsInline muted className={`absolute inset-0 size-full object-cover ${mode === "camera" ? "" : "hidden"}`} />
@@ -349,7 +350,8 @@ export default function TryOn({ products, initialSlug }) {
             {list.length} {list.length === 1 ? "frame" : "frames"}
             {shapeFilter ? ` · ${shapeFilter}` : onlyMatches && faceShape ? " that suit you" : " to try"}
           </p>
-          <div className="no-scrollbar flex gap-3 overflow-x-auto px-4 sm:px-6">
+          {/* vertical padding leaves room for the selected frame's ring, which the scroll box would otherwise clip */}
+          <div className="no-scrollbar flex gap-3 overflow-x-auto px-4 py-1.5 sm:px-6">
             {list.map((p) => {
               const active = p.slug === product?.slug;
               const suits = faceShape?.shapes.includes(p.shape);
@@ -362,8 +364,8 @@ export default function TryOn({ products, initialSlug }) {
                   >
                     {p.images[0] && <Image src={p.images[0]} alt="" fill sizes="72px" className="object-cover" />}
                   </span>
-                  <span className={`mt-2 flex items-center justify-center gap-1 truncate font-display text-[8px] uppercase tracking-[0.14em] ${active ? "text-sand" : "text-sand/55"}`}>
-                    {suits && <span className="size-1 shrink-0 rounded-full bg-olive-400" />}
+                  <span className={`mt-2 block truncate font-display text-[8px] uppercase tracking-[0.14em] ${active ? "text-sand" : "text-sand/55"}`}>
+                    {suits && <span className="mr-1 inline-block size-1 rounded-full bg-olive-400 align-middle" />}
                     {p.name}
                   </span>
                 </button>
@@ -385,7 +387,7 @@ export default function TryOn({ products, initialSlug }) {
       </div>
 
       {/* Panel */}
-      <aside className="flex min-w-0 flex-col border-sand/10 px-5 py-8 sm:px-8 lg:overflow-y-auto lg:border-l lg:py-10">
+      <aside className="flex min-w-0 flex-col border-sand/10 px-5 py-8 sm:px-8 lg:border-l lg:py-10">
         <p className="eyebrow text-sand/60">Virtual try-on</p>
         <h1 className="display-title mt-3 text-2xl sm:text-3xl">What suits your face?</h1>
 

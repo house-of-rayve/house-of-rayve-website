@@ -1,6 +1,7 @@
 import "server-only";
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
+import { normalizePhone } from "@/lib/phone";
 
 export function json(data, status = 200) {
   return NextResponse.json(data, { status });
@@ -29,4 +30,4 @@ export async function authorize(role) {
 export const str = (v) => (typeof v === "string" ? v.trim() : "");
 
 export const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-export const isPhone = (v) => /^[+]?[\d\s-]{8,15}$/.test(v);
+export const isPhone = (v) => normalizePhone(v) !== null; // 10-digit Indian mobile, see lib/phone.js

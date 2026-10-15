@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { parseImages } from "@/lib/format";
 import { shippingFor } from "@/lib/shipping";
 import { isPhone } from "@/lib/api";
+import { normalizePhone, PHONE_ERROR } from "@/lib/phone";
 import { checkCoupon } from "@/lib/coupons";
 import { razorpayEnabled } from "@/lib/razorpay";
 
@@ -17,7 +18,8 @@ export function parseAddress(input = {}) {
   const a = {};
   for (const k of ADDRESS_FIELDS) a[k] = typeof input[k] === "string" ? input[k].trim() : "";
   if (!a.fullName) return { error: "Please enter the recipient's full name." };
-  if (!isPhone(a.phone)) return { error: "Please enter a valid phone number." };
+  if (!isPhone(a.phone)) return { error: PHONE_ERROR };
+  a.phone = normalizePhone(a.phone);
   if (!a.line1) return { error: "Please enter the address." };
   if (!a.city || !a.state) return { error: "Please enter the city and state." };
   if (!/^\d{6}$/.test(a.postalCode)) return { error: "Please enter a valid 6-digit PIN code." };
