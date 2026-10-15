@@ -6,6 +6,7 @@ import { publish } from "@/lib/events";
 import { invalidateCatalog } from "@/lib/products";
 import { sendOrderEmails } from "@/lib/email";
 import { autoShip } from "@/lib/ithink";
+import { awardOrderPoints } from "@/lib/points";
 
 export async function GET() {
   const [user, denied] = await authorize();
@@ -44,12 +45,19 @@ export async function POST(request) {
       paymentMethod: body.paymentMethod,
       notes: typeof body.notes === "string" ? body.notes.trim().slice(0, 500) : "",
       couponCode: typeof body.couponCode === "string" ? body.couponCode : "",
+      pointsToUse: body.pointsToUse,
     });
     invalidateCatalog();
     publish("order:created", { id: order.id, orderNumber: order.orderNumber, total: order.total, customer: user.name });
-    // Cash on delivery goes to the courier now (online orders once paid), then the customer is emailed with the tracking link.
-    // Both run after the response, so they never slow the checkout.
-    if (order.paymentMethod === "COD") after(async () => sendOrderEmails((await autoShip(order.id)) ?? { ...order, user: { name: user.name, email: user.email } }, "placed").catch(() => {}));
+    // Cash on delivery (and orders paid in full with points) earn their RAYVE points and go to the courier now — online
+    // orders once paid — then the customer is emailed with the tracking link. All after the response, so the checkout
+    // never waits on it.
+    if (order.paymentMethod !== "ONLINE") {
+      after(async () => {
+        await awardOrderPoints(order.id).catch((e) => console.error("Points award failed", e.message));
+        await sendOrderEmails((await autoShip(order.id)) ?? { ...order, user: { name: user.name, email: user.email } }, "placed").catch(() => {});
+      });
+    }
     return json({ order }, 201);
   } catch (e) {
     if (e instanceof OrderError) return error(e.message, 409);

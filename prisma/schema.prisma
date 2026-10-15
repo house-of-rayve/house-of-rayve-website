@@ -23,6 +23,7 @@ model User {
   addresses    Address[]
   orders       Order[]
   reviews      Review[]
+  points       PointsEntry[]
 }
 
 model Address {
@@ -75,7 +76,7 @@ model Order {
   userId            String
   user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   status            String      @default("PENDING") // PENDING | CONFIRMED | SHIPPED | DELIVERED | CANCELLED
-  paymentMethod     String      @default("COD") // COD | ONLINE
+  paymentMethod     String      @default("COD") // COD | ONLINE | POINTS (paid in full with RAYVE points)
   paymentStatus     String      @default("PENDING") // PENDING | PAID | REFUNDED
   subtotal          Int
   shippingFee       Int         @default(0)
@@ -84,6 +85,8 @@ model Order {
   total             Int
   razorpayOrderId   String?
   razorpayPaymentId String?
+  pointsUsed        Int         @default(0) // RAYVE points spent on this order (1 point = ₹1)
+  pointsEarned      Int         @default(0) // RAYVE points this order earns once delivered
   // Shipment with iThink Logistics, once the admin ships the order
   awb               String?
   courier           String?
@@ -164,4 +167,21 @@ model Review {
   createdAt DateTime @default(now())
 
   @@unique([productId, userId]) // one review per customer per frame
+}
+
+// RAYVE points ledger: every earn and spend is a row; a customer's balance is the sum of their AVAILABLE rows.
+// Points from an order are PENDING until it is delivered, then AVAILABLE. 1 point = ₹1.
+model PointsEntry {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orderId   String?
+  points    Int // positive = added, negative = spent
+  kind      String // EARNED | SPENT | REFUNDED | ADJUSTED
+  status    String   @default("AVAILABLE") // PENDING | AVAILABLE
+  note      String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([orderId])
 }

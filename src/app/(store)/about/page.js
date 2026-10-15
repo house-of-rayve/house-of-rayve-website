@@ -18,7 +18,7 @@ export default function AboutPage() {
       <section id="care" className="border-t border-line bg-sand/50">
         <div className="container-x section-y grid gap-10 md:grid-cols-3">
           {[
-            ["Shipping", "Complimentary shipping on orders above ₹2,999. Orders are dispatched within 24 hours and delivered in 3–5 working days."],
+            ["Shipping", "Free delivery across Delhi NCR; ₹200–₹300 elsewhere in India. Orders are dispatched within 24 hours, and the product page shows the delivery date for your PIN code."],
             ["Returns", "Changed your mind? Return or exchange unworn frames within 7 days of delivery, from your account."],
             ["Care", "Clean lenses with the RAYVE cloth, store frames in their case, and avoid leaving them in hot cars."],
           ].map(([t, d]) => (

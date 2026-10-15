@@ -3,11 +3,11 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { X, ShoppingBag, Plus, Truck, Lock } from "lucide-react";
+import { X, ShoppingBag, Plus, Sparkles, Lock } from "lucide-react";
 import { useCart } from "./CartProvider";
 import CartLines from "./CartLines";
 import { formatPrice } from "@/lib/format";
-import { FREE_SHIPPING_THRESHOLD, SHIPPING_FEE } from "@/lib/constants";
+import { ORDER_VALUE_TIER, POINTS_FROM_TIER, pointsFor } from "@/lib/shipping";
 import { LogoMark } from "@/components/ui/Logo";
 
 function Upsell({ onNavigate }) {
@@ -73,9 +73,9 @@ export default function CartDrawer() {
     };
   }, [open, setOpen]);
 
-  // With no shipping fee, every bag already ships free
-  const remaining = SHIPPING_FEE ? FREE_SHIPPING_THRESHOLD - subtotal : 0;
-  const progress = SHIPPING_FEE ? Math.min(100, (subtotal / FREE_SHIPPING_THRESHOLD) * 100) : 100;
+  // The bull runs towards the order value that earns the higher RAYVE points reward
+  const remaining = ORDER_VALUE_TIER - subtotal;
+  const progress = Math.min(100, (subtotal / ORDER_VALUE_TIER) * 100);
 
   return (
     <div className={`fixed inset-0 z-50 ${open ? "" : "pointer-events-none"}`} aria-hidden={!open} inert={!open}>
@@ -114,19 +114,19 @@ export default function CartDrawer() {
           <>
             <div className="border-b border-line px-6 py-4">
               <p className="flex items-center gap-2 text-xs text-olive-800">
-                <Truck className="size-4" />
+                <Sparkles className="size-4" />
                 {remaining > 0 ? (
                   <span>
-                    You&apos;re <strong className="font-medium">{formatPrice(remaining)}</strong> away from free shipping
+                    This bag earns <strong className="font-medium">{pointsFor(subtotal)} RAYVE points</strong> — add {formatPrice(remaining)} more for {POINTS_FROM_TIER}
                   </span>
                 ) : (
                   <span>
-                    You&apos;ve unlocked complimentary shipping{" "}
+                    This bag earns <strong className="font-medium">{POINTS_FROM_TIER} RAYVE points</strong>{" "}
                     <span className="inline-block animate-pop font-display text-[9px] uppercase tracking-[0.2em] text-olive-700">¡Olé!</span>
                   </span>
                 )}
               </p>
-              {/* The bull runs along the bar towards free shipping */}
+              {/* The bull runs along the bar towards the higher points reward */}
               <div className="relative mt-4 h-1 rounded-full bg-line">
                 <div className="h-full rounded-full bg-olive-800 transition-all duration-700" style={{ width: `${progress}%` }} />
                 <span
@@ -149,7 +149,7 @@ export default function CartDrawer() {
                 <span className="text-muted">Subtotal</span>
                 <span className="font-medium">{formatPrice(subtotal)}</span>
               </div>
-              <p className="text-xs text-muted">Inclusive of all taxes. Shipping calculated at checkout.</p>
+              <p className="text-xs text-muted">Inclusive of all taxes. Free delivery in Delhi NCR; elsewhere shipping is added at checkout.</p>
               <div className="grid gap-2">
                 <Link href="/checkout" onClick={close} className="btn-primary w-full">
                   <Lock className="size-3.5" /> Secure checkout

@@ -50,7 +50,11 @@ export default async function AdminOrderPage({ params }) {
                 <div className="flex justify-between text-olive-700"><dt>Discount{order.couponCode ? ` (${order.couponCode})` : ""}</dt><dd className="tabular-nums">−{formatPrice(order.discount)}</dd></div>
               )}
               <div className="flex justify-between"><dt className="text-muted">Shipping</dt><dd className="tabular-nums">{formatPrice(order.shippingFee)}</dd></div>
+              {order.pointsUsed > 0 && (
+                <div className="flex justify-between text-olive-700"><dt>RAYVE points used</dt><dd className="tabular-nums">−{formatPrice(order.pointsUsed)}</dd></div>
+              )}
               <div className="flex justify-between pt-1 font-semibold"><dt>Total</dt><dd className="tabular-nums">{formatPrice(order.total)}</dd></div>
+              {order.pointsEarned > 0 && <p className="pt-1 text-xs text-muted">Earns the customer {order.pointsEarned} RAYVE points{order.status === "DELIVERED" ? "" : " on delivery"}.</p>}
             </dl>
           </Panel>
           <div className="grid gap-6 sm:grid-cols-2">
@@ -94,7 +98,7 @@ export default async function AdminOrderPage({ params }) {
           </Panel>
           <Panel title="Payment">
             <dl className="space-y-2 p-5 text-sm">
-              <div className="flex justify-between"><dt className="text-muted">Method</dt><dd>{order.paymentMethod === "COD" ? "Cash on delivery" : "Online"}</dd></div>
+              <div className="flex justify-between"><dt className="text-muted">Method</dt><dd>{order.paymentMethod === "COD" ? "Cash on delivery" : order.paymentMethod === "POINTS" ? "RAYVE points" : "Online"}</dd></div>
               <div className="flex justify-between"><dt className="text-muted">Status</dt><dd><StatusBadge status={order.paymentStatus} /></dd></div>
               <div className="flex justify-between"><dt className="text-muted">Last update</dt><dd>{formatDateTime(order.updatedAt)}</dd></div>
             </dl>

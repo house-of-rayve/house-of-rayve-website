@@ -3,7 +3,6 @@
 import { createContext, useContext, useState } from "react";
 import { cartStore } from "./store";
 import { useLocalStore } from "@/components/ui/localStore";
-import { shippingFor } from "@/lib/constants";
 import CartDrawer from "./CartDrawer";
 import { flyToBag } from "@/components/motion/flyToBag";
 
@@ -60,10 +59,10 @@ export function CartProvider({ children }) {
 
   const count = items.reduce((s, i) => s + i.quantity, 0);
   const subtotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
-  const shipping = shippingFor(subtotal);
 
   const has = (productId) => items.some((i) => i.productId === productId);
-  const value = { items, count, subtotal, shipping, total: subtotal + shipping, add, update, remove, clear, open, setOpen, has, bump };
+  // Shipping depends on the delivery PIN code, so it's worked out at checkout
+  const value = { items, count, subtotal, add, update, remove, clear, open, setOpen, has, bump };
 
   return (
     <CartContext value={value}>

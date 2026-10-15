@@ -109,8 +109,16 @@ export default async function OrderDetailPage({ params, searchParams }) {
             {order.discount > 0 && (
               <div className="flex justify-between text-olive-700"><dt>Discount{order.couponCode ? ` (${order.couponCode})` : ""}</dt><dd>−{formatPrice(order.discount)}</dd></div>
             )}
-            <div className="flex justify-between"><dt className="text-muted">Shipping</dt><dd>{order.shippingFee ? formatPrice(order.shippingFee) : "Complimentary"}</dd></div>
+            <div className="flex justify-between"><dt className="text-muted">Shipping</dt><dd>{order.shippingFee ? formatPrice(order.shippingFee) : "Free"}</dd></div>
+            {order.pointsUsed > 0 && (
+              <div className="flex justify-between text-olive-700"><dt>RAYVE points</dt><dd>−{formatPrice(order.pointsUsed)}</dd></div>
+            )}
             <div className="flex justify-between pt-2 text-base font-medium"><dt>Total</dt><dd>{formatPrice(order.total)}</dd></div>
+            {order.pointsEarned > 0 && (
+              <p className="pt-1 text-xs text-olive-700">
+                {order.status === "DELIVERED" ? `You earned ${order.pointsEarned} RAYVE points on this order.` : `You'll earn ${order.pointsEarned} RAYVE points once this order is delivered.`}
+              </p>
+            )}
           </dl>
         </div>
         <div className="space-y-6">
@@ -127,7 +135,7 @@ export default async function OrderDetailPage({ params, searchParams }) {
           <div className="card p-6">
             <h3 className="font-display text-xs uppercase tracking-[0.25em]">Payment</h3>
             <div className="mt-4 flex items-center justify-between text-sm">
-              <span>{order.paymentMethod === "COD" ? "Cash on delivery" : "Paid online"}</span>
+              <span>{order.paymentMethod === "COD" ? "Cash on delivery" : order.paymentMethod === "POINTS" ? "Paid with RAYVE points" : "Paid online"}</span>
               <StatusBadge status={order.paymentStatus} />
             </div>
             {order.notes && <p className="mt-4 border-t border-line pt-4 text-sm text-muted">“{order.notes}”</p>}

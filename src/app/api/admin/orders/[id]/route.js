@@ -2,11 +2,12 @@ import { after } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { json, error, readJson, authorize } from "@/lib/api";
 import { ORDER_STATUSES, PAYMENT_STATUSES } from "@/lib/constants";
-import { restockOrder } from "@/lib/orders";
+import { restockOrder, ORDER_TX } from "@/lib/orders";
 import { publish } from "@/lib/events";
 import { invalidateCatalog } from "@/lib/products";
 import { sendOrderEmails } from "@/lib/email";
 import { cancelShipment } from "@/lib/ithink";
+import { awardOrderPoints, releaseOrderPoints, reverseOrderPoints } from "@/lib/points";
 
 export async function GET(_request, { params }) {
   const [, denied] = await authorize("ADMIN");
@@ -56,13 +57,21 @@ export async function PATCH(request, { params }) {
   }
 
   const updated = await prisma.$transaction(async (tx) => {
-    if (data.status === "CANCELLED" && order.status !== "CANCELLED") await restockOrder(tx, id);
+    if (data.status === "CANCELLED" && order.status !== "CANCELLED") {
+      await restockOrder(tx, id);
+      await reverseOrderPoints(tx, id);
+    }
     return tx.order.update({
       where: { id },
       data,
       include: { items: true, user: { select: { id: true, name: true, email: true, phone: true } } },
     });
-  });
+  }, ORDER_TX);
+  // RAYVE points: earned once the order is under way, spendable once it's delivered
+  if (["CONFIRMED", "SHIPPED", "DELIVERED"].includes(data.status)) {
+    await awardOrderPoints(id);
+    if (data.status === "DELIVERED") await releaseOrderPoints(id);
+  }
   invalidateCatalog();
   publish("order:updated", { id, orderNumber: order.orderNumber, status: updated.status });
   // Let the customer know when the order ships, arrives or is cancelled

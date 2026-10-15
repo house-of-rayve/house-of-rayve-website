@@ -1,11 +1,12 @@
 import { after } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { json, error, authorize } from "@/lib/api";
-import { restockOrder } from "@/lib/orders";
+import { restockOrder, ORDER_TX } from "@/lib/orders";
 import { publish } from "@/lib/events";
 import { invalidateCatalog } from "@/lib/products";
 import { sendOrderEmails } from "@/lib/email";
 import { cancelShipment } from "@/lib/ithink";
+import { reverseOrderPoints } from "@/lib/points";
 
 export async function POST(_request, { params }) {
   const [user, denied] = await authorize();
@@ -26,6 +27,7 @@ export async function POST(_request, { params }) {
   }
   const updated = await prisma.$transaction(async (tx) => {
     await restockOrder(tx, id);
+    await reverseOrderPoints(tx, id);
     return tx.order.update({
       where: { id },
       data: {
@@ -35,7 +37,7 @@ export async function POST(_request, { params }) {
       },
       include: { items: true, user: { select: { name: true, email: true } } },
     });
-  });
+  }, ORDER_TX);
   invalidateCatalog();
   publish("order:updated", { id, orderNumber: order.orderNumber, status: "CANCELLED" });
   // No email for an online order abandoned before paying (the customer just closed the payment window)

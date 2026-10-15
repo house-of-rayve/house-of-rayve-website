@@ -2,7 +2,7 @@ import "server-only";
 import { randomInt } from "node:crypto";
 import { prisma } from "@/lib/prisma";
 import { parseImages } from "@/lib/format";
-import { shippingFor } from "@/lib/constants";
+import { shippingFor } from "@/lib/shipping";
 import { isPhone } from "@/lib/api";
 import { checkCoupon } from "@/lib/coupons";
 import { razorpayEnabled } from "@/lib/razorpay";
@@ -28,7 +28,10 @@ export function parseAddress(input = {}) {
 
 export class OrderError extends Error {}
 
-export async function createOrder(userId, { items, address, paymentMethod, notes, couponCode }) {
+// Order transactions run several queries (stock, codes, points); give them room beyond Prisma's 5s default
+export const ORDER_TX = { maxWait: 10_000, timeout: 20_000 };
+
+export async function createOrder(userId, { items, address, paymentMethod, notes, couponCode, pointsToUse = 0 }) {
   const quantities = new Map();
   for (const item of items) {
     const qty = Number(item.quantity);
@@ -70,22 +73,37 @@ export async function createOrder(userId, { items, address, paymentMethod, notes
       code = result.coupon.code;
     }
 
-    const shippingFee = shippingFor(subtotal);
-    // Online orders wait for a verified Razorpay payment before they count as paid / confirmed
-    const online = paymentMethod === "ONLINE";
+    const shippingFee = shippingFor(subtotal - discount, address.postalCode) ?? 0;
+
+    // RAYVE points: lock the customer's row so two orders can't spend the same points, then use up to what they
+    // have and what the order costs
+    let pointsUsed = 0;
+    const wanted = Math.floor(Number(pointsToUse) || 0);
+    if (wanted > 0) {
+      await tx.$executeRaw`SELECT id FROM "User" WHERE id = ${userId} FOR UPDATE`;
+      const { _sum } = await tx.pointsEntry.aggregate({ where: { userId, status: "AVAILABLE" }, _sum: { points: true } });
+      pointsUsed = Math.max(0, Math.min(wanted, _sum.points ?? 0, subtotal - discount + shippingFee));
+    }
+    const total = subtotal - discount + shippingFee - pointsUsed;
+
+    // Online orders wait for a verified Razorpay payment before they count as paid / confirmed; an order fully
+    // covered by points is paid already
+    const coveredByPoints = total === 0;
+    const online = !coveredByPoints && paymentMethod === "ONLINE";
     if (online && !razorpayEnabled()) throw new OrderError("Online payment isn't available right now — please choose cash on delivery.");
-    return tx.order.create({
+    const order = await tx.order.create({
       data: {
         orderNumber: newOrderNumber(),
         userId,
-        status: "PENDING",
-        paymentMethod: online ? "ONLINE" : "COD",
-        paymentStatus: "PENDING",
+        status: coveredByPoints ? "CONFIRMED" : "PENDING",
+        paymentMethod: coveredByPoints ? "POINTS" : online ? "ONLINE" : "COD",
+        paymentStatus: coveredByPoints ? "PAID" : "PENDING",
         subtotal,
         shippingFee,
         discount,
         couponCode: code,
-        total: subtotal - discount + shippingFee,
+        pointsUsed,
+        total,
         shipName: address.fullName,
         shipPhone: address.phone,
         shipLine1: address.line1,
@@ -99,7 +117,11 @@ export async function createOrder(userId, { items, address, paymentMethod, notes
       },
       include: { items: true },
     });
-  });
+    if (pointsUsed) {
+      await tx.pointsEntry.create({ data: { userId, orderId: order.id, points: -pointsUsed, kind: "SPENT", note: `Order ${order.orderNumber}` } });
+    }
+    return order;
+  }, ORDER_TX);
 }
 
 // Put stock back (and give back a used discount code) when an order is cancelled

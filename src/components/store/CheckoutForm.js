@@ -1,14 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Check, Banknote, CreditCard, TicketPercent, X } from "lucide-react";
+import { Check, Banknote, CreditCard, Sparkles, TicketPercent, Truck, X } from "lucide-react";
 import { useCart } from "@/components/cart/CartProvider";
 import OrderSummary from "@/components/cart/OrderSummary";
 import AddressFields, { EMPTY_ADDRESS } from "@/components/account/AddressFields";
 import { api } from "@/components/ui/fetcher";
 import { formatPrice } from "@/lib/format";
+import { isValidPin, shippingFor } from "@/lib/shipping";
+
+const fmtDay = (iso) => new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
 
 // Loads Razorpay's checkout script once, when an online payment starts
 function loadRazorpay() {
@@ -22,9 +25,12 @@ function loadRazorpay() {
   });
 }
 
-export default function CheckoutForm({ user, addresses, onlinePayments = false }) {
+export default function CheckoutForm({ user, addresses, onlinePayments = false, points = 0 }) {
   const router = useRouter();
-  const { items, subtotal, total, clear } = useCart();
+  const { items, subtotal, clear } = useCart();
+  const [usePoints, setUsePoints] = useState(false);
+  const [pointsInput, setPointsInput] = useState("");
+  const [eta, setEta] = useState(null); // live delivery estimate for the chosen PIN code
   const [codeInput, setCodeInput] = useState("");
   const [coupon, setCoupon] = useState(null); // { code, amount, label }
   const [codeError, setCodeError] = useState("");
@@ -37,6 +43,26 @@ export default function CheckoutForm({ user, addresses, onlinePayments = false }
   const [notes, setNotes] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+
+  // Shipping depends on where it's going: free in Delhi NCR, otherwise by order value
+  const pin = addressId === "new" ? address.postalCode : addresses.find((a) => a.id === addressId)?.postalCode;
+  const value = subtotal - (coupon?.amount ?? 0);
+  const shipping = shippingFor(value, pin);
+  const due = value + (shipping ?? 0);
+  const maxPoints = Math.min(points, due);
+  const pointsUsed = usePoints ? Math.min(maxPoints, pointsInput === "" ? maxPoints : Math.max(0, Math.floor(Number(pointsInput) || 0))) : 0;
+  const payable = due - pointsUsed;
+
+  useEffect(() => {
+    if (!isValidPin(pin)) return;
+    let live = true;
+    api(`/api/delivery?pin=${pin}&value=${Math.max(1, value)}`)
+      .then((r) => live && setEta(r))
+      .catch(() => live && setEta(null));
+    return () => {
+      live = false;
+    };
+  }, [pin, value]);
 
   if (items.length === 0 && !busy) {
     return (
@@ -117,10 +143,11 @@ export default function CheckoutForm({ user, addresses, onlinePayments = false }
           ...(addressId === "new" ? { address, saveAddress } : { addressId }),
           paymentMethod: payment,
           couponCode: coupon?.code ?? "",
+          pointsToUse: pointsUsed,
           notes,
         },
       });
-      if (order.paymentMethod === "ONLINE") await payOnline(order);
+      if (order.paymentMethod === "ONLINE") await payOnline(order); // fully paid with points needs no payment
       else finish(order);
     } catch (err) {
       setError(err.message);
@@ -128,7 +155,6 @@ export default function CheckoutForm({ user, addresses, onlinePayments = false }
     }
   };
 
-  const payable = total - (coupon?.amount ?? 0);
   const paymentOptions = [
     { id: "COD", title: "Cash on delivery", text: "Pay when your order arrives.", Icon: Banknote },
     ...(onlinePayments ? [{ id: "ONLINE", title: "Pay online", text: "UPI, cards & netbanking, secured by Razorpay.", Icon: CreditCard }] : []),
@@ -187,6 +213,38 @@ export default function CheckoutForm({ user, addresses, onlinePayments = false }
 
         <section>
           <h2 className="font-display text-xs uppercase tracking-[0.25em]">3 · Payment</h2>
+          {points > 0 && (
+            <div className={`card mt-5 p-5 text-sm transition-colors ${usePoints ? "border-olive-800" : ""}`}>
+              <label className="flex cursor-pointer items-start gap-4">
+                <input type="checkbox" className="mt-1 accent-olive-800" checked={usePoints} onChange={(e) => setUsePoints(e.target.checked)} />
+                <span className="flex-1">
+                  <span className="flex items-center gap-2 font-medium">
+                    <Sparkles className="size-4 text-olive-500" /> Use my RAYVE points
+                  </span>
+                  <span className="mt-1 block text-xs text-muted">
+                    You have {points.toLocaleString("en-IN")} points = {formatPrice(points)}. Use as many as you like, or save them for later.
+                  </span>
+                </span>
+              </label>
+              {usePoints && (
+                <div className="mt-4 flex items-center gap-3 pl-8">
+                  <input
+                    type="number"
+                    min={0}
+                    max={maxPoints}
+                    value={pointsInput === "" ? maxPoints : pointsInput}
+                    onChange={(e) => setPointsInput(e.target.value)}
+                    className="field h-10 w-32"
+                    aria-label="Points to use"
+                  />
+                  <span className="text-xs text-muted">of {maxPoints.toLocaleString("en-IN")} usable on this order</span>
+                </div>
+              )}
+            </div>
+          )}
+          {payable === 0 && pointsUsed > 0 ? (
+            <p className="card mt-3 p-5 text-sm text-olive-800">Your points cover the whole order — nothing more to pay.</p>
+          ) : (
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
             {paymentOptions.map(({ id, title, text, Icon }) => (
               <button
@@ -204,6 +262,7 @@ export default function CheckoutForm({ user, addresses, onlinePayments = false }
               </button>
             ))}
           </div>
+          )}
           <div className="mt-6">
             <label className="label">Order notes (optional)</label>
             <textarea rows={3} className="field" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Delivery instructions, gift message…" />
@@ -216,6 +275,8 @@ export default function CheckoutForm({ user, addresses, onlinePayments = false }
           <OrderSummary
             compact
             discount={coupon}
+            shipping={isValidPin(pin) ? shipping : null}
+            pointsUsed={pointsUsed}
             couponSlot={
               <div className="mt-6 border-t border-line pt-5">
                 {coupon ? (
@@ -249,9 +310,15 @@ export default function CheckoutForm({ user, addresses, onlinePayments = false }
               </div>
             }
           >
+            {eta?.serviceable && (
+              <p className="mt-5 flex items-center gap-2 text-xs text-ink/80">
+                <Truck className="size-4 shrink-0 text-olive-500" /> Delivery by <strong className="font-medium">{fmtDay(eta.from)} – {fmtDay(eta.to)}</strong>
+              </p>
+            )}
+            {eta && eta.serviceable === false && <p className="mt-5 text-xs text-red-700">Sorry — we don&apos;t deliver to {eta.pin} yet.</p>}
             {error && <p className="mt-5 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
             <button disabled={busy} className="btn-primary mt-6 w-full">
-              {busy ? (payment === "ONLINE" ? "Waiting for payment…" : "Placing order…") : `${payment === "ONLINE" ? "Pay" : "Place order"} · ${formatPrice(payable)}`}
+              {busy ? (payment === "ONLINE" && payable > 0 ? "Waiting for payment…" : "Placing order…") : `${payment === "ONLINE" && payable > 0 ? "Pay" : "Place order"} · ${formatPrice(payable)}`}
             </button>
             <p className="mt-3 text-center text-[11px] text-muted">
               By placing this order you agree to our{" "}

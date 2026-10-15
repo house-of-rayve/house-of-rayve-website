@@ -42,7 +42,8 @@ function layout(title, intro, order, cta) {
 <table width="100%" cellpadding="0" cellspacing="0">
 ${line("Subtotal", formatPrice(order.subtotal))}
 ${order.discount ? line(`Discount${order.couponCode ? ` (${esc(order.couponCode)})` : ""}`, `−${formatPrice(order.discount)}`) : ""}
-${line("Shipping", order.shippingFee ? formatPrice(order.shippingFee) : "Complimentary")}
+${line("Shipping", order.shippingFee ? formatPrice(order.shippingFee) : "Free")}
+${order.pointsUsed ? line("RAYVE points", `−${formatPrice(order.pointsUsed)}`) : ""}
 ${line("Total", formatPrice(order.total), true)}
 </table>
 <p style="margin:24px 0 0;line-height:1.6;color:#4a483c">Shipping to ${esc(order.shipName)}, ${esc(order.shipLine1)}${order.shipLine2 ? `, ${esc(order.shipLine2)}` : ""}, ${esc(order.shipCity)}, ${esc(order.shipState)} ${esc(order.shipPostalCode)}</p>
@@ -56,7 +57,7 @@ const MESSAGES = {
   placed: (o) => ({
     subject: `Your RAYVE order ${o.orderNumber} is placed`,
     title: "Thank you — your order is placed",
-    intro: `${o.paymentMethod === "COD" ? "We've received your order. You'll pay on delivery." : "Your payment is confirmed and your order is being prepared."}${o.awb ? ` Your courier pickup is booked — <span style="text-transform:capitalize">${esc(o.courier ?? "")}</span>, AWB ${esc(o.awb)}. Follow it any time with the link below.` : ""}`,
+    intro: `${o.paymentMethod === "COD" ? "We've received your order. You'll pay on delivery." : "Your payment is confirmed and your order is being prepared."}${o.pointsEarned ? ` It earns you ${o.pointsEarned} RAYVE points (₹${o.pointsEarned}), yours to use once it's delivered.` : ""}${o.awb ? ` Your courier pickup is booked — <span style="text-transform:capitalize">${esc(o.courier ?? "")}</span>, AWB ${esc(o.awb)}. Follow it any time with the link below.` : ""}`,
   }),
   SHIPPED: (o) => ({
     subject: `Your RAYVE order ${o.orderNumber} has shipped`,
@@ -83,7 +84,7 @@ export async function sendOrderEmails(order, kind) {
     await send(
       ADMIN,
       `New order ${order.orderNumber} · ${formatPrice(order.total)}`,
-      layout("New order", `${esc(order.user?.name)} placed an order (${order.paymentMethod === "COD" ? "cash on delivery" : "paid online"}).`, order, { href: `${SITE}/admin/orders/${order.id}`, label: "Open in admin" }),
+      layout("New order", `${esc(order.user?.name)} placed an order (${order.paymentMethod === "COD" ? "cash on delivery" : order.paymentMethod === "POINTS" ? "paid with RAYVE points" : "paid online"}).`, order, { href: `${SITE}/admin/orders/${order.id}`, label: "Open in admin" }),
     );
   }
 }

@@ -5,6 +5,8 @@ import { formatDate, formatPrice } from "@/lib/format";
 import PageHeader, { Panel } from "@/components/admin/PageHeader";
 import CustomerForm from "@/components/admin/CustomerForm";
 import StatusBadge from "@/components/ui/StatusBadge";
+import PointsAdjust from "@/components/admin/PointsAdjust";
+import { pointsBalance } from "@/lib/points";
 
 export const metadata = { title: "Customer" };
 
@@ -25,6 +27,10 @@ export default async function AdminCustomerPage({ params }) {
     },
   });
   if (!customer) notFound();
+  const [points, pointsHistory] = await Promise.all([
+    pointsBalance(customer.id),
+    prisma.pointsEntry.findMany({ where: { userId: customer.id }, orderBy: { createdAt: "desc" }, take: 50 }),
+  ]);
 
   const spent = customer.orders.filter((o) => o.status !== "CANCELLED").reduce((s, o) => s + o.total, 0);
   const addresses = customer.addresses.map(({ createdAt, updatedAt, ...a }) => a);
@@ -48,6 +54,34 @@ export default async function AdminCustomerPage({ params }) {
               <p className="mt-1 text-xl font-semibold tabular-nums">{formatPrice(spent)}</p>
             </div>
           </div>
+          <Panel title="RAYVE points">
+            <div className="flex items-end justify-between gap-3 p-5">
+              <div>
+                <p className="text-3xl font-semibold tabular-nums">{points.available.toLocaleString("en-IN")}</p>
+                <p className="text-xs text-muted">available · worth {formatPrice(points.available)}</p>
+              </div>
+              {points.pending > 0 && <p className="text-right text-xs text-muted">+{points.pending.toLocaleString("en-IN")} pending delivery</p>}
+            </div>
+            <div className="border-t border-line p-5">
+              <PointsAdjust customerId={customer.id} />
+            </div>
+            {pointsHistory.length > 0 && (
+              <ul className="max-h-72 divide-y divide-line overflow-y-auto border-t border-line">
+                {pointsHistory.map((e) => (
+                  <li key={e.id} className="flex items-center justify-between gap-3 px-5 py-2.5 text-sm">
+                    <div className="min-w-0">
+                      <p className="truncate">
+                        {e.kind.charAt(0) + e.kind.slice(1).toLowerCase()}
+                        {e.status === "PENDING" && <span className="ml-2 text-xs text-amber-700">pending</span>}
+                      </p>
+                      <p className="truncate text-xs text-muted">{e.note} · {formatDate(e.createdAt)}</p>
+                    </div>
+                    <span className={`shrink-0 tabular-nums ${e.points > 0 ? "text-emerald-700" : ""}`}>{e.points > 0 ? `+${e.points}` : e.points}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Panel>
           <Panel title="Order history">
             {customer.orders.length === 0 ? (
               <p className="p-5 text-sm text-muted">No orders yet.</p>

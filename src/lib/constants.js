@@ -23,14 +23,6 @@ export const STATUS_LABELS = {
   REFUNDED: "Refunded",
 };
 
-export const FREE_SHIPPING_THRESHOLD = 2999;
-// TEMPORARY: shipping is free on every order while live payments are being tested. Restore to 149 afterwards.
-export const SHIPPING_FEE = 0;
-
-export function shippingFor(subtotal) {
-  return subtotal === 0 || subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
-}
-
 // Photos kept out of editorial features (lookbook, stories) because they carry a third-party watermark.
 // Replace the photo in the admin panel, then remove it from this list.
 export const EDITORIAL_EXCLUDE = ["/images/model-cordoba.jpg"];

@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { formatDate, formatPrice } from "@/lib/format";
+import { pointsBalances } from "@/lib/points";
 import PageHeader from "@/components/admin/PageHeader";
 import ListToolbar from "@/components/admin/ListToolbar";
 import AutoRefresh from "@/components/admin/AutoRefresh";
@@ -21,6 +22,7 @@ export default async function AdminCustomersPage({ searchParams }) {
       orders: { select: { total: true, status: true } },
     },
   });
+  const points = await pointsBalances(customers.map((c) => c.id));
 
   return (
     <>
@@ -31,7 +33,7 @@ export default async function AdminCustomersPage({ searchParams }) {
           <ListToolbar placeholder="Name, email or phone…" />
         </Suspense>
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[860px] text-sm">
+          <table className="w-full min-w-[960px] text-sm">
             <thead>
               <tr className="border-b border-line text-left text-xs text-muted">
                 <th className="px-5 py-3 font-medium">Customer</th>
@@ -39,6 +41,7 @@ export default async function AdminCustomersPage({ searchParams }) {
                 <th className="px-5 py-3 font-medium">Address</th>
                 <th className="px-5 py-3 font-medium">Orders</th>
                 <th className="px-5 py-3 font-medium">Spent</th>
+                <th className="px-5 py-3 font-medium">RAYVE points</th>
                 <th className="px-5 py-3 font-medium">Joined</th>
               </tr>
             </thead>
@@ -65,12 +68,13 @@ export default async function AdminCustomersPage({ searchParams }) {
                     </td>
                     <td className="px-5 py-3 tabular-nums">{c.orders.length}</td>
                     <td className="px-5 py-3 tabular-nums">{formatPrice(spent)}</td>
+                    <td className="px-5 py-3 tabular-nums">{(points[c.id] ?? 0).toLocaleString("en-IN")}</td>
                     <td className="px-5 py-3 text-muted">{formatDate(c.createdAt)}</td>
                   </tr>
                 );
               })}
               {customers.length === 0 && (
-                <tr><td colSpan={6} className="px-5 py-10 text-center text-muted">No customers found.</td></tr>
+                <tr><td colSpan={7} className="px-5 py-10 text-center text-muted">No customers found.</td></tr>
               )}
             </tbody>
           </table>

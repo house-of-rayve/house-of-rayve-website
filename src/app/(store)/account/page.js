@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { pointsBalance } from "@/lib/points";
 import { formatDate, formatPrice } from "@/lib/format";
 import OrderRow from "@/components/account/OrderRow";
 
@@ -8,15 +9,27 @@ export const metadata = { title: "My account" };
 
 export default async function AccountOverview() {
   const user = await requireUser();
-  const [orders, address] = await Promise.all([
+  const [orders, address, points] = await Promise.all([
     prisma.order.findMany({ where: { userId: user.id }, orderBy: { createdAt: "desc" }, include: { items: true } }),
     prisma.address.findFirst({ where: { userId: user.id }, orderBy: [{ isDefault: "desc" }, { createdAt: "asc" }] }),
+    pointsBalance(user.id),
   ]);
   const spent = orders.filter((o) => o.status !== "CANCELLED").reduce((s, o) => s + o.total, 0);
   const active = orders.filter((o) => ["PENDING", "CONFIRMED", "SHIPPED"].includes(o.status)).length;
 
   return (
     <div className="space-y-10">
+      <Link href="/account/points" className="group flex items-center justify-between gap-4 bg-olive-800 p-5 text-sand sm:p-6">
+        <div>
+          <p className="text-[11px] uppercase tracking-[0.15em] text-sand/60">RAYVE points</p>
+          <p className="mt-2 text-3xl font-light">
+            {points.available.toLocaleString("en-IN")} <span className="text-sm text-sand/60">= {formatPrice(points.available)}</span>
+          </p>
+          {points.pending > 0 && <p className="mt-1 text-xs text-sand/60">+ {points.pending} unlocking on delivery</p>}
+        </div>
+        <span className="text-[11px] uppercase tracking-[0.18em] text-sand/70 group-hover:text-sand">View →</span>
+      </Link>
+
       <div className="grid grid-cols-2 gap-px bg-line sm:grid-cols-3">
         {[
           ["Orders", orders.length],

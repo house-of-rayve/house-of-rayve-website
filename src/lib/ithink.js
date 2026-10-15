@@ -3,6 +3,7 @@ import { PDFDocument } from "pdf-lib";
 import { prisma } from "@/lib/prisma";
 import { siteUrl } from "@/lib/site";
 import { sendOrderEmails } from "@/lib/email";
+import { releaseOrderPoints } from "@/lib/points";
 
 // Shipping through iThink Logistics (https://docs.ithinklogistics.com, API v3).
 // Needs ITHINK_ACCESS_TOKEN and ITHINK_SECRET_KEY (dashboard → Store → API); the pickup warehouse and
@@ -70,10 +71,60 @@ export async function courierRates(pincode, { cod = false, value = 1000, pairs =
         name: service === "surface" ? c.logistic_name : `${c.logistic_name} (${c.service_type})`,
         rate: Math.round(c.rate),
         days: Number(c.delivery_tat) || null,
+        cod: c.cod === "Y",
       };
     })
     .sort((a, b) => a.rate - b.rate);
   return { rates, eta: body.expected_delivery_date ?? null };
+}
+
+// Delivery estimates, cached per PIN code for a few hours (couriers' transit times don't change minute to minute)
+const ESTIMATE_TTL_MS = 6 * 60 * 60 * 1000;
+const DISPATCH_CUTOFF_HOUR = 14; // IST; orders after this are picked up the next working day
+const estimates = new Map();
+
+// Today in India, as a plain date (no time zone surprises on a server running in UTC)
+function istToday() {
+  const ist = new Date(Date.now() + 5.5 * 60 * 60 * 1000);
+  return { date: new Date(Date.UTC(ist.getUTCFullYear(), ist.getUTCMonth(), ist.getUTCDate())), hour: ist.getUTCHours() };
+}
+const addWorkingDays = (d, n) => {
+  const x = new Date(d);
+  while (n > 0) {
+    x.setUTCDate(x.getUTCDate() + 1);
+    if (x.getUTCDay() !== 0) n--; // couriers don't deliver on Sundays
+  }
+  return x;
+};
+
+/**
+ * Live delivery estimate for a PIN code from iThink: the courier an order would be booked with (the cheapest one that
+ * delivers there) and its transit time, counted from the day we'd dispatch. Dates are "YYYY-MM-DD" in India.
+ * Returns { serviceable: false } when no courier delivers to the PIN code.
+ */
+export async function deliveryEstimate(pin, value = 1000) {
+  const key = String(pin);
+  const hit = estimates.get(key);
+  let rates;
+  if (hit && Date.now() - hit.at < ESTIMATE_TTL_MS) rates = hit.rates;
+  else {
+    try {
+      ({ rates } = await courierRates(key, { value }));
+    } catch (e) {
+      if (!/not serviceable/i.test(e.message)) throw e;
+      rates = []; // iThink answers an unserviceable PIN code with an error
+    }
+    estimates.set(key, { at: Date.now(), rates });
+  }
+  if (!rates.length) return { serviceable: false };
+  const courier = rates[0]; // what bookShipment() picks when no courier is chosen
+  const { date: today, hour } = istToday();
+  const dispatch = hour >= DISPATCH_CUTOFF_HOUR || today.getUTCDay() === 0 ? addWorkingDays(today, 1) : today;
+  const days = courier.days ?? 5;
+  const from = addWorkingDays(dispatch, days);
+  const to = addWorkingDays(from, 1); // a day's margin, so we under-promise rather than over-promise
+  const iso = (d) => d.toISOString().slice(0, 10);
+  return { serviceable: true, from: iso(from), to: iso(to), cod: rates.some((r) => r.cod), courier: courier.name };
 }
 
 /** Books the order with iThink. `courierId` is an id from courierRates(), or empty to let iThink choose. */
@@ -302,6 +353,7 @@ export async function syncShipments(orders, { force = false } = {}) {
         }
       }
       const updated = await prisma.order.update({ where: { id: o.id }, data, include: withItems });
+      if (email === "DELIVERED") await releaseOrderPoints(o.id).catch((e) => console.error("Points release failed", e.message));
       if (email) await sendOrderEmails(updated, email).catch(() => {});
     }
   }
