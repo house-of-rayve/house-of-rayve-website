@@ -1,67 +1,73 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import ProductCard from "@/components/store/ProductCard";
-import { gsap, useGSAP, prefersReducedMotion } from "./gsap";
 
-// Desktop: the section pins and vertical scrolling moves the products sideways.
-// Touch / small screens: a normal swipeable row.
+const edge = "px-5 sm:px-8 lg:px-10"; // same side spacing as the header, so the heading and the first card line up
+
+// A row of products that scrolls sideways with the arrow buttons (or a swipe / trackpad). The page keeps scrolling
+// normally past it.
 export default function HorizontalShowcase({ eyebrow, title, products, href = "/shop" }) {
-  const root = useRef(null);
   const track = useRef(null);
+  const [state, setState] = useState({ progress: 0, start: true, end: false });
 
-  useGSAP(
-    () => {
-      if (prefersReducedMotion()) return;
-      const mm = gsap.matchMedia();
-      mm.add("(min-width: 1024px)", () => {
-        const distance = () => track.current.scrollWidth - window.innerWidth;
-        gsap.to(track.current, {
-          x: () => -distance(),
-          ease: "none",
-          scrollTrigger: {
-            trigger: root.current,
-            start: "top top",
-            end: () => `+=${distance()}`,
-            scrub: 0.6,
-            pin: true,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
-          },
-        });
-        gsap.to(".hs-progress", {
-          scaleX: 1,
-          ease: "none",
-          scrollTrigger: { trigger: root.current, start: "top top", end: () => `+=${distance()}`, scrub: true },
-        });
-      });
-      return () => mm.revert();
-    },
-    { scope: root },
-  );
+  useEffect(() => {
+    const el = track.current;
+    const update = () => {
+      const max = el.scrollWidth - el.clientWidth;
+      setState({ progress: max > 0 ? el.scrollLeft / max : 1, start: el.scrollLeft <= 4, end: el.scrollLeft >= max - 4 });
+    };
+    update();
+    el.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => {
+      el.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, []);
+
+  // Moves by roughly one screen of cards
+  const move = (dir) => {
+    const el = track.current;
+    const card = el.firstElementChild?.firstElementChild;
+    const step = card ? Math.max(card.offsetWidth, Math.floor(el.clientWidth / card.offsetWidth - 0.2) * card.offsetWidth) : el.clientWidth * 0.8;
+    el.scrollBy({ left: dir * step, behavior: "smooth" });
+  };
+
+  const arrow = "grid size-11 place-items-center rounded-full border border-olive-800 transition-colors hover:bg-olive-800 hover:text-sand disabled:pointer-events-none disabled:opacity-25";
 
   return (
-    <section ref={root} className="relative overflow-hidden lg:flex lg:h-svh lg:flex-col lg:justify-center">
-      <div className="container-x section-head flex flex-wrap items-end justify-between gap-4 max-lg:pt-20">
+    <section className="section-y">
+      <div className={`${edge} section-head flex flex-wrap items-end justify-between gap-4`}>
         <div>
           <p className="eyebrow">{eyebrow}</p>
           <h2 className="display-title mt-4 text-2xl sm:text-3xl lg:text-4xl">{title}</h2>
         </div>
-        <Link href={href} className="group flex items-center gap-2 border-b border-ink pb-1 text-[11px] uppercase tracking-[0.2em]">
-          Shop all <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-1" />
-        </Link>
+        <div className="flex items-center gap-6">
+          <Link href={href} className="group flex items-center gap-2 border-b border-ink pb-1 text-[11px] uppercase tracking-[0.2em]">
+            Shop all <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-1" />
+          </Link>
+          <div className="hidden gap-2 sm:flex">
+            <button type="button" onClick={() => move(-1)} disabled={state.start} className={arrow} aria-label="Previous frames">
+              <ArrowLeft className="size-4" />
+            </button>
+            <button type="button" onClick={() => move(1)} disabled={state.end} className={arrow} aria-label="Next frames">
+              <ArrowRight className="size-4" />
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div className="no-scrollbar max-lg:overflow-x-auto max-lg:pb-20">
-        <div ref={track} className="flex w-max gap-4 px-5 sm:gap-6 sm:px-8 lg:px-12">
+      <div ref={track} className={`no-scrollbar snap-x snap-mandatory overflow-x-auto ${edge} scroll-px-5 sm:scroll-px-8 lg:scroll-px-10`}>
+        <div className="flex w-max gap-4 sm:gap-6">
           {products.map((p, i) => (
-            <div key={p.id} className="w-[64vw] shrink-0 sm:w-[38vw] lg:w-[24vw] xl:w-[21vw]">
+            <div key={p.id} className="w-[64vw] shrink-0 snap-start sm:w-[38vw] lg:w-[24vw] xl:w-[21vw]">
               <ProductCard product={p} priority={i < 2} sizes="(min-width:1024px) 24vw, 64vw" />
             </div>
           ))}
-          <Link href={href} className="group flex w-[64vw] shrink-0 flex-col items-center justify-center gap-5 border border-line sm:w-[38vw] lg:w-[24vw] xl:w-[21vw]">
+          <Link href={href} className="group flex w-[64vw] shrink-0 snap-start flex-col items-center justify-center gap-5 border border-line sm:w-[38vw] lg:w-[24vw] xl:w-[21vw]">
             <span className="grid size-16 place-items-center rounded-full border border-olive-800 transition-colors group-hover:bg-olive-800 group-hover:text-sand">
               <ArrowRight className="size-5" />
             </span>
@@ -70,9 +76,9 @@ export default function HorizontalShowcase({ eyebrow, title, products, href = "/
         </div>
       </div>
 
-      <div className="container-x mt-10 hidden lg:block">
+      <div className={`${edge} mt-10`}>
         <div className="h-px bg-line">
-          <div className="hs-progress h-px origin-left bg-olive-800" style={{ transform: "scaleX(0)" }} />
+          <div className="h-px origin-left bg-olive-800 transition-transform duration-300" style={{ transform: `scaleX(${Math.max(0.08, state.progress)})` }} />
         </div>
       </div>
     </section>
