@@ -177,9 +177,7 @@ export default async function ProductPage({ params }) {
       {product.category === "Sunglasses" && (
         <>
           <FrameAnatomy product={product} />
-          <section className="container-x section-y">
-            <LensTintLab initialTint={tintIndexFor(product.lensColor)} />
-          </section>
+          <LensTintLab initialTint={tintIndexFor(product.lensColor)} />
         </>
       )}
 

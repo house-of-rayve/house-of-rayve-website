@@ -14,7 +14,7 @@ const SCENE = "https://images.unsplash.com/photo-1782916539674-33c80b12ec66";
  * A pair of lenses that floats over a street scene; inside the lenses the scene is shown through the
  * selected tint. Follows the mouse, moves to a tap on touch screens, and drifts on its own when idle.
  */
-export default function LensTintLab({ initialTint = 0, compact = false }) {
+export default function LensTintLab({ initialTint = 0 }) {
   const stage = useRef(null);
   const pos = useRef({ x: 0.5, y: 0.5 }); // normalised lens centre
   const [tint, setTint] = useState(initialTint);
@@ -25,7 +25,7 @@ export default function LensTintLab({ initialTint = 0, compact = false }) {
     const p = pos.current;
     const apply = () => {
       const { width, height } = el.getBoundingClientRect();
-      const rx = Math.min(width * 0.13, 170);
+      const rx = Math.min(width * 0.1, 180);
       el.style.setProperty("--rx", `${rx}px`);
       el.style.setProperty("--ry", `${rx * 0.74}px`);
       el.style.setProperty("--gap", `${rx * 0.16}px`);
@@ -65,7 +65,7 @@ export default function LensTintLab({ initialTint = 0, compact = false }) {
       });
     };
     const onMove = (e) => e.pointerType === "mouse" && moveTo(e, true);
-    const onDown = (e) => e.pointerType !== "mouse" && moveTo(e, false);
+    const onDown = (e) => e.pointerType !== "mouse" && !e.target.closest("[data-lab-ui]") && moveTo(e, false);
     el.addEventListener("pointermove", onMove);
     el.addEventListener("pointerdown", onDown);
     return () => {
@@ -81,77 +81,86 @@ export default function LensTintLab({ initialTint = 0, compact = false }) {
   const lens = (side) => `radial-gradient(var(--rx) var(--ry) at calc(var(--x) ${side} var(--rx) ${side} var(--gap)) var(--y), #000 98.5%, transparent 100%)`;
   const mask = `${lens("-")}, ${lens("+")}`;
 
+  // The scene, the tinted copy inside the lenses, and the frame outline
+  const scene = (
+    <>
+      <Image loader={unsplashLoader} src={SCENE} alt="A sunny street in Seville" fill sizes="100vw" className="object-cover" draggable={false} />
+      <div className="absolute inset-0" style={{ maskImage: mask, WebkitMaskImage: mask }} aria-hidden="true">
+        <Image
+          loader={unsplashLoader}
+          src={SCENE}
+          alt=""
+          fill
+          sizes="100vw"
+          className="object-cover transition-[filter] duration-500"
+          style={{ filter: active.filter }}
+          draggable={false}
+        />
+        <div className="absolute inset-0 mix-blend-multiply transition-colors duration-500" style={{ background: active.wash }} />
+      </div>
+      <div className="pointer-events-none absolute left-0 top-0" style={{ transform: "translate(var(--x), var(--y))" }} aria-hidden="true">
+        {["-", "+"].map((side) => (
+          <span
+            key={side}
+            className="absolute rounded-[50%] border-[6px] border-olive-950 shadow-[0_8px_30px_rgba(0,0,0,0.35),0_0_0_1px_rgba(233,226,208,0.45)]"
+            style={{
+              width: "calc(var(--rx) * 2 + 12px)",
+              height: "calc(var(--ry) * 2 + 12px)",
+              left: `calc(${side === "-" ? "-1" : "1"} * (var(--rx) + var(--gap)) - var(--rx) - 6px)`,
+              top: "calc(-1 * var(--ry) - 6px)",
+            }}
+          />
+        ))}
+        <span
+          className="absolute h-3 rounded-t-full border-x-0 border-b-0 border-t-[6px] border-solid border-olive-950"
+          style={{ width: "calc(var(--gap) * 2 + 16px)", left: "calc(-1 * var(--gap) - 8px)", top: "calc(-0.45 * var(--ry))" }}
+        />
+      </div>
+    </>
+  );
+
   return (
-    <div className={`grid items-center gap-8 lg:grid-cols-12 ${compact ? "" : "lg:gap-14"}`}>
-      <div className={compact ? "lg:col-span-12" : "lg:col-span-4"}>
-        <p className="eyebrow">Lens lab</p>
-        <h2 className="display-title mt-4 text-2xl sm:text-3xl lg:text-4xl">See the world through RAYVE.</h2>
-        <p className="mt-4 max-w-md text-sm leading-relaxed text-muted">
-          Move the frame across the street to compare tints{compact ? "" : " — tap the photo on your phone"}. Every RAYVE lens blocks 100% of UVA and UVB (UV400).
-        </p>
-        <div className="mt-7 flex flex-wrap gap-2" role="radiogroup" aria-label="Lens tint">
+    <section ref={stage} className="relative h-[min(92svh,940px)] min-h-[600px] cursor-none select-none overflow-hidden bg-olive-950 text-sand">
+      {scene}
+      {/* shade so the copy and controls read over the photo */}
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-olive-950/70 via-olive-950/10 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-olive-950/90 to-transparent" />
+
+      <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-6 px-5 pt-24 sm:px-8 sm:pt-28 lg:px-10 lg:pt-32">
+        <div className="max-w-xl">
+          <p className="eyebrow text-sand/70">Lens lab</p>
+          <h2 className="display-title mt-5 text-3xl leading-[1.05] sm:text-5xl lg:text-6xl">See the world through RAYVE.</h2>
+          <p className="mt-5 max-w-sm text-sm leading-relaxed text-sand/75">
+            <span className="hidden sm:inline">Move across the street</span>
+            <span className="sm:hidden">Tap the street</span> to look through the lenses. Pick a tint below.
+          </p>
+        </div>
+        <span className="hidden shrink-0 border border-sand/30 bg-olive-950/45 px-3 py-1.5 text-[10px] uppercase tracking-[0.22em] text-sand backdrop-blur-sm sm:block">UV400 · 100% UVA/UVB</span>
+      </div>
+
+      <div className="absolute inset-x-0 bottom-0 flex flex-col gap-6 px-5 pb-8 sm:px-8 lg:flex-row lg:items-end lg:justify-between lg:px-10 lg:pb-12">
+        <div key={tint} className="pointer-events-none animate-fade-in">
+          <p className="text-[10px] uppercase tracking-[0.3em] text-sand/60">Now looking through</p>
+          <p className="display-title mt-2 text-2xl sm:text-4xl">{active.name}</p>
+          <p className="mt-2 text-sm text-sand/75">{active.note}</p>
+        </div>
+        <div data-lab-ui className="flex cursor-auto gap-3 sm:gap-5" role="radiogroup" aria-label="Lens tint">
           {TINTS.map((t, i) => (
-            <button
-              key={t.name}
-              role="radio"
-              aria-checked={tint === i}
-              onClick={() => setTint(i)}
-              className={`flex items-center gap-2 border px-3 py-2 text-[10px] uppercase tracking-[0.18em] transition-colors ${
-                tint === i ? "border-olive-800 bg-olive-800 text-sand" : "border-line bg-paper hover:border-olive-800"
-              }`}
-            >
-              <span className="size-3 rounded-full ring-1 ring-black/10" style={{ background: t.swatch }} />
-              {t.name}
+            <button key={t.name} role="radio" aria-checked={tint === i} onClick={() => setTint(i)} className="group flex flex-col items-center gap-2">
+              {/* a little lens in the tint, with a highlight */}
+              <span
+                className={`block h-10 w-14 rounded-[50%] border-[3px] transition-all duration-300 sm:h-12 sm:w-16 ${
+                  tint === i ? "scale-110 border-sand shadow-[0_0_0_4px_rgba(233,226,208,0.18)]" : "border-olive-950/70 opacity-80 group-hover:opacity-100"
+                }`}
+                style={{ background: `radial-gradient(120% 90% at 30% 25%, rgba(255,255,255,0.45), transparent 45%), ${t.swatch}` }}
+              />
+              <span className={`text-[9px] uppercase tracking-[0.2em] transition-colors sm:text-[10px] ${tint === i ? "text-sand" : "text-sand/60 group-hover:text-sand"}`}>{t.name}</span>
             </button>
           ))}
         </div>
-        <p key={tint} className="mt-4 animate-fade-in text-xs text-muted">
-          {active.name}: <span className="text-ink">{active.note}</span>
-        </p>
       </div>
 
-      <div className={compact ? "lg:col-span-12" : "lg:col-span-8"}>
-        <div ref={stage} className="relative aspect-[4/5] cursor-none select-none overflow-hidden bg-mist sm:aspect-[16/10]">
-          <Image loader={unsplashLoader} src={SCENE} alt="A sunny street in Seville" fill sizes="(min-width:1024px) 60vw, 100vw" className="object-cover" draggable={false} />
-          {/* The same scene, tinted, visible only inside the lenses */}
-          <div className="absolute inset-0" style={{ maskImage: mask, WebkitMaskImage: mask }} aria-hidden="true">
-            <Image
-              loader={unsplashLoader}
-              src={SCENE}
-              alt=""
-              fill
-              sizes="(min-width:1024px) 60vw, 100vw"
-              className="object-cover transition-[filter] duration-500"
-              style={{ filter: active.filter }}
-              draggable={false}
-            />
-            <div className="absolute inset-0 mix-blend-multiply transition-colors duration-500" style={{ background: active.wash }} />
-          </div>
-          {/* Frame outline around the lenses */}
-          <div className="pointer-events-none absolute left-0 top-0" style={{ transform: "translate(var(--x), var(--y))" }} aria-hidden="true">
-            {["-", "+"].map((side) => (
-              <span
-                key={side}
-                className="absolute rounded-[50%] border-[6px] border-olive-950 shadow-[0_8px_30px_rgba(0,0,0,0.35)]"
-                style={{
-                  width: "calc(var(--rx) * 2 + 12px)",
-                  height: "calc(var(--ry) * 2 + 12px)",
-                  left: `calc(${side === "-" ? "-1" : "1"} * (var(--rx) + var(--gap)) - var(--rx) - 6px)`,
-                  top: "calc(-1 * var(--ry) - 6px)",
-                }}
-              />
-            ))}
-            {/* bridge */}
-            <span
-              className="absolute h-3 rounded-t-full border-x-0 border-b-0 border-t-[6px] border-solid border-olive-950"
-              style={{ width: "calc(var(--gap) * 2 + 16px)", left: "calc(-1 * var(--gap) - 8px)", top: "calc(-0.45 * var(--ry))" }}
-            />
-          </div>
-          <span className="pointer-events-none absolute bottom-3 left-3 bg-paper/85 px-2.5 py-1 text-[9px] uppercase tracking-[0.2em] text-ink backdrop-blur sm:bottom-4 sm:left-4">
-            Tints simulated on screen
-          </span>
-        </div>
-      </div>
-    </div>
+      <span className="pointer-events-none absolute bottom-3 right-5 text-[9px] uppercase tracking-[0.2em] text-sand/45 sm:right-8 lg:right-10 lg:top-auto max-lg:hidden">Tints simulated on screen</span>
+    </section>
   );
 }
