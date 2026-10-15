@@ -146,13 +146,19 @@ export default function LensTintLab({ initialTint = 0 }) {
         </div>
         <div data-lab-ui className="flex cursor-auto gap-3 sm:gap-5" role="radiogroup" aria-label="Lens tint">
           {TINTS.map((t, i) => (
-            <button key={t.name} role="radio" aria-checked={tint === i} onClick={() => setTint(i)} className="group flex flex-col items-center gap-2">
-              {/* a little lens in the tint, with a highlight */}
+            <button
+              key={t.name}
+              role="radio"
+              aria-checked={tint === i}
+              onClick={() => setTint(i)}
+              className="group flex flex-col items-center gap-2 rounded-sm outline-none focus-visible:ring-1 focus-visible:ring-sand/70 focus-visible:ring-offset-4 focus-visible:ring-offset-transparent"
+            >
+              {/* a swatch of the tint, with a highlight */}
               <span
-                className={`block h-10 w-14 rounded-[50%] border-[3px] transition-all duration-300 sm:h-12 sm:w-16 ${
-                  tint === i ? "scale-110 border-sand shadow-[0_0_0_4px_rgba(233,226,208,0.18)]" : "border-olive-950/70 opacity-80 group-hover:opacity-100"
+                className={`block size-10 rounded-full border-2 transition-all duration-300 sm:size-12 ${
+                  tint === i ? "border-sand shadow-[0_0_0_4px_rgba(233,226,208,0.2)]" : "border-sand/20 opacity-75 group-hover:opacity-100"
                 }`}
-                style={{ background: `radial-gradient(120% 90% at 30% 25%, rgba(255,255,255,0.45), transparent 45%), ${t.swatch}` }}
+                style={{ background: `radial-gradient(circle at 32% 28%, rgba(255,255,255,0.4), transparent 42%), ${t.swatch}` }}
               />
               <span className={`text-[9px] uppercase tracking-[0.2em] transition-colors sm:text-[10px] ${tint === i ? "text-sand" : "text-sand/60 group-hover:text-sand"}`}>{t.name}</span>
             </button>
