@@ -1,4 +1,5 @@
 import "server-only";
+import { PDFDocument } from "pdf-lib";
 import { prisma } from "@/lib/prisma";
 import { siteUrl } from "@/lib/site";
 import { sendOrderEmails } from "@/lib/email";
@@ -165,11 +166,40 @@ export async function createShipment(order, courierId) {
   };
 }
 
-/** Link to the printable shipping label PDF for one AWB, or several comma-separated (one label per page). */
-export async function shippingLabel(awbs) {
-  const body = await call("shipping/label", { awb_numbers: awbs, page_size: "A4", display_cod_prepaid: "1", display_shipper_mobile: "1", display_shipper_address: "1" });
+// iThink draws an A6 label in the top-left quarter of an A4 page; this is that quarter, in PDF points
+const A6 = { width: 297.64, height: 420.94 };
+
+async function labelUrl(awb) {
+  const body = await call("shipping/label", { awb_numbers: awb, page_size: "A6", display_cod_prepaid: "1", display_shipper_mobile: "1", display_shipper_address: "1" });
   if (!body.file_name) throw new Error("iThink Logistics did not return a label.");
   return body.file_name.replace(/^http:/, "https:");
+}
+
+/** Shipping labels for the given AWBs as one PDF of A6 pages (one label per page), ready for a 4×6 thermal printer. */
+export async function labelPdf(awbs) {
+  const out = await PDFDocument.create();
+  // Fetched a few at a time, but added in the order given
+  const sources = [];
+  for (let i = 0; i < awbs.length; i += 5) {
+    sources.push(
+      ...(await Promise.all(
+        awbs.slice(i, i + 5).map(async (awb) => {
+          const res = await fetch(await labelUrl(awb), { cache: "no-store" });
+          if (!res.ok) throw new Error(`Couldn't download the label for ${awb}.`);
+          return res.arrayBuffer();
+        }),
+      )),
+    );
+  }
+  for (const bytes of sources) {
+    const doc = await PDFDocument.load(bytes);
+    for (const page of doc.getPages()) {
+      const { height } = page.getSize();
+      const [label] = await out.embedPages([page], [{ left: 0, right: A6.width, bottom: height - A6.height, top: height }]);
+      out.addPage([A6.width, A6.height]).drawPage(label, { x: 0, y: 0, width: A6.width, height: A6.height });
+    }
+  }
+  return out.save();
 }
 
 export async function cancelShipment(awb) {
