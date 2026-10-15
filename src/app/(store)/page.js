@@ -55,8 +55,6 @@ function SectionHead({ eyebrow, title, href, linkLabel = "View all", center = fa
   );
 }
 
-const SHOW_EDITORIAL = false;
-
 export default async function HomePage() {
   const all = await listProducts();
   const featured = all.filter((p) => p.featured);
@@ -174,27 +172,23 @@ export default async function HomePage() {
       {/* Signature product in 3D: rotates, folds and changes lens tint as you scroll */}
       <ToroShowcase product={spotlight} />
 
-      {/* Editorial split — hidden for now; set SHOW_EDITORIAL to true to bring it back */}
-      {SHOW_EDITORIAL && (
-        <>
-          <section className="grid bg-olive-800 text-sand lg:grid-cols-2">
-            <div data-reveal className="group relative aspect-[4/5] overflow-hidden md:aspect-[16/11] lg:aspect-auto lg:min-h-[640px]">
-              <Image src="/images/campaign-matador.jpg" alt="RAYVE campaign at the bullring" fill sizes="(min-width:1024px) 50vw, 100vw" className="object-cover transition-transform duration-[1.5s] group-hover:scale-105" />
-            </div>
-            <Reveal className="flex flex-col justify-center px-5 py-20 sm:px-8 md:px-16 lg:px-20 xl:px-24">
-              <p className="eyebrow text-olive-400">A different way of seeing the familiar</p>
-              <h2 className="display-title mt-6 text-3xl lg:text-4xl">Where the familiar takes an unexpected form</h2>
-              <p className="mt-6 max-w-md leading-relaxed text-sand/75">
-                Rayve takes forms, codes and references we already recognise and shifts them through proportion, detail,
-                contrast and attitude. A classic idea, seen through another point of view.
-              </p>
-              <Link href="/about" className="mt-10 self-start border-b border-sand/60 pb-1 text-[11px] uppercase tracking-[0.25em] hover:border-sand">
-                Discover Rayve
-              </Link>
-            </Reveal>
-          </section>
-        </>
-      )}
+      {/* Editorial split */}
+      <section className="grid bg-olive-800 text-sand lg:grid-cols-2">
+        <div data-reveal className="group relative aspect-[4/5] overflow-hidden md:aspect-[16/11] lg:aspect-auto lg:min-h-[640px]">
+          <Image src="/images/campaign-matador.jpg" alt="RAYVE campaign at the bullring" fill sizes="(min-width:1024px) 50vw, 100vw" className="object-cover transition-transform duration-[1.5s] group-hover:scale-105" />
+        </div>
+        <Reveal className="flex flex-col justify-center px-5 py-20 sm:px-8 md:px-16 lg:px-20 xl:px-24">
+          <p className="eyebrow text-olive-400">A different way of seeing the familiar</p>
+          <h2 className="display-title mt-6 text-3xl lg:text-4xl">Where the familiar takes an unexpected form</h2>
+          <p className="mt-6 max-w-md leading-relaxed text-sand/75">
+            Rayve takes forms, codes and references we already recognise and shifts them through proportion, detail,
+            contrast and attitude. A classic idea, seen through another point of view.
+          </p>
+          <Link href="/about" className="mt-10 self-start border-b border-sand/60 pb-1 text-[11px] uppercase tracking-[0.25em] hover:border-sand">
+            Discover Rayve
+          </Link>
+        </Reveal>
+      </section>
 
       {/* Image trail: campaign photos follow the cursor */}
       <section className="bg-olive-950 text-sand">
