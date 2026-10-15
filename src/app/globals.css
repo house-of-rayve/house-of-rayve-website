@@ -76,6 +76,9 @@
 }
 
 @utility container-x { @apply mx-auto w-full max-w-[1440px] px-5 sm:px-8 lg:px-12; }
+/* Homepage width: on laptops and up it matches the lookbook's row of ten story bubbles (see LookbookStories; 2px each side is the gap between a bubble and its button), so every
+   section's edges line up with the first and last bubble */
+@utility container-home { @apply mx-auto w-full px-5 sm:px-8 lg:max-w-[calc(10*min(122px,6vw+18px)+9*min(40px,1.4vw)-4px)] lg:px-0; }
 /* One vertical rhythm for every section: 80px mobile, 96px tablet, 112px laptop+ */
 @utility section-y { @apply py-20 md:py-24 lg:py-28; }
 @utility section-head { @apply mb-10 md:mb-12; }

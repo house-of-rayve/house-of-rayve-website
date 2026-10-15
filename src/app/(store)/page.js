@@ -102,7 +102,7 @@ export default async function HomePage() {
 
       {/* What we stand for */}
       <section className="border-y border-line bg-mist">
-        <div className="container-x section-y">
+        <div className="container-home section-y">
           <Reveal className="section-head grid items-end gap-6 lg:grid-cols-2">
             <div>
               <p className="eyebrow">The symbol</p>
@@ -128,7 +128,7 @@ export default async function HomePage() {
       <PhotoInWord image="/images/banners/the-signal.jpg" alt="RAYVE sunglasses floating before a sunlit gateway" focus="20% 50%" line="Poise. Tension. Precision. Command." sub="Collection 01 — premium, in the everyday." />
 
       {/* New arrivals grid */}
-      <section className="container-x section-y">
+      <section className="container-home section-y">
         <SectionHead eyebrow="Just landed" title="New arrivals" href="/shop?sort=newest" />
         <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 lg:grid-cols-4">
           {newest.slice(0, 4).map((p, i) => (
@@ -143,7 +143,7 @@ export default async function HomePage() {
       <FullBanner src="/images/banners/break-the-familiar.jpg" alt="RAYVE — Break the familiar" />
 
       {/* Craft details */}
-      <section className="container-x section-y">
+      <section className="container-home section-y">
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
           <Reveal className="relative aspect-[4/5] overflow-hidden bg-mist md:aspect-[16/10] lg:col-span-5 lg:aspect-auto lg:min-h-[520px]">
             <Image src="/images/matador.jpg" alt="RAYVE temple detail with the signature horns" fill sizes="(min-width:1024px) 40vw, 100vw" className="object-cover" />
@@ -225,7 +225,7 @@ export default async function HomePage() {
 
       {/* FAQ */}
       <section className="border-t border-line">
-        <div className="container-x section-y">
+        <div className="container-home section-y">
           <Reveal>
             <HomeFAQ />
           </Reveal>
@@ -234,7 +234,7 @@ export default async function HomePage() {
 
       {/* Newsletter */}
       <section className="border-t border-line bg-mist">
-        <Reveal className="container-x section-y flex flex-col items-center text-center">
+        <Reveal className="container-home section-y flex flex-col items-center text-center">
           <p className="eyebrow">The Rayve list</p>
           <h2 className="display-title mt-4 max-w-xl text-2xl sm:text-3xl lg:text-4xl">New frames, first</h2>
           <p className="mt-4 max-w-md text-sm text-muted">Early access to new drops, restocks and private previews. No noise.</p>

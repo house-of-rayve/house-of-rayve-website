@@ -106,7 +106,7 @@ export default function ToroShowcase({ product }) {
         </p>
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_55%,rgba(166,159,78,0.16),transparent_60%)]" />
 
-        <div className="container-x relative z-10 flex items-start justify-between gap-6 pt-24 md:pt-28">
+        <div className="container-home relative z-10 flex items-start justify-between gap-6 pt-24 md:pt-28">
           <div>
             <p className="eyebrow text-olive-400">Signature frame · 3D</p>
             <h2 className="display-title mt-4 text-4xl sm:text-6xl">{product?.name ?? "Toro"}</h2>
@@ -128,7 +128,7 @@ export default function ToroShowcase({ product }) {
         </div>
 
         {/* Bottom bar: stage copy, tint swatches, buy */}
-        <div className="container-x pointer-events-none relative z-10 mt-auto grid gap-4 pb-8 md:grid-cols-3 md:items-end md:gap-6 md:pb-12">
+        <div className="container-home pointer-events-none relative z-10 mt-auto grid gap-4 pb-8 md:grid-cols-3 md:items-end md:gap-6 md:pb-12">
           <div key={stage} className="animate-fade-up">
             <p className="text-[10px] uppercase tracking-[0.3em] text-olive-400">
               0{stage + 1} / 0{STAGES.length} · {copy.name}
