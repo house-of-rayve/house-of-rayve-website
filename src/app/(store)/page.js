@@ -101,6 +101,30 @@ export default async function HomePage() {
         ))}
       </section>
 
+      {/* What we stand for */}
+      <section className="border-y border-line bg-mist">
+        <div className="container-x section-y">
+          <Reveal className="section-head grid items-end gap-6 lg:grid-cols-2">
+            <div>
+              <p className="eyebrow">The symbol</p>
+              <h2 className="display-title mt-4 text-2xl sm:text-3xl lg:text-4xl">What we stand for</h2>
+            </div>
+            <p className="max-w-md text-sm leading-relaxed text-muted lg:justify-self-end">
+              The bull is our symbol of precision, vision and presence. Not aggression — control. Not noise — confidence.
+            </p>
+          </Reveal>
+          <div className="grid gap-px bg-line md:grid-cols-3">
+            {PILLARS.map((p, i) => (
+              <Reveal key={p.title} delay={i * 100} className="group bg-canvas p-6 transition-colors duration-500 hover:bg-olive-800 hover:text-sand sm:p-8">
+                <span className="font-display text-xs text-olive-500">/0{i + 1}</span>
+                <h3 className="display-title mt-6 text-sm">{p.title}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-muted transition-colors duration-500 group-hover:text-sand/70">{p.text}</p>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Brand moment: the campaign photo seen through the letters of RAYVE, opening up on scroll */}
       <PhotoInWord image="/images/banners/the-signal.jpg" alt="RAYVE sunglasses floating before a sunlit gateway" focus="20% 50%" line="Poise. Tension. Precision. Command." sub="Collection 01 — premium, in the everyday." />
 
@@ -166,30 +190,6 @@ export default async function HomePage() {
                 </Reveal>
               ))}
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* What we stand for */}
-      <section className="border-y border-line bg-mist">
-        <div className="container-x section-y">
-          <Reveal className="section-head grid items-end gap-6 lg:grid-cols-2">
-            <div>
-              <p className="eyebrow">The symbol</p>
-              <h2 className="display-title mt-4 text-2xl sm:text-3xl lg:text-4xl">What we stand for</h2>
-            </div>
-            <p className="max-w-md text-sm leading-relaxed text-muted lg:justify-self-end">
-              The bull is our symbol of precision, vision and presence. Not aggression — control. Not noise — confidence.
-            </p>
-          </Reveal>
-          <div className="grid gap-px bg-line md:grid-cols-3">
-            {PILLARS.map((p, i) => (
-              <Reveal key={p.title} delay={i * 100} className="group bg-canvas p-6 transition-colors duration-500 hover:bg-olive-800 hover:text-sand sm:p-8">
-                <span className="font-display text-xs text-olive-500">/0{i + 1}</span>
-                <h3 className="display-title mt-6 text-sm">{p.title}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-muted transition-colors duration-500 group-hover:text-sand/70">{p.text}</p>
-              </Reveal>
-            ))}
           </div>
         </div>
       </section>
