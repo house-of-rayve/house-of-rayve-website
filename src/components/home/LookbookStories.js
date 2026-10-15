@@ -70,14 +70,14 @@ export default function LookbookStories({ products }) {
 
   return (
     <>
-      {/* Phones/tablets: scrolls from the first story. Desktop: bubbles scale with the screen so all fit in one row */}
-      <div className="no-scrollbar -mx-5 overflow-x-auto px-5 pb-2 pt-1 sm:-mx-8 sm:px-8 lg:mx-0 lg:px-0">
-        <div className="mx-auto flex w-max gap-5 sm:gap-8 lg:gap-[min(40px,1.4vw)]">
+      {/* Phones/tablets: scrolls from the first story. Desktop: the row spans the page width, first and last bubbles on its edges */}
+      <div className="no-scrollbar -mx-5 overflow-x-auto px-5 pb-2 pt-1 sm:-mx-8 sm:px-8 lg:mx-0 lg:overflow-visible lg:px-0">
+        <div className="flex w-max gap-5 sm:gap-8 lg:w-full lg:justify-between lg:gap-2">
         {stories.map((p, i) => (
           <button
             key={p.id}
             onClick={() => go(i)}
-            className="group relative flex w-20 shrink-0 flex-col items-center sm:w-24 lg:w-[min(122px,calc(6vw+18px))]"
+            className="group relative flex w-20 shrink-0 flex-col items-center sm:w-24 lg:w-[min(118px,calc(6vw+14px))]"
           >
             {/* thin brushed-gold ring (grey once seen), a little air, then the photo */}
             <span

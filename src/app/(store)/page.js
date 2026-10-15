@@ -72,7 +72,7 @@ export default async function HomePage() {
       <FullBanner src="/images/banners/broken-open.jpg" alt="RAYVE — The familiar, broken open" priority reveal={false} underHeader className="-mt-[65px]" />
 
       {/* Lookbook: Instagram-style stories of the frames on model */}
-      <section className="px-5 pb-6 pt-12 sm:px-8 sm:pt-16 lg:px-12">
+      <section className="container-x pb-6 pt-12 sm:pt-16">
         <p className="eyebrow mb-8 flex items-center gap-4 lg:justify-center">
           <span className="hidden h-px w-12 bg-line lg:block" /> The lookbook <span className="h-px flex-1 bg-line lg:w-12 lg:flex-none" />
         </p>
