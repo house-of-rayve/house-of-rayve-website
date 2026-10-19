@@ -55,6 +55,9 @@ function SectionHead({ eyebrow, title, href, linkLabel = "View all", center = fa
   );
 }
 
+// Sections switched off for now
+const SHOW_TORO = false;
+
 export default async function HomePage() {
   const all = await listProducts();
   const featured = all.filter((p) => p.featured);
@@ -170,7 +173,8 @@ export default async function HomePage() {
       </section>
 
       {/* Signature product in 3D: rotates, folds and changes lens tint as you scroll */}
-      <ToroShowcase product={spotlight} />
+      {/* Hidden for now — set SHOW_TORO to true to bring it back */}
+      {SHOW_TORO && <ToroShowcase product={spotlight} />}
 
       {/* Editorial split */}
       <section className="grid bg-olive-800 text-sand lg:grid-cols-2">
