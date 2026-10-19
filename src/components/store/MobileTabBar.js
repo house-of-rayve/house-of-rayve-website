@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Heart, Home, ScanFace, ShoppingBag, Store } from "lucide-react";
 import { useCart } from "@/components/cart/CartProvider";
 import { useWishlist } from "@/components/wishlist/WishlistProvider";
+import { TRY_ON_ENABLED } from "@/lib/constants";
 
 // Pages with their own bottom bar (sticky add-to-bag, checkout) don't get the tab bar
 const HIDDEN = /^\/(product|checkout|cart)(\/|$)/;
@@ -19,7 +20,7 @@ export default function MobileTabBar() {
   const tabs = [
     { href: "/", label: "Home", Icon: Home, active: pathname === "/" },
     { href: "/shop", label: "Shop", Icon: Store, active: pathname.startsWith("/shop") },
-    { href: "/try-on", label: "Try on", Icon: ScanFace, active: pathname.startsWith("/try-on") },
+    ...(TRY_ON_ENABLED ? [{ href: "/try-on", label: "Try on", Icon: ScanFace, active: pathname.startsWith("/try-on") }] : []),
     { href: "/wishlist", label: "Wishlist", Icon: Heart, active: pathname.startsWith("/wishlist"), badge: wishCount },
   ];
   const item = (active) => `relative flex flex-1 flex-col items-center gap-1 pt-2.5 text-[9px] uppercase tracking-[0.12em] transition-colors ${active ? "text-olive-800" : "text-muted"}`;

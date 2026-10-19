@@ -14,11 +14,11 @@ import ScrambleText from "@/components/motion/ScrambleText";
 import FullscreenMenu from "@/components/motion/FullscreenMenu";
 import SoundToggle from "@/components/motion/SoundToggle";
 import { playBull } from "@/components/motion/bullSound";
-import { SHAPES } from "@/lib/constants";
+import { SHAPES, TRY_ON_ENABLED } from "@/lib/constants";
 
 const NAV = [
   { href: "/shop?category=Sunglasses", label: "Sunglasses" },
-  { href: "/try-on", label: "Try on", wide: true }, // only on wide screens; it is always in the menu
+  ...(TRY_ON_ENABLED ? [{ href: "/try-on", label: "Try on", wide: true }] : []), // only on wide screens; it is always in the menu
   { href: "/about", label: "The brand" },
 ];
 

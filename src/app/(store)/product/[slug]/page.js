@@ -15,6 +15,7 @@ import LensTintLab from "@/components/motion/LensTintLab";
 import { tintIndexFor } from "@/lib/tints";
 import ProductCarousel from "@/components/home/ProductCarousel";
 import Price from "@/components/ui/Price";
+import { TRY_ON_ENABLED } from "@/lib/constants";
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
@@ -130,7 +131,7 @@ export default async function ProductPage({ params }) {
 
               <div className="mt-6">
                 <ProductPurchase product={product} />
-                {product.category === "Sunglasses" && (
+                {TRY_ON_ENABLED && product.category === "Sunglasses" && (
                   <Link
                     href={`/try-on?p=${product.slug}`}
                     className="group mt-3 flex items-center justify-between border border-line px-4 py-3 text-[11px] uppercase tracking-[0.2em] transition-colors hover:border-olive-800"

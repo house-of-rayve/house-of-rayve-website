@@ -1,9 +1,10 @@
 import { listProducts } from "@/lib/products";
 import { siteUrl } from "@/lib/site";
+import { TRY_ON_ENABLED } from "@/lib/constants";
 
 export default async function sitemap() {
   const products = await listProducts();
-  const pages = ["", "/shop", "/lookbook", "/try-on", "/about", "/contact", "/terms", "/privacy", "/refund-policy", "/shipping-policy"].map((path) => ({
+  const pages = ["", "/shop", "/lookbook", ...(TRY_ON_ENABLED ? ["/try-on"] : []), "/about", "/contact", "/terms", "/privacy", "/refund-policy", "/shipping-policy"].map((path) => ({
     url: `${siteUrl}${path}`,
     changeFrequency: "weekly",
     priority: path === "" ? 1 : 0.7,

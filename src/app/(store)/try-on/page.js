@@ -1,5 +1,7 @@
 import { listProducts } from "@/lib/products";
 import TryOn from "@/components/tryon/TryOn";
+import { notFound } from "next/navigation";
+import { TRY_ON_ENABLED } from "@/lib/constants";
 
 export const metadata = {
   title: "Virtual try-on",
@@ -7,6 +9,7 @@ export const metadata = {
 };
 
 export default async function TryOnPage({ searchParams }) {
+  if (!TRY_ON_ENABLED) notFound();
   const { p } = await searchParams;
   const products = (await listProducts({ category: "Sunglasses" })).filter((x) => x.images.length);
 
