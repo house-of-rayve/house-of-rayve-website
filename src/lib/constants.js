@@ -1,5 +1,5 @@
-// Virtual try-on is switched off for now: the page returns 404 and every link to it is hidden. Set to true to bring it back.
-export const TRY_ON_ENABLED = false;
+// Virtual try-on switch: false returns 404 for the page and hides every link to it.
+export const TRY_ON_ENABLED = true;
 
 export const CATEGORIES = ["Sunglasses"];
 export const SHAPES = ["Rectangle", "Oval", "Round", "Cat-eye", "Square", "Shield", "Aviator"];
