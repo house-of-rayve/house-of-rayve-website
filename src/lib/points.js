@@ -1,6 +1,7 @@
 import "server-only";
 import { prisma } from "@/lib/prisma";
 import { pointsFor } from "@/lib/shipping";
+import { POINTS_ENABLED } from "@/lib/constants";
 
 // RAYVE points (1 point = ₹1). Every change is a PointsEntry row; see the model in prisma/schema.prisma.
 // An order earns points as soon as it's a real order (cash on delivery placed, or paid). They stay PENDING until the
@@ -21,6 +22,7 @@ export async function pointsBalances(userIds) {
 
 /** Records the points an order earns (once; safe to call again). */
 export async function awardOrderPoints(orderId, db = prisma) {
+  if (!POINTS_ENABLED) return;
   const order = await db.order.findUnique({ where: { id: orderId }, select: { userId: true, orderNumber: true, subtotal: true, discount: true, status: true } });
   if (!order || order.status === "CANCELLED") return;
   if (await db.pointsEntry.findFirst({ where: { orderId, kind: "EARNED" }, select: { id: true } })) return;

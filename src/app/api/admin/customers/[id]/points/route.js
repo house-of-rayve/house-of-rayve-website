@@ -1,11 +1,13 @@
 import { prisma } from "@/lib/prisma";
 import { json, error, readJson, authorize, str } from "@/lib/api";
 import { pointsBalance } from "@/lib/points";
+import { POINTS_ENABLED } from "@/lib/constants";
 
 // Admin: add (positive) or remove (negative) RAYVE points for a customer, with a reason
 export async function POST(request, { params }) {
   const [, denied] = await authorize("ADMIN");
   if (denied) return denied;
+  if (!POINTS_ENABLED) return error("RAYVE points are switched off.", 404);
   const { id } = await params;
   const body = await readJson(request);
   const points = Math.trunc(Number(body.points));

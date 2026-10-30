@@ -9,6 +9,7 @@ import CartLines from "./CartLines";
 import { formatPrice } from "@/lib/format";
 import { ORDER_VALUE_TIER, POINTS_FROM_TIER, pointsFor } from "@/lib/shipping";
 import { LogoMark } from "@/components/ui/Logo";
+import { POINTS_ENABLED } from "@/lib/constants";
 
 function Upsell({ onNavigate }) {
   const { items, add } = useCart();
@@ -112,34 +113,36 @@ export default function CartDrawer() {
           </div>
         ) : (
           <>
-            <div className="border-b border-line px-6 py-4">
-              <p className="flex items-center gap-2 text-xs text-olive-800">
-                <Sparkles className="size-4" />
-                {remaining > 0 ? (
-                  <span>
-                    This bag earns <strong className="font-medium">{pointsFor(subtotal)} RAYVE points</strong> — add {formatPrice(remaining)} more for {POINTS_FROM_TIER}
+            {POINTS_ENABLED && (
+              <div className="border-b border-line px-6 py-4">
+                <p className="flex items-center gap-2 text-xs text-olive-800">
+                  <Sparkles className="size-4" />
+                  {remaining > 0 ? (
+                    <span>
+                      This bag earns <strong className="font-medium">{pointsFor(subtotal)} RAYVE points</strong> — add {formatPrice(remaining)} more for {POINTS_FROM_TIER}
+                    </span>
+                  ) : (
+                    <span>
+                      This bag earns <strong className="font-medium">{POINTS_FROM_TIER} RAYVE points</strong>{" "}
+                      <span className="inline-block animate-pop font-display text-[9px] uppercase tracking-[0.2em] text-olive-700">¡Olé!</span>
+                    </span>
+                  )}
+                </p>
+                {/* The bull runs along the bar towards the higher points reward */}
+                <div className="relative mt-4 h-1 rounded-full bg-line">
+                  <div className="h-full rounded-full bg-olive-800 transition-all duration-700" style={{ width: `${progress}%` }} />
+                  <span
+                    className="absolute bottom-1 -translate-x-1/2 text-olive-800 transition-[left] duration-700 ease-out"
+                    style={{ left: `${Math.min(progress, 96)}%` }}
+                    aria-hidden="true"
+                  >
+                    <LogoMark className={`block h-3.5 w-6 ${remaining > 0 ? "animate-gallop motion-reduce:animate-none" : "animate-pop"}`} />
                   </span>
-                ) : (
-                  <span>
-                    This bag earns <strong className="font-medium">{POINTS_FROM_TIER} RAYVE points</strong>{" "}
-                    <span className="inline-block animate-pop font-display text-[9px] uppercase tracking-[0.2em] text-olive-700">¡Olé!</span>
-                  </span>
-                )}
-              </p>
-              {/* The bull runs along the bar towards the higher points reward */}
-              <div className="relative mt-4 h-1 rounded-full bg-line">
-                <div className="h-full rounded-full bg-olive-800 transition-all duration-700" style={{ width: `${progress}%` }} />
-                <span
-                  className="absolute bottom-1 -translate-x-1/2 text-olive-800 transition-[left] duration-700 ease-out"
-                  style={{ left: `${Math.min(progress, 96)}%` }}
-                  aria-hidden="true"
-                >
-                  <LogoMark className={`block h-3.5 w-6 ${remaining > 0 ? "animate-gallop motion-reduce:animate-none" : "animate-pop"}`} />
-                </span>
-                {/* Finish line */}
-                <span className="absolute -top-1.5 right-0 h-4 w-px bg-olive-800/40" aria-hidden="true" />
+                  {/* Finish line */}
+                  <span className="absolute -top-1.5 right-0 h-4 w-px bg-olive-800/40" aria-hidden="true" />
+                </div>
               </div>
-            </div>
+            )}
             <div data-lenis-prevent className="flex-1 overflow-y-auto px-6">
               <CartLines onNavigate={close} />
               {open && <Upsell onNavigate={close} />}

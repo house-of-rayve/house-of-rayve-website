@@ -9,6 +9,7 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import OrderControls from "@/components/admin/OrderControls";
 import ShipmentPanel from "@/components/admin/ShipmentPanel";
 import { ithinkEnabled, syncShipments } from "@/lib/ithink";
+import { POINTS_ENABLED } from "@/lib/constants";
 
 export const metadata = { title: "Order" };
 
@@ -54,7 +55,7 @@ export default async function AdminOrderPage({ params }) {
                 <div className="flex justify-between text-olive-700"><dt>RAYVE points used</dt><dd className="tabular-nums">−{formatPrice(order.pointsUsed)}</dd></div>
               )}
               <div className="flex justify-between pt-1 font-semibold"><dt>Total</dt><dd className="tabular-nums">{formatPrice(order.total)}</dd></div>
-              {order.pointsEarned > 0 && <p className="pt-1 text-xs text-muted">Earns the customer {order.pointsEarned} RAYVE points{order.status === "DELIVERED" ? "" : " on delivery"}.</p>}
+              {POINTS_ENABLED && order.pointsEarned > 0 && <p className="pt-1 text-xs text-muted">Earns the customer {order.pointsEarned} RAYVE points{order.status === "DELIVERED" ? "" : " on delivery"}.</p>}
             </dl>
           </Panel>
           <div className="grid gap-6 sm:grid-cols-2">

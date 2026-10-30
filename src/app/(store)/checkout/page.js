@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import CheckoutForm from "@/components/store/CheckoutForm";
 import { razorpayEnabled } from "@/lib/razorpay";
 import { pointsBalance } from "@/lib/points";
+import { POINTS_ENABLED } from "@/lib/constants";
 
 export const metadata = { title: "Checkout" };
 
@@ -10,7 +11,7 @@ export default async function CheckoutPage() {
   const user = await requireUser("/checkout");
   const [addresses, points] = await Promise.all([
     prisma.address.findMany({ where: { userId: user.id }, orderBy: [{ isDefault: "desc" }, { createdAt: "asc" }] }),
-    pointsBalance(user.id),
+    POINTS_ENABLED ? pointsBalance(user.id) : { available: 0 },
   ]);
   return (
     <div className="container-x py-12 sm:py-16">

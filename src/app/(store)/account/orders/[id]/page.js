@@ -11,6 +11,7 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import OrderTimeline from "@/components/account/OrderTimeline";
 import CancelOrderButton from "@/components/account/CancelOrderButton";
 import OrderCelebration from "@/components/motion/OrderCelebration";
+import { POINTS_ENABLED } from "@/lib/constants";
 
 export const metadata = { title: "Order details" };
 
@@ -114,7 +115,7 @@ export default async function OrderDetailPage({ params, searchParams }) {
               <div className="flex justify-between text-olive-700"><dt>RAYVE points</dt><dd>−{formatPrice(order.pointsUsed)}</dd></div>
             )}
             <div className="flex justify-between pt-2 text-base font-medium"><dt>Total</dt><dd>{formatPrice(order.total)}</dd></div>
-            {order.pointsEarned > 0 && (
+            {POINTS_ENABLED && order.pointsEarned > 0 && (
               <p className="pt-1 text-xs text-olive-700">
                 {order.status === "DELIVERED" ? `You earned ${order.pointsEarned} RAYVE points on this order.` : `You'll earn ${order.pointsEarned} RAYVE points once this order is delivered.`}
               </p>

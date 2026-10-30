@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { pointsBalance } from "@/lib/points";
 import { formatDate, formatPrice } from "@/lib/format";
 import OrderRow from "@/components/account/OrderRow";
+import { POINTS_ENABLED } from "@/lib/constants";
 
 export const metadata = { title: "My account" };
 
@@ -12,13 +13,14 @@ export default async function AccountOverview() {
   const [orders, address, points] = await Promise.all([
     prisma.order.findMany({ where: { userId: user.id }, orderBy: { createdAt: "desc" }, include: { items: true } }),
     prisma.address.findFirst({ where: { userId: user.id }, orderBy: [{ isDefault: "desc" }, { createdAt: "asc" }] }),
-    pointsBalance(user.id),
+    POINTS_ENABLED ? pointsBalance(user.id) : null,
   ]);
   const spent = orders.filter((o) => o.status !== "CANCELLED").reduce((s, o) => s + o.total, 0);
   const active = orders.filter((o) => ["PENDING", "CONFIRMED", "SHIPPED"].includes(o.status)).length;
 
   return (
     <div className="space-y-10">
+      {points && (
       <Link href="/account/points" className="group flex items-center justify-between gap-4 bg-olive-800 p-5 text-sand sm:p-6">
         <div>
           <p className="text-[11px] uppercase tracking-[0.15em] text-sand/60">RAYVE points</p>
@@ -29,6 +31,7 @@ export default async function AccountOverview() {
         </div>
         <span className="text-[11px] uppercase tracking-[0.18em] text-sand/70 group-hover:text-sand">View →</span>
       </Link>
+      )}
 
       <div className="grid grid-cols-2 gap-px bg-line sm:grid-cols-3">
         {[

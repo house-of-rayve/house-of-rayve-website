@@ -10,6 +10,7 @@ import { rememberViewed } from "@/components/wishlist/WishlistProvider";
 import { formatPrice } from "@/lib/format";
 import { pointsFor } from "@/lib/shipping";
 import { api } from "@/components/ui/fetcher";
+import { POINTS_ENABLED } from "@/lib/constants";
 
 // The gallery that is actually showing (desktop and mobile use different markup)
 const visibleGallery = () => [...document.querySelectorAll("[data-gallery-main]")].find((el) => el.offsetParent !== null);
@@ -144,7 +145,7 @@ export default function ProductPurchase({ product }) {
           </div>
         </div>
       )}
-      {!soldOut && (
+      {POINTS_ENABLED && !soldOut && (
         <p className="flex items-center gap-2 text-xs text-olive-800">
           <Sparkles className="size-3.5 shrink-0" />
           <span>

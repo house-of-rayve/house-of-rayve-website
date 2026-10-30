@@ -7,6 +7,7 @@ import CustomerForm from "@/components/admin/CustomerForm";
 import StatusBadge from "@/components/ui/StatusBadge";
 import PointsAdjust from "@/components/admin/PointsAdjust";
 import { pointsBalance } from "@/lib/points";
+import { POINTS_ENABLED } from "@/lib/constants";
 
 export const metadata = { title: "Customer" };
 
@@ -27,10 +28,12 @@ export default async function AdminCustomerPage({ params }) {
     },
   });
   if (!customer) notFound();
-  const [points, pointsHistory] = await Promise.all([
-    pointsBalance(customer.id),
-    prisma.pointsEntry.findMany({ where: { userId: customer.id }, orderBy: { createdAt: "desc" }, take: 50 }),
-  ]);
+  const [points, pointsHistory] = POINTS_ENABLED
+    ? await Promise.all([
+        pointsBalance(customer.id),
+        prisma.pointsEntry.findMany({ where: { userId: customer.id }, orderBy: { createdAt: "desc" }, take: 50 }),
+      ])
+    : [null, []];
 
   const spent = customer.orders.filter((o) => o.status !== "CANCELLED").reduce((s, o) => s + o.total, 0);
   const addresses = customer.addresses.map(({ createdAt, updatedAt, ...a }) => a);
@@ -54,6 +57,7 @@ export default async function AdminCustomerPage({ params }) {
               <p className="mt-1 text-xl font-semibold tabular-nums">{formatPrice(spent)}</p>
             </div>
           </div>
+          {points && (
           <Panel title="RAYVE points">
             <div className="flex items-end justify-between gap-3 p-5">
               <div>
@@ -82,6 +86,7 @@ export default async function AdminCustomerPage({ params }) {
               </ul>
             )}
           </Panel>
+          )}
           <Panel title="Order history">
             {customer.orders.length === 0 ? (
               <p className="p-5 text-sm text-muted">No orders yet.</p>

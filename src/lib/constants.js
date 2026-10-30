@@ -1,5 +1,8 @@
 // Virtual try-on switch: false returns 404 for the page and hides every link to it.
 export const TRY_ON_ENABLED = true;
+// RAYVE points switch: false hides points everywhere on the site and admin, and stops new orders earning or spending
+// them. Points already recorded are kept, so turning it back on carries on where it left off.
+export const POINTS_ENABLED = false;
 
 export const CATEGORIES = ["Sunglasses"];
 export const SHAPES = ["Rectangle", "Oval", "Round", "Cat-eye", "Square", "Shield", "Aviator"];

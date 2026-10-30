@@ -4,11 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutGrid, Package, Sparkles, UserRound, MapPin } from "lucide-react";
 import LogoutButton from "./LogoutButton";
+import { POINTS_ENABLED } from "@/lib/constants";
 
 const LINKS = [
   { href: "/account", label: "Overview", Icon: LayoutGrid },
   { href: "/account/orders", label: "Orders", Icon: Package },
-  { href: "/account/points", label: "RAYVE points", Icon: Sparkles },
+  ...(POINTS_ENABLED ? [{ href: "/account/points", label: "RAYVE points", Icon: Sparkles }] : []),
   { href: "/account/profile", label: "Profile", Icon: UserRound },
   { href: "/account/addresses", label: "Addresses", Icon: MapPin },
 ];

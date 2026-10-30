@@ -7,6 +7,7 @@ import { isPhone } from "@/lib/api";
 import { normalizePhone, PHONE_ERROR } from "@/lib/phone";
 import { checkCoupon } from "@/lib/coupons";
 import { razorpayEnabled } from "@/lib/razorpay";
+import { POINTS_ENABLED } from "@/lib/constants";
 
 export function newOrderNumber() {
   return `RV-${Date.now().toString().slice(-6)}${randomInt(10, 99)}`;
@@ -80,7 +81,7 @@ export async function createOrder(userId, { items, address, paymentMethod, notes
     // RAYVE points: lock the customer's row so two orders can't spend the same points, then use up to what they
     // have and what the order costs
     let pointsUsed = 0;
-    const wanted = Math.floor(Number(pointsToUse) || 0);
+    const wanted = POINTS_ENABLED ? Math.floor(Number(pointsToUse) || 0) : 0;
     if (wanted > 0) {
       await tx.$executeRaw`SELECT id FROM "User" WHERE id = ${userId} FOR UPDATE`;
       const { _sum } = await tx.pointsEntry.aggregate({ where: { userId, status: "AVAILABLE" }, _sum: { points: true } });

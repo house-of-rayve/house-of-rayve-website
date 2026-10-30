@@ -5,12 +5,15 @@ import { prisma } from "@/lib/prisma";
 import { pointsBalance } from "@/lib/points";
 import { formatDate, formatPrice } from "@/lib/format";
 import { ORDER_VALUE_TIER, POINTS_BELOW_TIER, POINTS_FROM_TIER } from "@/lib/shipping";
+import { POINTS_ENABLED } from "@/lib/constants";
+import { notFound } from "next/navigation";
 
 export const metadata = { title: "RAYVE points" };
 
 const KIND = { EARNED: "Earned", SPENT: "Used", REFUNDED: "Returned", ADJUSTED: "Adjusted" };
 
 export default async function PointsPage() {
+  if (!POINTS_ENABLED) notFound();
   const user = await requireUser("/account/points");
   const [balance, history] = await Promise.all([
     pointsBalance(user.id),

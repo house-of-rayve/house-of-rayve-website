@@ -4,6 +4,7 @@ import { Sparkles } from "lucide-react";
 import { useCart } from "./CartProvider";
 import { formatPrice } from "@/lib/format";
 import { pointsFor } from "@/lib/shipping";
+import { POINTS_ENABLED } from "@/lib/constants";
 
 /**
  * `discount`: { code, amount } from an applied discount code; `shipping`: the fee for the chosen PIN code, or null
@@ -55,7 +56,7 @@ export default function OrderSummary({ children, compact = false, discount = nul
         </div>
       </dl>
       <p className="mt-2 text-xs text-muted">Inclusive of all taxes.</p>
-      {value > 0 && (
+      {POINTS_ENABLED && value > 0 && (
         <p className="mt-4 flex items-center gap-2 bg-olive-500/10 px-3 py-2.5 text-xs text-olive-800">
           <Sparkles className="size-3.5 shrink-0" />
           <span>

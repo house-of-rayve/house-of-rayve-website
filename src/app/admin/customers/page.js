@@ -6,6 +6,7 @@ import { pointsBalances } from "@/lib/points";
 import PageHeader from "@/components/admin/PageHeader";
 import ListToolbar from "@/components/admin/ListToolbar";
 import AutoRefresh from "@/components/admin/AutoRefresh";
+import { POINTS_ENABLED } from "@/lib/constants";
 
 export const metadata = { title: "Customers" };
 
@@ -22,7 +23,7 @@ export default async function AdminCustomersPage({ searchParams }) {
       orders: { select: { total: true, status: true } },
     },
   });
-  const points = await pointsBalances(customers.map((c) => c.id));
+  const points = POINTS_ENABLED ? await pointsBalances(customers.map((c) => c.id)) : null;
 
   return (
     <>
@@ -41,7 +42,7 @@ export default async function AdminCustomersPage({ searchParams }) {
                 <th className="px-5 py-3 font-medium">Address</th>
                 <th className="px-5 py-3 font-medium">Orders</th>
                 <th className="px-5 py-3 font-medium">Spent</th>
-                <th className="px-5 py-3 font-medium">RAYVE points</th>
+                {points && <th className="px-5 py-3 font-medium">RAYVE points</th>}
                 <th className="px-5 py-3 font-medium">Joined</th>
               </tr>
             </thead>
@@ -68,13 +69,13 @@ export default async function AdminCustomersPage({ searchParams }) {
                     </td>
                     <td className="px-5 py-3 tabular-nums">{c.orders.length}</td>
                     <td className="px-5 py-3 tabular-nums">{formatPrice(spent)}</td>
-                    <td className="px-5 py-3 tabular-nums">{(points[c.id] ?? 0).toLocaleString("en-IN")}</td>
+                    {points && <td className="px-5 py-3 tabular-nums">{(points[c.id] ?? 0).toLocaleString("en-IN")}</td>}
                     <td className="px-5 py-3 text-muted">{formatDate(c.createdAt)}</td>
                   </tr>
                 );
               })}
               {customers.length === 0 && (
-                <tr><td colSpan={7} className="px-5 py-10 text-center text-muted">No customers found.</td></tr>
+                <tr><td colSpan={points ? 7 : 6} className="px-5 py-10 text-center text-muted">No customers found.</td></tr>
               )}
             </tbody>
           </table>
