@@ -161,7 +161,7 @@ export default async function ProductPage({ params }) {
                 <SizeGuide product={product} />
                 <Accordion title="Shipping & returns">
                   <ul className="space-y-3">
-                    <li className="flex gap-3"><Truck className="mt-0.5 size-4 shrink-0 text-olive-500" /> Free delivery across Delhi NCR. Dispatched within 24 hours — check your delivery date above.</li>
+                    <li className="flex gap-3"><Truck className="mt-0.5 size-4 shrink-0 text-olive-500" /> Free shipping when you pay online. Dispatched within 24 hours — check your delivery date above.</li>
                     <li className="flex gap-3"><RotateCcw className="mt-0.5 size-4 shrink-0 text-olive-500" /> Return or exchange unworn frames within 7 days of delivery, right from your account.</li>
                     <li className="flex gap-3"><ShieldCheck className="mt-0.5 size-4 shrink-0 text-olive-500" /> 1-year warranty on frames and hinges.</li>
                   </ul>

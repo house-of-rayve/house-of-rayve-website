@@ -76,7 +76,8 @@ export async function createOrder(userId, { items, address, paymentMethod, notes
       code = result.coupon.code;
     }
 
-    const shippingFee = shippingFor(subtotal - discount, address.postalCode) ?? 0;
+    // Free when paid online; cash on delivery pays the shipping charge for the PIN code
+    const shippingFee = shippingFor(address.postalCode, { cod: paymentMethod !== "ONLINE" }) ?? 0;
 
     // RAYVE points: lock the customer's row so two orders can't spend the same points, then use up to what they
     // have and what the order costs

@@ -93,12 +93,14 @@ function DeliveryCheck({ value }) {
           </li>
           <li className="flex items-start gap-2">
             <Check className="mt-0.5 size-3.5 shrink-0 text-emerald-600" />
-            <span>{result.shipping === 0 ? <><strong className="font-medium text-ink">Free delivery</strong> — Delhi NCR</> : <>Shipping <strong className="font-medium text-ink">{formatPrice(result.shipping)}</strong></>}</span>
+            <span>
+              <strong className="font-medium text-ink">Free delivery</strong> when you pay online
+            </span>
           </li>
           {result.cod && (
             <li className="flex items-start gap-2">
               <Check className="mt-0.5 size-3.5 shrink-0 text-emerald-600" />
-              <span>Cash on delivery available</span>
+              <span>Cash on delivery available · {formatPrice(result.codShipping)} shipping</span>
             </li>
           )}
         </ul>

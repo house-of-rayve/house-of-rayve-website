@@ -100,7 +100,7 @@ export default function MagicCheckout({ user }) {
           <p className="text-sm text-muted">{user.email}</p>
           <p className="mt-6 text-sm leading-relaxed text-muted">
             Next, our secure checkout (powered by Razorpay) asks for your delivery address and how you&apos;d like to pay — UPI,
-            card, netbanking or cash on delivery. Saved addresses are filled in for you. Delivery is free across Delhi NCR.
+            card, netbanking or cash on delivery. Saved addresses are filled in for you. Shipping is free when you pay online; cash on delivery has a ₹99 shipping charge in Delhi NCR and ₹149 elsewhere.
           </p>
         </div>
       </div>

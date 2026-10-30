@@ -91,7 +91,7 @@ export async function startMagicCheckout(user, items) {
   return { keyId: razorpayKeyId(), razorpayOrderId: order.id };
 }
 
-/** Shipping options for the addresses in the checkout window (free in Delhi NCR, by order value elsewhere). */
+/** Shipping options for the addresses in the checkout window: free online; cash on delivery adds the COD shipping charge. */
 export async function shippingOptions({ order_id, addresses = [] }) {
   const session = order_id ? await prisma.checkoutSession.findUnique({ where: { id: String(order_id) } }) : null;
   const value = session?.subtotal ?? 1000;
@@ -105,7 +105,7 @@ export async function shippingOptions({ order_id, addresses = [] }) {
         const estimate = await Promise.race([deliveryEstimate(pin, value).catch(() => null), new Promise((r) => setTimeout(() => r(null), 6000))]);
         if (estimate) ({ serviceable, cod } = { serviceable: estimate.serviceable, cod: estimate.serviceable && estimate.cod });
       }
-      const fee = shippingFor(value, pin) ?? 0;
+      const codCharge = shippingFor(pin, { cod: true }) ?? 0;
       return {
         id: a.id,
         zipcode: pin,
@@ -113,12 +113,12 @@ export async function shippingOptions({ order_id, addresses = [] }) {
         shipping_methods: [
           {
             id: "standard",
-            name: fee ? "Standard delivery" : "Free delivery",
-            description: fee ? "Delivered by our courier partner" : "Free across Delhi NCR",
+            name: "Free delivery",
+            description: `Free when you pay online · ₹${codCharge} shipping with cash on delivery`,
             serviceable,
-            shipping_fee: paise(fee),
+            shipping_fee: 0,
             cod,
-            cod_fee: 0,
+            cod_fee: cod ? paise(codCharge) : 0,
           },
         ],
       };

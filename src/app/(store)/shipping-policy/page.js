@@ -1,6 +1,6 @@
 import LegalPage from "@/components/store/LegalPage";
 import { BUSINESS } from "@/lib/business";
-import { ORDER_VALUE_TIER, SHIPPING_BELOW_TIER, SHIPPING_FROM_TIER } from "@/lib/shipping";
+import { COD_SHIPPING_ELSEWHERE, COD_SHIPPING_NCR } from "@/lib/shipping";
 import { formatPrice } from "@/lib/format";
 
 export const metadata = { title: "Shipping & delivery policy", alternates: { canonical: "/shipping-policy" } };
@@ -11,8 +11,8 @@ export default function ShippingPolicyPage() {
     {
       title: "Shipping charges",
       body: [
-        "Delivery is free on every order within Delhi NCR (Delhi, Gurugram, Noida, Greater Noida, Ghaziabad and Faridabad).",
-        `Everywhere else in India: ${formatPrice(SHIPPING_BELOW_TIER)} on orders below ${formatPrice(ORDER_VALUE_TIER)}, and ${formatPrice(SHIPPING_FROM_TIER)} on orders of ${formatPrice(ORDER_VALUE_TIER)} or more.`,
+        "Shipping is free on every order paid online (UPI, card, netbanking or wallet), anywhere in India.",
+        `Cash on delivery orders have a shipping charge of ${formatPrice(COD_SHIPPING_NCR)} within Delhi NCR (Delhi, Gurugram, Noida, Greater Noida, Ghaziabad and Faridabad) and ${formatPrice(COD_SHIPPING_ELSEWHERE)} elsewhere in India.`,
         "The exact charge for your PIN code is shown on the product page and at checkout before you pay.",
       ],
     },
@@ -24,5 +24,5 @@ export default function ShippingPolicyPage() {
     { title: "Undelivered orders", body: ["If a delivery fails because of an incorrect address or because the package is refused or unclaimed, it will be returned to us. Prepaid orders are then refunded, less the shipping charge."] },
     { title: "Questions", body: [`Write to ${BUSINESS.email} or call ${BUSINESS.phone} with your order number.`] },
   ];
-  return <LegalPage title="Shipping & delivery" intro="Free delivery across Delhi NCR, dispatched from New Delhi within 24 hours." sections={sections} current="/shipping-policy" />;
+  return <LegalPage title="Shipping & delivery" intro="Free shipping on every prepaid order, dispatched from New Delhi within 24 hours." sections={sections} current="/shipping-policy" />;
 }

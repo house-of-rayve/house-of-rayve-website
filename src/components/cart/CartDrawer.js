@@ -152,7 +152,7 @@ export default function CartDrawer() {
                 <span className="text-muted">Subtotal</span>
                 <span className="font-medium">{formatPrice(subtotal)}</span>
               </div>
-              <p className="text-xs text-muted">Inclusive of all taxes. Free delivery in Delhi NCR; elsewhere shipping is added at checkout.</p>
+              <p className="text-xs text-muted">Inclusive of all taxes. Free shipping when you pay online.</p>
               <div className="grid gap-2">
                 <Link href="/checkout" onClick={close} className="btn-primary w-full">
                   <Lock className="size-3.5" /> Secure checkout

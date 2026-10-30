@@ -42,7 +42,7 @@ export default function OrderSummary({ children, compact = false, discount = nul
         )}
         <div className="flex justify-between gap-4">
           <dt className="text-muted">Shipping</dt>
-          <dd className="text-right">{shipping === null ? <span className="text-muted">Free in Delhi NCR · else at checkout</span> : shipping === 0 ? "Free" : formatPrice(shipping)}</dd>
+          <dd className="text-right">{shipping === null ? <span className="text-muted">Free online · COD ₹99–₹149</span> : shipping === 0 ? "Free" : formatPrice(shipping)}</dd>
         </div>
         {pointsUsed > 0 && (
           <div className="flex justify-between text-olive-700">

@@ -2,7 +2,7 @@ import { json, error } from "@/lib/api";
 import { deliveryEstimate, ithinkEnabled } from "@/lib/ithink";
 import { isNcrPin, isValidPin, shippingFor } from "@/lib/shipping";
 
-// Delivery date and shipping charge for a PIN code: GET /api/delivery?pin=110092&value=4990
+// Delivery date for a PIN code, with the shipping charge when paid online (free) and with cash on delivery: GET /api/delivery?pin=110092&value=4990
 export async function GET(request) {
   const params = new URL(request.url).searchParams;
   const pin = params.get("pin") ?? "";
@@ -11,7 +11,7 @@ export async function GET(request) {
   if (!ithinkEnabled()) return error("Delivery dates aren't available right now.", 503);
   try {
     const estimate = await deliveryEstimate(pin, value);
-    return json({ pin, ncr: isNcrPin(pin), shipping: shippingFor(value, pin), ...estimate });
+    return json({ pin, ncr: isNcrPin(pin), shipping: shippingFor(pin), codShipping: shippingFor(pin, { cod: true }), ...estimate });
   } catch {
     return error("We couldn't check this PIN code right now. Please try again.", 502);
   }

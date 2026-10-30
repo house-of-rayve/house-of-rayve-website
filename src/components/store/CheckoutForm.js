@@ -47,7 +47,7 @@ export default function CheckoutForm({ user, addresses, onlinePayments = false, 
   // Shipping depends on where it's going: free in Delhi NCR, otherwise by order value
   const pin = addressId === "new" ? address.postalCode : addresses.find((a) => a.id === addressId)?.postalCode;
   const value = subtotal - (coupon?.amount ?? 0);
-  const shipping = shippingFor(value, pin);
+  const shipping = shippingFor(pin, { cod: payment === "COD" });
   const due = value + (shipping ?? 0);
   const maxPoints = Math.min(points, due);
   const pointsUsed = usePoints ? Math.min(maxPoints, pointsInput === "" ? maxPoints : Math.max(0, Math.floor(Number(pointsInput) || 0))) : 0;
@@ -157,8 +157,8 @@ export default function CheckoutForm({ user, addresses, onlinePayments = false, 
   };
 
   const paymentOptions = [
-    { id: "COD", title: "Cash on delivery", text: "Pay when your order arrives.", Icon: Banknote },
-    ...(onlinePayments ? [{ id: "ONLINE", title: "Pay online", text: "UPI, cards & netbanking, secured by Razorpay.", Icon: CreditCard }] : []),
+    { id: "COD", title: "Cash on delivery", text: "Pay when your order arrives. ₹99 shipping in Delhi NCR, ₹149 elsewhere.", Icon: Banknote },
+    ...(onlinePayments ? [{ id: "ONLINE", title: "Pay online", text: "Free shipping. UPI, cards & netbanking, secured by Razorpay.", Icon: CreditCard }] : []),
   ];
 
   return (
@@ -276,7 +276,7 @@ export default function CheckoutForm({ user, addresses, onlinePayments = false, 
           <OrderSummary
             compact
             discount={coupon}
-            shipping={isValidPin(pin) ? shipping : null}
+            shipping={shipping}
             pointsUsed={pointsUsed}
             couponSlot={
               <div className="mt-6 border-t border-line pt-5">

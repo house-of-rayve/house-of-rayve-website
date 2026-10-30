@@ -1,7 +1,7 @@
 import { Plus } from "lucide-react";
 
 const FAQS = [
-  ["How long does delivery take?", "Orders are dispatched within 24 hours. Enter your PIN code on any product page to see the delivery date for your address. Delivery is free across Delhi NCR; elsewhere it's ₹200 below ₹2,500 and ₹300 above."],
+  ["How long does delivery take?", "Orders are dispatched within 24 hours. Enter your PIN code on any product page to see the delivery date for your address. Shipping is free when you pay online; cash on delivery has a ₹99 shipping charge in Delhi NCR and ₹149 elsewhere."],
   ["Can I pay cash on delivery?", "Yes. Choose cash on delivery at checkout, or pay online by UPI, card or netbanking."],
   ["What is your return policy?", "Return or exchange unworn frames within 7 days of delivery. Start it from your account under Orders."],
   ["Do your sunglasses offer UV protection?", "Every RAYVE sunglass lens blocks 100% of UVA and UVB rays (UV400)."],
