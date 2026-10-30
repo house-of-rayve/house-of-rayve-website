@@ -15,6 +15,7 @@ import FullscreenMenu from "@/components/motion/FullscreenMenu";
 import SoundToggle from "@/components/motion/SoundToggle";
 import { playBull } from "@/components/motion/bullSound";
 import { SHAPES, TRY_ON_ENABLED } from "@/lib/constants";
+import { searchProducts } from "@/lib/search";
 
 const NAV = [
   { href: "/shop?category=Sunglasses", label: "Sunglasses" },
@@ -27,30 +28,23 @@ const POPULAR = ["Oval", "Tortoise", "Gold", "Round", "Black"];
 function SearchPanel({ onClose }) {
   const router = useRouter();
   const [q, setQ] = useState("");
-  const [results, setResults] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [catalog, setCatalog] = useState(null); // every product, fetched once when the panel opens
 
+  // The catalogue is small, so it's loaded once and searched as you type, with no wait between keystrokes
   useEffect(() => {
-    const term = q.trim();
-    if (!term) return;
-    const ctrl = new AbortController();
-    const t = setTimeout(async () => {
-      setLoading(true);
-      try {
-        const res = await fetch(`/api/products?q=${encodeURIComponent(term)}`, { signal: ctrl.signal });
-        const data = await res.json();
-        setResults(data.products ?? []);
-      } catch {}
-      setLoading(false);
-    }, 180);
+    let live = true;
+    fetch("/api/products")
+      .then((r) => r.json())
+      .then((d) => live && setCatalog(d.products ?? []))
+      .catch(() => live && setCatalog([]));
     return () => {
-      clearTimeout(t);
-      ctrl.abort();
+      live = false;
     };
-  }, [q]);
+  }, []);
 
   const term = q.trim();
-  const shown = term ? results : null;
+  const loading = Boolean(term) && catalog === null;
+  const shown = term && catalog ? searchProducts(catalog, term) : null;
 
   const submit = (e) => {
     e.preventDefault();

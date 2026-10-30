@@ -3,6 +3,7 @@ import { unstable_cache, revalidateTag } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { parseImages, slugify } from "@/lib/format";
 import { CATEGORIES } from "@/lib/constants";
+import { searchProducts } from "@/lib/search";
 
 export function serializeProduct(p) {
   if (!p) return null;
@@ -46,14 +47,7 @@ export async function listProducts({ category, shape, q, sort, featured, take } 
   if (category && CATEGORIES.includes(category)) products = products.filter((p) => p.category === category);
   if (shape) products = products.filter((p) => p.shape === shape);
   if (featured) products = products.filter((p) => p.featured);
-  if (q) {
-    const needle = q.toLowerCase();
-    products = products.filter((p) =>
-      [p.name, p.tagline, p.description, p.frameColor, p.shape, p.lensColor]
-        .filter(Boolean)
-        .some((v) => v.toLowerCase().includes(needle)),
-    );
-  }
+  if (q) products = searchProducts(products, q);
   if (SORTERS[sort]) products = [...products].sort(SORTERS[sort]);
   return take ? products.slice(0, take) : products;
 }
