@@ -73,6 +73,7 @@ export default function MagicCheckout({ user }) {
       key: session.keyId,
       one_click_checkout: true,
       name: "RAYVE",
+      image: `${window.location.origin}/brand/admin-app/icon-512.png`, // the bull mark, square, shown in the checkout header
       order_id: session.razorpayOrderId,
       show_coupons: true,
       prefill: { name: user.name, email: user.email, ...(user.phone ? { contact: `+91${user.phone}` } : {}) },
