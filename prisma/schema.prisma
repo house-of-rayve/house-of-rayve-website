@@ -185,3 +185,15 @@ model PointsEntry {
   @@index([userId])
   @@index([orderId])
 }
+
+// A Razorpay Magic Checkout in progress: the bag the customer opened checkout with. Razorpay calls back with this
+// id (the order "receipt") for shipping and coupons, and the real Order is created from it once they pay or choose COD.
+model CheckoutSession {
+  id              String   @id @default(cuid())
+  userId          String
+  items           String // JSON: [{ productId, quantity }]
+  subtotal        Int // ₹, before any discount code
+  razorpayOrderId String?  @unique
+  orderId         String?  @unique // our Order, once placed
+  createdAt       DateTime @default(now())
+}
