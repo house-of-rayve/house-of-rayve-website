@@ -181,6 +181,8 @@ export async function placeMagicOrder(razorpayOrderId, { paymentId, signature } 
   const promotion = rz.promotions?.[0];
   const discount = (rz.promotions ?? []).reduce((s, p) => s + rupees(p.value), 0);
   const shippingFee = rupees(rz.shipping_fee) + rupees(rz.cod_fee);
+  // Worked out from the parts: Razorpay's order amount leaves out the COD fee, and the courier collects this total on COD
+  const total = Math.max(0, session.subtotal - discount) + shippingFee;
 
   try {
     const order = await prisma.$transaction(async (tx) => {
@@ -205,7 +207,7 @@ export async function placeMagicOrder(razorpayOrderId, { paymentId, signature } 
           shippingFee,
           discount,
           couponCode: promotion?.code ? String(promotion.code).toUpperCase() : null,
-          total: rupees(rz.amount),
+          total,
           razorpayOrderId,
           razorpayPaymentId: paymentId ?? null,
           shipName: a.name || "Customer",
