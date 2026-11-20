@@ -75,7 +75,7 @@ export async function mountCurtain(hero, { markSrc, wordSrc, fontFamily = "sans-
   scene.add(new THREE.HemisphereLight(0xfff0e0, 0x1c160c, 0.42));
   const spot = new THREE.SpotLight(PALETTE.spot, 3.0, 0, 0.75, 0.95, 0);
   spot.castShadow = true;
-  spot.shadow.mapSize.set(4096, 4096);
+  spot.shadow.mapSize.set(2048, 2048); // 2k is plenty for soft fold shadows and starts much faster
   spot.shadow.bias = -0.0008;
   spot.shadow.normalBias = 0.05;
   spot.shadow.radius = 10;

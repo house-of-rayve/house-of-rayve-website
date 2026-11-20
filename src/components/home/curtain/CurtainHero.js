@@ -68,9 +68,12 @@ export default function CurtainHero({ className = "" }) {
         </div>
       </div>
 
-      <div className="rv-cover" aria-hidden="true" />
+      {/* closed-curtain poster: shows instantly, the live 3D curtain takes over as soon as it's ready */}
+      <picture className="rv-cover">
+        <source media="(max-aspect-ratio: 3/4)" srcSet="/images/curtain/poster-tall.webp" />
+        <img src="/images/curtain/poster-wide.webp" alt="" fetchPriority="high" decoding="async" />
+      </picture>
       <canvas className="rv-gl" data-curtain-gl aria-hidden="true" />
-      <p className="rv-prompt">Click to open</p>
       <button className="rv-replay" type="button" data-curtain-replay>↺ Replay</button>
     </section>
   );
