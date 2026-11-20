@@ -10,9 +10,20 @@ export function serializeProduct(p) {
   return {
     ...p,
     images: parseImages(p.images),
+    colors: parseColors(p.colors),
     createdAt: p.createdAt?.toISOString?.() ?? p.createdAt,
     updatedAt: p.updatedAt?.toISOString?.() ?? p.updatedAt,
   };
+}
+
+// A frame's colour options (see Product.colors); bad or missing data reads as no options
+function parseColors(raw) {
+  try {
+    const list = typeof raw === "string" ? JSON.parse(raw) : raw;
+    return Array.isArray(list) ? list.filter((c) => c && typeof c.code === "string" && typeof c.name === "string") : [];
+  } catch {
+    return [];
+  }
 }
 
 export const CATALOG_TAG = "catalog";
@@ -27,7 +38,7 @@ const getCatalog = unstable_cache(
     });
     return products.map(serializeProduct);
   },
-  ["catalog-v2"], // bump when the product fields change, so no stale shape is served
+  ["catalog-v4"], // bump when the product fields change, so no stale shape is served
   { tags: [CATALOG_TAG], revalidate: 600 },
 );
 

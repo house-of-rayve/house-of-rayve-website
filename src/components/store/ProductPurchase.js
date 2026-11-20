@@ -110,7 +110,7 @@ function DeliveryCheck({ value }) {
   );
 }
 
-export default function ProductPurchase({ product }) {
+export default function ProductPurchase({ product, color }) {
   const { add } = useCart();
   const [qty, setQty] = useState(1);
   const [stuck, setStuck] = useState(false);
@@ -135,7 +135,7 @@ export default function ProductPurchase({ product }) {
     <div className="space-y-4">
       <div ref={anchor} className="flex gap-3">
         {WAITLIST_MODE ? (
-          <WaitlistButton product={product} className="btn-primary flex-1" />
+          <WaitlistButton product={product} color={color} className="btn-primary flex-1" />
         ) : (
           <>
             {!soldOut && <QuantityStepper value={qty} max={max} onChange={(q) => setQty(Math.max(1, Math.min(q, max)))} />}
@@ -179,7 +179,7 @@ export default function ProductPurchase({ product }) {
             </p>
           </div>
           {WAITLIST_MODE ? (
-            <WaitlistButton product={product} tabIndex={stuck ? 0 : -1} className="btn-primary h-11 shrink-0" />
+            <WaitlistButton product={product} color={color} tabIndex={stuck ? 0 : -1} className="btn-primary h-11 shrink-0" />
           ) : (
             <button disabled={soldOut} tabIndex={stuck ? 0 : -1} onClick={(e) => add(product, qty, e.currentTarget)} className="btn-primary h-11 shrink-0">
               {soldOut ? "Sold out" : "Add to bag"}

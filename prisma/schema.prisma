@@ -63,6 +63,7 @@ model Product {
   comparePrice Int?
   stock        Int         @default(0)
   images       String      @default("[]") // JSON array of image URLs
+  colors       String      @default("[]") // JSON: [{ code, name, frame, lens, swatch: [frameHex, lensHex], images? }]; the first is the main colour (uses images above)
   featured     Boolean     @default(false)
   isActive     Boolean     @default(true)
   createdAt    DateTime    @default(now())
@@ -211,6 +212,7 @@ model WaitlistEntry {
   name      String
   email     String
   phone     String?
+  color     String? // which colour they want, when the frame comes in more than one
   createdAt DateTime @default(now())
 
   @@unique([userId, productId])

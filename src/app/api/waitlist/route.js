@@ -14,14 +14,19 @@ export async function GET() {
 export async function POST(request) {
   const [user, denied] = await authorize();
   if (denied) return denied;
-  const { productId } = await readJson(request);
-  const product = typeof productId === "string" ? await prisma.product.findUnique({ where: { id: productId }, select: { id: true, name: true } }) : null;
+  const { productId, color } = await readJson(request);
+  const product = typeof productId === "string" ? await prisma.product.findUnique({ where: { id: productId }, select: { id: true, name: true, colors: true } }) : null;
   if (!product) return error("That frame wasn't found.", 404);
+  // Keep the colour's name, but only one this frame actually comes in
+  let colorName = null;
+  try {
+    colorName = JSON.parse(product.colors || "[]").find((c) => c.code === color)?.name ?? null;
+  } catch {}
 
   const existing = await prisma.waitlistEntry.findUnique({ where: { userId_productId: { userId: user.id, productId: product.id } } });
   if (existing) return json({ joined: true, already: true, email: user.email });
   await prisma.waitlistEntry.create({
-    data: { userId: user.id, productId: product.id, name: user.name, email: user.email, phone: user.phone ?? null },
+    data: { userId: user.id, productId: product.id, name: user.name, email: user.email, phone: user.phone ?? null, color: colorName },
   });
   publish("waitlist:joined", { productId: product.id });
   return json({ joined: true, already: false, email: user.email }, 201);

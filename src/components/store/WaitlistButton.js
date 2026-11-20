@@ -21,6 +21,7 @@ const autoJoined = new Set(); // frames joined on return from sign-in, so two bu
  */
 export default function WaitlistButton({
   product,
+  color,
   className = "",
   children,
   tabIndex,
@@ -38,11 +39,11 @@ export default function WaitlistButton({
       const res = await fetch("/api/waitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId: product.id }),
+        body: JSON.stringify({ productId: product.id, color }),
       });
       if (res.status === 401) {
         router.push(
-          `/login?next=${encodeURIComponent(`${pathname}?waitlist=${product.slug}`)}`,
+          `/login?next=${encodeURIComponent(`${pathname}?waitlist=${product.slug}${color ? `&color=${color}` : ""}`)}`,
         );
         return;
       }

@@ -49,3 +49,12 @@ export const TRY_ON_CUTOUTS = {
   fiero: { src: "/images/tryon/fiero.webp", aspect: 3.183, temple: "#4a2a17", templeOpacity: 1 },
   nobel: { src: "/images/tryon/nobel.webp", aspect: 2.9056, temple: "#c9a35a", templeOpacity: 1 },
 };
+
+// Product page layout: "split" (photos left, dark details panel right) or "film" (photos slide sideways as you scroll)
+export const PRODUCT_LAYOUT = "split";
+
+// Product page only: the order to show a frame's photos in (indexes into product.images). Shop cards and the rest
+// of the site keep the stored order, so the full front view stays first there.
+export const PAGE_IMAGE_ORDER = {
+  nobel: [3, 0, 1, 2, 5, 4], // logo close-up first, hinge close-up last
+};

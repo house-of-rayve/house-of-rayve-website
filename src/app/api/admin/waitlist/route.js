@@ -14,8 +14,8 @@ export async function GET(request) {
     include: { product: { select: { name: true } } },
   });
   const rows = [
-    ["Name", "Email", "Phone", "Frame", "Joined (IST)"],
-    ...entries.map((e) => [e.name, e.email, e.phone, e.product.name, e.createdAt.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })]),
+    ["Name", "Email", "Phone", "Frame", "Colour", "Joined (IST)"],
+    ...entries.map((e) => [e.name, e.email, e.phone, e.product.name, e.color, e.createdAt.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })]),
   ];
   const csv = rows.map((r) => r.map(cell).join(",")).join("\n");
   return new Response(csv, {

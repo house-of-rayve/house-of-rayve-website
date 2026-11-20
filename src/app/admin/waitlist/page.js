@@ -16,7 +16,7 @@ export default async function AdminWaitlistPage({ searchParams }) {
     prisma.waitlistEntry.findMany({
       where: {
         ...(product ? { product: { slug: product } } : {}),
-        ...(q ? { OR: [{ name: { contains: q, mode: "insensitive" } }, { email: { contains: q, mode: "insensitive" } }, { phone: { contains: q, mode: "insensitive" } }] } : {}),
+        ...(q ? { OR: [{ name: { contains: q, mode: "insensitive" } }, { email: { contains: q, mode: "insensitive" } }, { phone: { contains: q, mode: "insensitive" } }, { color: { contains: q, mode: "insensitive" } }] } : {}),
       },
       orderBy: { createdAt: "desc" },
       include: { product: { select: { name: true, slug: true } } },
@@ -48,6 +48,7 @@ export default async function AdminWaitlistPage({ searchParams }) {
                 <th className="px-5 py-3 font-medium">Email</th>
                 <th className="px-5 py-3 font-medium">Phone</th>
                 <th className="px-5 py-3 font-medium">Frame</th>
+                <th className="px-5 py-3 font-medium">Colour</th>
                 <th className="px-5 py-3 font-medium">Joined</th>
               </tr>
             </thead>
@@ -62,12 +63,13 @@ export default async function AdminWaitlistPage({ searchParams }) {
                   <td className="px-5 py-3 text-muted">{e.email}</td>
                   <td className="px-5 py-3 text-muted">{e.phone || "—"}</td>
                   <td className="px-5 py-3">{e.product.name}</td>
+                  <td className="px-5 py-3 text-muted">{e.color || "—"}</td>
                   <td className="px-5 py-3 text-muted">{formatDateTime(e.createdAt)}</td>
                 </tr>
               ))}
               {entries.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-5 py-10 text-center text-muted">No one on the waitlist yet.</td>
+                  <td colSpan={6} className="px-5 py-10 text-center text-muted">No one on the waitlist yet.</td>
                 </tr>
               )}
             </tbody>

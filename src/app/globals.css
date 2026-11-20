@@ -172,3 +172,22 @@ html[data-reveal-ready] [data-reveal]::after {
 html[data-reveal-ready] [data-reveal].is-revealed::after {
   transform: scaleY(0);
 }
+
+/* Dark panel (product page split screen): the same components, re-coloured by swapping the theme colours in scope */
+@utility on-dark {
+  --color-ink: #e9e2d0;
+  --color-muted: #a9a48c;
+  --color-line: rgb(233 226 208 / 0.16);
+  --color-olive-800: #d9d4b0;
+  --color-olive-700: #bcb56a;
+  --color-paper: #2f2f1f;
+  --color-canvas: #22221a;
+  color: var(--color-ink);
+  & .btn-primary {
+    background: #a69f4e;
+    color: #22221a;
+  }
+  & .btn-primary:hover {
+    background: #bcb56a;
+  }
+}
