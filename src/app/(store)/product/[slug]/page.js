@@ -16,6 +16,7 @@ import { tintIndexFor } from "@/lib/tints";
 import ProductCarousel from "@/components/home/ProductCarousel";
 import Price from "@/components/ui/Price";
 import { PAGE_IMAGE_ORDER, PRODUCT_LAYOUT, TRY_ON_ENABLED } from "@/lib/constants";
+import { CARE_INTRO, PRODUCT_DETAILS } from "@/lib/productDetails";
 import FilmStrip from "@/components/store/FilmStrip";
 
 export async function generateMetadata({ params }) {
@@ -85,14 +86,27 @@ export default async function ProductPage({ params, searchParams }) {
     ...all.filter((p) => p.id !== product.id && p.shape !== product.shape && p.category === product.category),
   ].slice(0, 8);
 
+  // Full spec sheet and care notes from the product sheet where we have them; the colour chosen leads the list
+  const sheet = PRODUCT_DETAILS[product.slug];
   const specs = [
-    ["Shape", product.shape],
+    ["Colour", color?.name],
     ["Frame", frameColor],
     ["Lens", lensColor],
-    ["Material", product.material],
-    ["Protection", "100% UV400"],
-    ["Category", product.category],
+    ...(sheet?.specs ?? [
+      ["Shape", product.shape],
+      ["Material", product.material],
+      ["Protection", "100% UV400"],
+    ]),
+    ["Available colours", colors.length > 1 ? colors.map((c) => c.name).join(", ") : null],
   ].filter(([, v]) => v);
+  // Description: paragraphs separated by a blank line
+  const description = (
+    <div className="space-y-3">
+      {product.description.split(/\n\s*\n/).map((para) => (
+        <p key={para.slice(0, 40)}>{para.trim()}</p>
+      ))}
+    </div>
+  );
 
   // This page can show the photos in its own order; cards elsewhere keep the stored one
   const order = PAGE_IMAGE_ORDER[product.slug];
@@ -152,7 +166,18 @@ export default async function ProductPage({ params, searchParams }) {
         </ul>
       </Accordion>
       <Accordion title="Care">
-        Clean lenses with the RAYVE microfibre cloth, store frames in their case, and avoid leaving them on a car dashboard or near heat.
+        {sheet?.care ? (
+          <>
+            <p>{CARE_INTRO}</p>
+            <ul className="mt-3 list-disc space-y-1.5 pl-4 marker:text-olive-500">
+              {sheet.care.map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+          </>
+        ) : (
+          "Clean lenses with the RAYVE microfibre cloth, store frames in their case, and avoid leaving them on a car dashboard or near heat."
+        )}
       </Accordion>
     </>
   );
@@ -196,7 +221,7 @@ export default async function ProductPage({ params, searchParams }) {
                   {tryOnLink}
                 </div>
                 <div className="mt-6 border-t border-line">
-                  <Accordion title="Description">{product.description}</Accordion>
+                  <Accordion title="Description">{description}</Accordion>
                   {details}
                 </div>
               </>
@@ -265,7 +290,7 @@ export default async function ProductPage({ params, searchParams }) {
 
               <div className="mt-10 border-t border-line">
                 <Accordion title="Description" defaultOpen>
-                  {product.description}
+                  {description}
                 </Accordion>
                 {details}
               </div>
