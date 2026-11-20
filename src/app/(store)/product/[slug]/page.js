@@ -239,13 +239,23 @@ export default async function ProductPage({ params, searchParams }) {
               <p className="mt-1 text-xs text-muted">Inclusive of all taxes</p>
 
               {swatches}
-              <div className="mt-8 grid auto-cols-fr grid-flow-col border-y border-line text-[10px] uppercase tracking-[0.15em] text-muted">
-                {[["Frame", frameColor], ["Lens", lensColor], ["Material", product.material]].filter(([, v]) => v).map(([k, v], i) => (
-                  <div key={k} className={`py-4 ${i ? "border-l border-line pl-4" : ""}`}>
-                    {k}
-                    <span className="mt-1 block text-[11px] normal-case tracking-normal text-sand">{v}</span>
-                  </div>
-                ))}
+              {/* Frame, lens and material as small tiles; frame and lens carry a dot of their colour */}
+              <div className="mt-8 grid auto-cols-fr grid-flow-col gap-2">
+                {[
+                  ["Frame", frameColor, color?.swatch?.[0]],
+                  ["Lens", lensColor, color?.swatch?.[1]],
+                  ["Material", product.material, null],
+                ]
+                  .filter(([, v]) => v)
+                  .map(([k, v, dot]) => (
+                    <div key={k} className="bg-sand/[0.04] px-4 py-3.5 ring-1 ring-inset ring-sand/10">
+                      <p className="font-display text-[9px] uppercase tracking-[0.3em] text-olive-400">{k}</p>
+                      <p className="mt-2 flex items-start gap-2 text-[13px] leading-tight text-sand">
+                        {dot && <span className="mt-[3px] size-2.5 shrink-0 rounded-full ring-1 ring-sand/25" style={{ background: dot }} />}
+                        {v}
+                      </p>
+                    </div>
+                  ))}
               </div>
 
               <div className="mt-8">

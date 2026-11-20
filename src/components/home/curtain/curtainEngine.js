@@ -5,7 +5,9 @@
 import * as THREE from "three";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 
-const PALETTE = { base: "#353922", light: [110, 116, 66], dark: [16, 17, 10], sheen: [0.42, 0.46, 0.27], spot: 0xf1eee0, exposure: 0.62, foot: 0xf6ead2 };
+// Deep olive velvet (the site's olive-900/950) with a warm gold sheen on the folds, like the brand's gold accent
+const PALETTE = { base: "#23251a", light: [86, 92, 52], dark: [6, 6, 3], sheen: [0.34, 0.33, 0.17], spot: 0xf4ead2, exposure: 0.56, foot: 0xf6e3c0 };
+const GOLD = ["#f6e7b8", "#d9b96a", "#a8843a", "#e9d08e"]; // crest foil, light to dark and back
 const PANEL = { half: 0.55, width: 0.552, height: 1.1 }; // × view.w / view.w / view.h
 const COLS = 360, ROWS = 90, PLEATS = 12;
 const OPEN_MS = 2600, CLOSE_MS = 2400;
@@ -18,19 +20,32 @@ const ease = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
 const clamp01 = (x) => Math.max(0, Math.min(1, x));
 const smooth = (e0, e1, x) => { const q = clamp01((x - e0) / (e1 - e0)); return q * q * (3 - 2 * q); };
 
-async function loadImg(src) { const i = new Image(); i.src = src; await i.decode(); return i; }
+// onload rather than decode(): decode() can stall in background tabs and reject on some browsers
+function loadImg(src) {
+  return new Promise((resolve, reject) => {
+    const i = new Image();
+    i.onload = () => resolve(i);
+    i.onerror = reject;
+    i.src = src;
+  });
+}
 function tint(img, color) {
   const c = document.createElement("canvas");
   c.width = img.naturalWidth; c.height = img.naturalHeight;
   const g = c.getContext("2d");
   g.drawImage(img, 0, 0);
   g.globalCompositeOperation = "source-in";
-  g.fillStyle = color;
+  if (Array.isArray(color)) {
+    // gold foil: a vertical gradient through the stops, so the crest catches the light like metal thread
+    const grad = g.createLinearGradient(0, 0, 0, c.height);
+    color.forEach((stop, i) => grad.addColorStop(i / (color.length - 1), stop));
+    g.fillStyle = grad;
+  } else g.fillStyle = color;
   g.fillRect(0, 0, c.width, c.height);
   return c;
 }
 
-export async function mountCurtain(hero, { markSrc, wordSrc, fontFamily = "sans-serif", freeze = null } = {}) {
+export async function mountCurtain(hero, { markSrc, wordSrc, fontFamily = "sans-serif", freeze = null, keepFrame = false } = {}) {
   const canvas = hero.querySelector("[data-curtain-gl]");
   const replayBtn = hero.querySelector("[data-curtain-replay]");
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -43,7 +58,7 @@ export async function mountCurtain(hero, { markSrc, wordSrc, fontFamily = "sans-
   on(canvas, "webglcontextlost", (e) => { e.preventDefault(); fallback(); });
   let renderer;
   try {
-    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance", preserveDrawingBuffer: keepFrame }); // keepFrame: lets QA save a frame as the poster
   } catch {
     fallback();
     return () => cleanups.forEach((f) => f());
@@ -94,11 +109,11 @@ export async function mountCurtain(hero, { markSrc, wordSrc, fontFamily = "sans-
   const sideR = new THREE.DirectionalLight(0xffb98a, 0.18);
   scene.add(sideL, sideR);
 
-  // the RAYVE crest (horns + wordmark), tinted sand
+  // the RAYVE crest (horns + wordmark), in gold foil
   let crest = null;
   try {
     const [mark, word] = await Promise.all([loadImg(markSrc), loadImg(wordSrc)]);
-    crest = { mark: tint(mark, "#e6dcc2"), word: tint(word, "#e6dcc2") };
+    crest = { mark: tint(mark, GOLD), word: tint(word, GOLD) };
   } catch { crest = null; }
   if (disposed) { renderer.dispose(); return () => {}; }
 
@@ -130,7 +145,7 @@ export async function mountCurtain(hero, { markSrc, wordSrc, fontFamily = "sans-
       const ww = Lw, wh = ww * (crest.word.height / crest.word.width);
       const gap = Lw * 0.07;
       const top = cy - (mh + gap + wh) / 2;
-      g.shadowColor = "rgba(8, 8, 2, 0.55)";
+      g.shadowColor = "rgba(4, 4, 1, 0.7)";
       g.shadowBlur = Lw * 0.012 * pxPerUnit;
       g.shadowOffsetX = Lw * 0.002 * pxPerUnit;
       g.shadowOffsetY = Lw * 0.004 * pxPerUnit;
@@ -139,7 +154,7 @@ export async function mountCurtain(hero, { markSrc, wordSrc, fontFamily = "sans-
       g.drawImage(crest.word, -ww / 2, top + mh + gap, ww, wh);
       const ty = top + mh + gap + wh + Lw * 0.09;
       g.shadowBlur = Lw * 0.006 * pxPerUnit;
-      g.fillStyle = "#e6dcc2";
+      g.fillStyle = "#d9bf7f";
       g.font = `600 ${Lw * 0.036}px ${fontFamily}`;
       g.textAlign = "center";
       g.textBaseline = "middle";

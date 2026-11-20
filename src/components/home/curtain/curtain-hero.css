@@ -1,7 +1,7 @@
 /* Curtain hero — every rule is scoped under .rv-curtain so nothing leaks into the rest of the site */
 .rv-curtain {
   --rv-cream: #f4e8d2;
-  --rv-gold: #d9b56c;
+  --rv-gold: #d2b36e;
   --rv-ink: #0e0604;
   position: relative;
   height: 100svh;
@@ -54,7 +54,7 @@
   inset: 0;
   z-index: 2;
   pointer-events: none;
-  background: linear-gradient(180deg, rgba(10, 4, 2, 0.45), transparent 18%);
+  background: linear-gradient(180deg, rgba(10, 8, 2, 0.55), transparent 32%);
 }
 .rv-curtain .rv-gl {
   position: absolute;
@@ -77,41 +77,102 @@
   text-align: center;
   width: min(92vw, 900px);
 }
+/* clickable niches over the three frames (they sit under the curtain canvas until it has opened) */
+.rv-curtain .rv-niche {
+  position: absolute;
+  top: 39%;
+  height: 30%;
+  z-index: 3;
+  display: block;
+  border-radius: 2px;
+  transition: background-color 0.5s ease;
+}
+.rv-curtain .rv-niche:hover,
+.rv-curtain .rv-niche:focus-visible {
+  background: radial-gradient(ellipse at 50% 70%, rgba(255, 226, 160, 0.16), transparent 70%);
+  outline: none;
+}
+/* the name engraved into the plinth below the ledge (the flat stone band at ~77% of the photo, under
+   each niche), gold-filled like an inscription; the dark top edge makes the letters sit in the stone */
+.rv-curtain .rv-niche-label {
+  position: absolute;
+  left: 50%;
+  top: 126%; /* niche spans 39–69% of the photo, so this lands at ~77%, mid-plinth */
+  transform: translate(-50%, -50%);
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(8px, 0.72vw, 11px);
+  letter-spacing: 0.55em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding: 0.85em 1.5em 0.8em 2.05em; /* extra left pad balances the trailing letter-spacing */
+  color: rgba(204, 168, 102, 0.9);
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.7), 0 1px 0 rgba(255, 220, 160, 0.1);
+  /* a dark, matte, aged-bronze board set into the stone: faint grain, soft top bevel, recessed edge */
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 230, 180, 0.025) 0 1px, transparent 1px 4px),
+    linear-gradient(180deg, #3b3021 0%, #2b2317 55%, #241d13 100%);
+  border-radius: 1px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 160, 0.14),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+    inset 0 0 0 1px rgba(120, 92, 48, 0.35),
+    0 0 0 1px rgba(10, 6, 2, 0.55),
+    0 3px 8px rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  transition: opacity 0.6s ease, color 0.4s ease;
+}
+.rv-curtain.is-revealed .rv-niche-label { opacity: 1; transition-delay: 2s, 0s; }
+.rv-curtain .rv-niche:hover .rv-niche-label,
+.rv-curtain .rv-niche:focus-visible .rv-niche-label { color: rgba(226, 192, 124, 0.95); }
+
+/* type follows the site: Michroma display caps, olive-gold eyebrow, sand title with a gold accent */
 .rv-curtain .rv-eyebrow {
+  font-family: var(--font-display), sans-serif;
   font-size: 10px;
   letter-spacing: 0.45em;
   text-transform: uppercase;
-  color: #5a3a1c;
+  color: var(--rv-gold);
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.55);
 }
 .rv-curtain .rv-title {
-  font-family: var(--rv-serif), "Times New Roman", serif;
-  font-weight: 500;
-  font-style: italic;
-  font-size: clamp(34px, 4.2vw, 64px);
-  line-height: 1;
-  margin-top: 8px;
-  color: #2a160a;
+  font-family: var(--font-display), sans-serif;
+  font-weight: 400;
+  font-size: clamp(26px, 3.2vw, 50px);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1.1;
+  margin-top: 14px;
+  color: #f4ecd8;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.55);
 }
-.rv-curtain .rv-title em { font-style: italic; color: #8a1018; }
+.rv-curtain .rv-title em { font-style: normal; color: var(--rv-gold); }
+.rv-curtain .rv-rule {
+  display: block;
+  width: 64px;
+  height: 1px;
+  margin: 18px auto 0;
+  background: linear-gradient(90deg, transparent, var(--rv-gold), transparent);
+}
 /* staged entrance once the curtain parts */
 .rv-curtain .rv-up { opacity: 0; transform: translateY(14px); transition: opacity 1.2s ease, transform 1.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
 .rv-curtain.is-revealed .rv-up { opacity: 1; transform: none; }
 .rv-curtain.is-revealed .rv-d1 { transition-delay: 1.2s; }
 .rv-curtain.is-revealed .rv-d2 { transition-delay: 1.4s; }
+.rv-curtain.is-revealed .rv-d3 { transition-delay: 1.7s; }
 
 .rv-curtain .rv-replay {
   position: absolute;
   z-index: 9;
   right: clamp(16px, 3vw, 40px);
   bottom: clamp(18px, 4vh, 36px);
-  font-size: 10px;
-  letter-spacing: 0.28em;
+  font-family: var(--font-display), sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.32em;
   text-transform: uppercase;
   color: var(--rv-cream);
-  background: rgba(20, 8, 4, 0.4);
-  border: 1px solid rgba(244, 232, 210, 0.25);
-  border-radius: 999px;
-  padding: 10px 16px;
+  background: rgba(34, 34, 26, 0.55);
+  border: 1px solid rgba(217, 181, 108, 0.45);
+  padding: 11px 18px;
   cursor: pointer;
   backdrop-filter: blur(8px);
   opacity: 0;
@@ -126,7 +187,7 @@
   inset: 0;
   z-index: 6;
   pointer-events: none;
-  background: #353922;
+  background: #272918;
   transition: opacity 0.9s ease;
 }
 .rv-curtain .rv-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -138,12 +199,6 @@
 }
 @media (max-width: 720px) {
   .rv-curtain .rv-replay { bottom: auto; top: 76px; }
-}
-/* screen taller than the photo: the headline sits on the dark blurred fill, so use light ink */
-@container (max-aspect-ratio: 1672 / 941) {
-  .rv-curtain .rv-eyebrow { color: var(--rv-gold); }
-  .rv-curtain .rv-title { color: #fbf1de; }
-  .rv-curtain .rv-title em { color: #e2a35a; }
 }
 @media (prefers-reduced-motion: reduce) {
   .rv-curtain .rv-up { opacity: 1; transform: none; transition: none; }
