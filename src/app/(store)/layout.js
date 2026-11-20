@@ -10,6 +10,7 @@ import PageCurtain from "@/components/motion/PageCurtain";
 import MobileTabBar from "@/components/store/MobileTabBar";
 import RevealImages from "@/components/motion/RevealImages";
 import { Suspense } from "react";
+import { MOBILE_TABBAR_ENABLED } from "@/lib/constants";
 
 export default async function StoreLayout({ children }) {
   const user = await getCurrentUser();
@@ -27,7 +28,7 @@ export default async function StoreLayout({ children }) {
       <Header user={user && { name: user.name, role: user.role }} />
       <main className="flex-1">{children}</main>
       <Footer />
-      <MobileTabBar />
+      {MOBILE_TABBAR_ENABLED && <MobileTabBar />}
     </>
   );
 }

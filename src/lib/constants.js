@@ -58,3 +58,6 @@ export const PRODUCT_LAYOUT = "split";
 export const PAGE_IMAGE_ORDER = {
   nobel: [3, 0, 1, 2, 5, 4], // logo close-up first, hinge close-up last
 };
+
+// The bottom tab bar on phones (Home / Try on). Off for launch.
+export const MOBILE_TABBAR_ENABLED = false;

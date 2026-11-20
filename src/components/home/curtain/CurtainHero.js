@@ -46,7 +46,16 @@ export default function CurtainHero({ className = "" }) {
       });
     }).catch(() => hero.classList.add("is-playing", "is-revealed"));
 
+    // phones: the arena pans sideways; start on the middle niche
+    const pan = hero.querySelector("[data-curtain-pan]");
+    const centre = () => {
+      if (pan && pan.scrollWidth > pan.clientWidth) pan.scrollLeft = (pan.scrollWidth - pan.clientWidth) / 2;
+    };
+    centre();
+    window.addEventListener("resize", centre);
+
     return () => {
+      window.removeEventListener("resize", centre);
       cancelled = true;
       clearTimeout(safety);
       dispose?.();
@@ -56,20 +65,23 @@ export default function CurtainHero({ className = "" }) {
   return (
     <section ref={heroRef} className={`rv-curtain ${className}`} aria-label="RAYVE — the arena">
       <div className="rv-ambient" aria-hidden="true" />
-      <div className="rv-stage">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/images/curtain/arena-v3@2x.webp"
-          srcSet="/images/curtain/arena-v3.webp 1672w, /images/curtain/arena-v3@2x.webp 3344w"
-          sizes="100vw"
-          alt="Three RAYVE sunglasses displayed in lit stone niches in a bullring arena at sunset"
-          fetchPriority="high"
-        />
-        {NICHES.map((n) => (
-          <Link key={n.slug} href={`/product/${n.slug}`} className="rv-niche" style={{ left: `${n.left}%`, width: `${n.width}%` }} aria-label={`View ${n.name}`}>
-            <span className="rv-niche-label">{n.name}</span>
-          </Link>
-        ))}
+      {/* the arena photo; on phones it fills the screen height and pans sideways between the niches */}
+      <div className="rv-stage" data-curtain-pan>
+        <div className="rv-stage-inner">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/curtain/arena-v3@2x.webp"
+            srcSet="/images/curtain/arena-v3.webp 1672w, /images/curtain/arena-v3@2x.webp 3344w"
+            sizes="(max-aspect-ratio: 3/4) 260vh, 100vw"
+            alt="Three RAYVE sunglasses displayed in lit stone niches in a bullring arena at sunset"
+            fetchPriority="high"
+          />
+          {NICHES.map((n) => (
+            <Link key={n.slug} href={`/product/${n.slug}`} className="rv-niche" style={{ left: `${n.left}%`, width: `${n.width}%` }} aria-label={`View ${n.name}`}>
+              <span className="rv-niche-label">{n.name}</span>
+            </Link>
+          ))}
+        </div>
       </div>
       <div className="rv-shade" aria-hidden="true" />
       <div className="rv-scrim" aria-hidden="true" />
@@ -83,6 +95,7 @@ export default function CurtainHero({ className = "" }) {
           </p>
           <span className="rv-rule rv-up rv-d3" aria-hidden="true" />
         </div>
+        <p className="rv-hint rv-up rv-d3">Swipe to explore</p>
       </div>
 
       {/* closed-curtain poster: shows instantly, the live 3D curtain takes over as soon as it's ready */}
