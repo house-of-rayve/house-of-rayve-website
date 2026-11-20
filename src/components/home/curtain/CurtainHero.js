@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Link from "next/link";
 import { Cormorant_Garamond } from "next/font/google";
 import "./curtain-hero.css";
 
@@ -67,16 +66,12 @@ export default function CurtainHero({ className = "" }) {
           <p className="rv-eyebrow rv-up rv-d1">Collection No. 1 · The Arena</p>
           <p className="rv-title rv-up rv-d2">Stare down the <em>sun.</em></p>
         </div>
-        <div className="rv-cta rv-up rv-d3">
-          <Link className="rv-btn" href="/shop">Shop the collection</Link>
-          <Link className="rv-btn rv-btn--ghost" href="/about">The story</Link>
-        </div>
       </div>
 
       <div className="rv-cover" aria-hidden="true" />
       <canvas className="rv-gl" data-curtain-gl aria-hidden="true" />
       <p className="rv-prompt">Click to open</p>
-      <button className="rv-replay" type="button" data-curtain-replay>↺ Replay the curtain</button>
+      <button className="rv-replay" type="button" data-curtain-replay>↺ Replay</button>
     </section>
   );
 }
