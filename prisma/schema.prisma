@@ -24,6 +24,7 @@ model User {
   orders       Order[]
   reviews      Review[]
   points       PointsEntry[]
+  waitlist     WaitlistEntry[]
 }
 
 model Address {
@@ -68,6 +69,7 @@ model Product {
   updatedAt    DateTime    @updatedAt
   orderItems   OrderItem[]
   reviews      Review[]
+  waitlist     WaitlistEntry[]
 }
 
 model Order {
@@ -196,4 +198,22 @@ model CheckoutSession {
   razorpayOrderId String?  @unique
   orderId         String?  @unique // our Order, once placed
   createdAt       DateTime @default(now())
+}
+
+// Someone waiting for a frame before it goes on sale: who (as they were when they joined), which frame and when.
+// One entry per person per frame.
+model WaitlistEntry {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name      String
+  email     String
+  phone     String?
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+  @@index([productId])
+  @@index([createdAt])
 }

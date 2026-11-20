@@ -10,7 +10,8 @@ import { rememberViewed } from "@/components/wishlist/WishlistProvider";
 import { formatPrice } from "@/lib/format";
 import { pointsFor } from "@/lib/shipping";
 import { api } from "@/components/ui/fetcher";
-import { POINTS_ENABLED } from "@/lib/constants";
+import { POINTS_ENABLED, WAITLIST_MODE } from "@/lib/constants";
+import WaitlistButton from "@/components/store/WaitlistButton";
 
 // The gallery that is actually showing (desktop and mobile use different markup)
 const visibleGallery = () => [...document.querySelectorAll("[data-gallery-main]")].find((el) => el.offsetParent !== null);
@@ -133,13 +134,19 @@ export default function ProductPurchase({ product }) {
   return (
     <div className="space-y-4">
       <div ref={anchor} className="flex gap-3">
-        {!soldOut && <QuantityStepper value={qty} max={max} onChange={(q) => setQty(Math.max(1, Math.min(q, max)))} />}
-        <button disabled={soldOut} onClick={() => add(product, qty, visibleGallery())} className="btn-primary flex-1">
-          {soldOut ? "Sold out" : "Add to bag"}
-        </button>
+        {WAITLIST_MODE ? (
+          <WaitlistButton product={product} className="btn-primary flex-1" />
+        ) : (
+          <>
+            {!soldOut && <QuantityStepper value={qty} max={max} onChange={(q) => setQty(Math.max(1, Math.min(q, max)))} />}
+            <button disabled={soldOut} onClick={() => add(product, qty, visibleGallery())} className="btn-primary flex-1">
+              {soldOut ? "Sold out" : "Add to bag"}
+            </button>
+          </>
+        )}
         <WishlistButton product={product} className="size-12 shrink-0 border border-line bg-paper hover:border-olive-800" />
       </div>
-      {!soldOut && product.stock <= 5 && (
+      {!WAITLIST_MODE && !soldOut && product.stock <= 5 && (
         <div>
           <p className="text-xs text-olive-700">Only {product.stock} left — order soon.</p>
           <div className="mt-2 h-1 bg-line">
@@ -147,7 +154,7 @@ export default function ProductPurchase({ product }) {
           </div>
         </div>
       )}
-      {POINTS_ENABLED && !soldOut && (
+      {POINTS_ENABLED && !WAITLIST_MODE && !soldOut && (
         <p className="flex items-center gap-2 text-xs text-olive-800">
           <Sparkles className="size-3.5 shrink-0" />
           <span>
@@ -155,7 +162,7 @@ export default function ProductPurchase({ product }) {
           </span>
         </p>
       )}
-      <DeliveryCheck value={product.price * qty} />
+      {!WAITLIST_MODE && <DeliveryCheck value={product.price * qty} />}
 
       <div
         className={`fixed inset-x-0 bottom-0 z-30 border-t border-line bg-canvas/95 backdrop-blur-md transition-transform duration-300 ${stuck ? "translate-y-0" : "translate-y-full"}`}
@@ -171,9 +178,13 @@ export default function ProductPurchase({ product }) {
               {formatPrice(product.price)} {product.frameColor && <span className="max-sm:hidden">· {product.frameColor}</span>}
             </p>
           </div>
-          <button disabled={soldOut} tabIndex={stuck ? 0 : -1} onClick={(e) => add(product, qty, e.currentTarget)} className="btn-primary h-11 shrink-0">
-            {soldOut ? "Sold out" : "Add to bag"}
-          </button>
+          {WAITLIST_MODE ? (
+            <WaitlistButton product={product} tabIndex={stuck ? 0 : -1} className="btn-primary h-11 shrink-0" />
+          ) : (
+            <button disabled={soldOut} tabIndex={stuck ? 0 : -1} onClick={(e) => add(product, qty, e.currentTarget)} className="btn-primary h-11 shrink-0">
+              {soldOut ? "Sold out" : "Add to bag"}
+            </button>
+          )}
         </div>
       </div>
     </div>

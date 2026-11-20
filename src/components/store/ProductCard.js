@@ -5,6 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { Plus, Check } from "lucide-react";
 import Price from "@/components/ui/Price";
+import WaitlistButton from "@/components/store/WaitlistButton";
+import { WAITLIST_MODE } from "@/lib/constants";
 import WishlistButton from "@/components/wishlist/WishlistButton";
 import { useCart } from "@/components/cart/CartProvider";
 import { liquidHover } from "@/components/motion/liquid";
@@ -78,7 +80,9 @@ export default function ProductCard({ product, priority = false, sizes, morph = 
           className="absolute right-2.5 top-2.5 size-9 rounded-full bg-paper/85 text-ink backdrop-blur transition hover:bg-paper lg:opacity-0 lg:group-hover:opacity-100 lg:focus-visible:opacity-100 lg:aria-pressed:opacity-100"
         />
 
-        {!soldOut && (
+        {WAITLIST_MODE ? (
+          <WaitlistButton product={product} className="absolute inset-x-3 bottom-3 flex h-10 translate-y-2 items-center justify-center gap-2 bg-paper/95 text-[10px] font-medium uppercase tracking-[0.2em] text-ink opacity-0 backdrop-blur transition duration-300 hover:bg-olive-800 hover:text-sand focus-visible:translate-y-0 focus-visible:opacity-100 group-hover:translate-y-0 group-hover:opacity-100 max-lg:hidden cursor-pointer" />
+        ) : !soldOut && (
           <button
             type="button"
             onClick={quickAdd}

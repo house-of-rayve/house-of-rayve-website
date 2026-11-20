@@ -7,6 +7,7 @@ import { invalidateCatalog } from "@/lib/products";
 import { sendOrderEmails } from "@/lib/email";
 import { autoShip } from "@/lib/ithink";
 import { awardOrderPoints } from "@/lib/points";
+import { WAITLIST_MODE } from "@/lib/constants";
 
 export async function GET() {
   const [user, denied] = await authorize();
@@ -20,6 +21,7 @@ export async function GET() {
 }
 
 export async function POST(request) {
+  if (WAITLIST_MODE) return error("Orders open at launch. Join the waitlist instead.", 503);
   const [user, denied] = await authorize();
   if (denied) return denied;
   const body = await readJson(request);

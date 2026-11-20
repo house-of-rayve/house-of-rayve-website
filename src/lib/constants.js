@@ -3,6 +3,13 @@ export const TRY_ON_ENABLED = true;
 // RAYVE points switch: false hides points everywhere on the site and admin, and stops new orders earning or spending
 // them. Points already recorded are kept, so turning it back on carries on where it left off.
 export const POINTS_ENABLED = false;
+// Hidden while only the launch frames are live; true brings each back everywhere it appears.
+export const SHOP_NAV_ENABLED = false; // "Shop" in the header, the menu and the phone tab bar (the shop page itself stays)
+export const NEW_ARRIVALS_ENABLED = false; // "New arrivals" links
+export const LOOKBOOK_ENABLED = false; // the lookbook page and its links
+export const WISHLIST_ENABLED = false; // wishlist hearts, the wishlist page and its links
+// Before launch: every "Add to bag" becomes "Join the waitlist", and the bag and checkout are switched off
+export const WAITLIST_MODE = true;
 
 export const CATEGORIES = ["Sunglasses"];
 export const SHAPES = ["Rectangle", "Oval", "Round", "Cat-eye", "Square", "Shield", "Aviator"];

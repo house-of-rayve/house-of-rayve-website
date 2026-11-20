@@ -1,12 +1,13 @@
 import { json, error, readJson, authorize } from "@/lib/api";
 import { OrderError } from "@/lib/orders";
 import { magicCheckoutEnabled, startMagicCheckout } from "@/lib/magic";
+import { WAITLIST_MODE } from "@/lib/constants";
 
 // Opens a Magic Checkout for the signed-in customer's bag
 export async function POST(request) {
   const [user, denied] = await authorize();
   if (denied) return denied;
-  if (!magicCheckoutEnabled()) return error("Checkout isn't available right now.", 503);
+  if (WAITLIST_MODE || !magicCheckoutEnabled()) return error("Checkout isn't available right now.", 503);
   const { items } = await readJson(request);
   try {
     return json(await startMagicCheckout(user, items));

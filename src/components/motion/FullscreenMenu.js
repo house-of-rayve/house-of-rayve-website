@@ -9,7 +9,7 @@ import RollText from "./RollText";
 import SoundToggle from "./SoundToggle";
 import { SHAPES } from "@/lib/constants";
 import { gsap, useGSAP, prefersReducedMotion } from "./gsap";
-import { TRY_ON_ENABLED } from "@/lib/constants";
+import { LOOKBOOK_ENABLED, NEW_ARRIVALS_ENABLED, SHOP_NAV_ENABLED, TRY_ON_ENABLED, WISHLIST_ENABLED } from "@/lib/constants";
 
 // Full-screen menu: the curtain drops, links rise in one by one, and on desktop
 // hovering a link swaps the photo on the right.
@@ -19,13 +19,13 @@ export default function FullscreenMenu({ open, onClose, user }) {
   const [preview, setPreview] = useState(0);
 
   const links = [
-    { label: "Shop all", href: "/shop", img: "/images/collection.jpg" },
+    ...(SHOP_NAV_ENABLED ? [{ label: "Shop all", href: "/shop", img: "/images/collection.jpg" }] : []),
     { label: "Sunglasses", href: "/shop?category=Sunglasses", img: "/images/model-sevilla.jpg" },
-    { label: "New arrivals", href: "/shop?sort=newest", img: "/images/model-arena.jpg" },
-    { label: "Lookbook", href: "/lookbook", img: "/images/campaign-matador.jpg" },
+    ...(NEW_ARRIVALS_ENABLED ? [{ label: "New arrivals", href: "/shop?sort=newest", img: "/images/model-arena.jpg" }] : []),
+    ...(LOOKBOOK_ENABLED ? [{ label: "Lookbook", href: "/lookbook", img: "/images/campaign-matador.jpg" }] : []),
     ...(TRY_ON_ENABLED ? [{ label: "Try on", href: "/try-on", img: "/images/model-sevilla.jpg" }] : []),
     { label: "The brand", href: "/about", img: "/images/campaign-matador.jpg" },
-    { label: "Wishlist", href: "/wishlist", img: "/images/model-toro.jpg" },
+    ...(WISHLIST_ENABLED ? [{ label: "Wishlist", href: "/wishlist", img: "/images/model-toro.jpg" }] : []),
     user ? { label: "My account", href: "/account", img: "/images/model-ronda.jpg" } : { label: "Sign in", href: "/login", img: "/images/model-ronda.jpg" },
     ...(user?.role === "ADMIN" ? [{ label: "Admin", href: "/admin", img: "/images/cards.jpg" }] : []),
   ];

@@ -4,6 +4,7 @@ import NewsletterForm from "./NewsletterForm";
 import ScrambleText from "@/components/motion/ScrambleText";
 import FooterMark from "@/components/motion/FooterMark";
 import { BUSINESS } from "@/lib/business";
+import { NEW_ARRIVALS_ENABLED, WISHLIST_ENABLED } from "@/lib/constants";
 
 const COLUMNS = [
   {
@@ -11,7 +12,7 @@ const COLUMNS = [
     links: [
       ["All eyewear", "/shop"],
       ["Sunglasses", "/shop?category=Sunglasses"],
-      ["New arrivals", "/shop?sort=newest"],
+      ...(NEW_ARRIVALS_ENABLED ? [["New arrivals", "/shop?sort=newest"]] : []),
     ],
   },
   {
@@ -19,7 +20,7 @@ const COLUMNS = [
     links: [
       ["The brand", "/about"],
       ["My account", "/account"],
-      ["Wishlist", "/wishlist"],
+      ...(WISHLIST_ENABLED ? [["Wishlist", "/wishlist"]] : []),
       ["Order history", "/account/orders"],
     ],
   },

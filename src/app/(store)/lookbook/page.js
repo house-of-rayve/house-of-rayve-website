@@ -3,7 +3,8 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { listProducts } from "@/lib/products";
 import { formatPrice } from "@/lib/format";
-import { EDITORIAL_EXCLUDE } from "@/lib/constants";
+import { EDITORIAL_EXCLUDE, LOOKBOOK_ENABLED } from "@/lib/constants";
+import { notFound } from "next/navigation";
 import FullBanner from "@/components/home/FullBanner";
 
 export const metadata = {
@@ -38,6 +39,7 @@ function Worn({ product, light = false }) {
 }
 
 export default async function LookbookPage() {
+  if (!LOOKBOOK_ENABLED) notFound();
   const looks = (await listProducts({ category: "Sunglasses" })).filter((p) => p.images[1] && !EDITORIAL_EXCLUDE.includes(p.images[1])).slice(0, 9);
 
   const blocks = [];

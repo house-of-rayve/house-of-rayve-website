@@ -36,6 +36,17 @@
     40% { transform: scale(1.35); }
     100% { transform: scale(1); }
   }
+  /* Waitlist popup: the card rises in and the tick draws itself */
+  --animate-rise: rise 0.5s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(24px) scale(0.97); }
+    to { opacity: 1; transform: none; }
+  }
+  --animate-draw: draw 0.6s 0.35s ease-out both;
+  @keyframes draw {
+    from { stroke-dashoffset: 40; }
+    to { stroke-dashoffset: 0; }
+  }
   --animate-marquee: marquee 32s linear infinite;
   @keyframes marquee {
     from { transform: translateX(0); }

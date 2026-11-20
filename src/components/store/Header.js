@@ -14,7 +14,7 @@ import ScrambleText from "@/components/motion/ScrambleText";
 import FullscreenMenu from "@/components/motion/FullscreenMenu";
 import SoundToggle from "@/components/motion/SoundToggle";
 import { playBull } from "@/components/motion/bullSound";
-import { SHAPES, TRY_ON_ENABLED } from "@/lib/constants";
+import { SHAPES, SHOP_NAV_ENABLED, TRY_ON_ENABLED, WAITLIST_MODE, WISHLIST_ENABLED } from "@/lib/constants";
 import { searchProducts } from "@/lib/search";
 
 const NAV = [
@@ -225,6 +225,7 @@ export default function Header({ user }) {
               </span>
             </button>
             <nav className="hidden items-center gap-6 lg:flex">
+              {SHOP_NAV_ENABLED && (
               <button
                 onMouseEnter={openShop}
                 onClick={() => setPanel((p) => (p === "shop" ? null : "shop"))}
@@ -233,6 +234,7 @@ export default function Header({ user }) {
               >
                 <RollText>Shop</RollText> <ChevronDown className={`size-3 transition-transform ${panel === "shop" ? "rotate-180" : ""}`} />
               </button>
+              )}
               {NAV.map((n) => (
                 <Link
                   key={n.href}
@@ -266,6 +268,7 @@ export default function Header({ user }) {
             <Link href={user ? "/account" : "/login"} className={iconBtn} aria-label={user ? "My account" : "Sign in"} title={user ? user.name : "Sign in"}>
               <User className="size-[18px]" strokeWidth={1.5} />
             </Link>
+            {WISHLIST_ENABLED && (
             <Link href="/wishlist" className={`${iconBtn} max-sm:hidden`} aria-label={`Wishlist, ${wishCount} items`}>
               <Heart className="size-[18px]" strokeWidth={1.5} />
               {wishCount > 0 && (
@@ -274,6 +277,8 @@ export default function Header({ user }) {
                 </span>
               )}
             </Link>
+            )}
+            {!WAITLIST_MODE && (
             <button data-bag-target onClick={() => setOpen(true)} className={iconBtn} aria-label={`Bag, ${count} items`}>
               <ShoppingBag key={bump} className={`size-[18px] ${bump ? "animate-pop" : ""}`} strokeWidth={1.5} />
               {count > 0 && (
@@ -282,6 +287,7 @@ export default function Header({ user }) {
                 </span>
               )}
             </button>
+            )}
           </div>
         </div>
 

@@ -57,6 +57,15 @@ function SectionHead({ eyebrow, title, href, linkLabel = "View all", center = fa
 
 // Sections switched off for now
 const SHOW_TORO = false;
+// Off while only the launch frames are live
+const SHOW_LOOKBOOK = false; // the story bubbles
+const SHOW_COLLECTION = false; // "Shop the collection"
+const SHOW_TILES = false; // the Sunglasses / New arrivals tiles
+const SHOW_NEW_ARRIVALS = false; // the New arrivals grid
+const SHOW_SIGNAL = false; // the RAYVE word that opens onto "The signal has arrived"
+const SHOW_ENERGY = false; // "Own the energy", photos following the cursor
+const SHOW_GALLERY = false; // "Seen in RAYVE", photos drifting past
+const SHOW_FLASHLIGHT = false; // "Made for the light" cursor reveal
 
 export default async function HomePage() {
   const all = await listProducts();
@@ -75,18 +84,18 @@ export default async function HomePage() {
       <FullBanner src="/images/banners/broken-open.jpg" alt="RAYVE — The familiar, broken open" priority reveal={false} underHeader className="-mt-[65px]" />
 
       {/* Lookbook: Instagram-style stories of the frames on model */}
-      <section className="px-5 pb-6 pt-12 sm:px-8 sm:pt-16 lg:px-12">
+      {SHOW_LOOKBOOK && <section className="px-5 pb-6 pt-12 sm:px-8 sm:pt-16 lg:px-12">
         <p className="eyebrow mb-8 flex items-center gap-4 lg:justify-center">
           <span className="hidden h-px w-12 bg-line lg:block" /> The lookbook <span className="h-px flex-1 bg-line lg:w-12 lg:flex-none" />
         </p>
         <LookbookStories products={all.filter((p) => p.category === "Sunglasses")} />
-      </section>
+      </section>}
 
       {/* Collection: pins and scrolls sideways on desktop */}
-      <HorizontalShowcase eyebrow="Collection 01" title="Shop the collection" products={featured.length >= 4 ? [...featured, ...all.filter((p) => !p.featured)] : all} />
+      {SHOW_COLLECTION && <HorizontalShowcase eyebrow="Collection 01" title="Shop the collection" products={featured.length >= 4 ? [...featured, ...all.filter((p) => !p.featured)] : all} />}
 
       {/* Full-bleed category tiles */}
-      <section className="grid gap-1 md:grid-cols-2">
+      {SHOW_TILES && <section className="grid gap-1 md:grid-cols-2">
         {[
           { title: "Sunglasses", sub: frames(count("Sunglasses")), href: "/shop?category=Sunglasses", img: "/images/model-sevilla.jpg" },
           { title: "New arrivals", sub: "Just landed", href: "/shop?sort=newest", img: "/images/model-arena.jpg" },
@@ -101,7 +110,7 @@ export default async function HomePage() {
             </div>
           </Link>
         ))}
-      </section>
+      </section>}
 
       {/* What we stand for */}
       <section className="border-y border-line bg-mist">
@@ -128,10 +137,10 @@ export default async function HomePage() {
       </section>
 
       {/* Brand moment: the campaign photo seen through the letters of RAYVE, opening up on scroll */}
-      <PhotoInWord image="/images/banners/the-signal.jpg" alt="RAYVE sunglasses floating before a sunlit gateway" focus="20% 50%" line="Poise. Tension. Precision. Command." sub="Collection 01 — premium, in the everyday." />
+      {SHOW_SIGNAL && <PhotoInWord image="/images/banners/the-signal.jpg" alt="RAYVE sunglasses floating before a sunlit gateway" focus="20% 50%" line="Poise. Tension. Precision. Command." sub="Collection 01 — premium, in the everyday." />}
 
       {/* New arrivals grid */}
-      <section className="container-home section-y">
+      {SHOW_NEW_ARRIVALS && <section className="container-home section-y">
         <SectionHead eyebrow="Just landed" title="New arrivals" href="/shop?sort=newest" />
         <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 lg:grid-cols-4">
           {newest.slice(0, 4).map((p, i) => (
@@ -140,7 +149,7 @@ export default async function HomePage() {
             </Reveal>
           ))}
         </div>
-      </section>
+      </section>}
 
       {/* Campaign banner */}
       <FullBanner src="/images/banners/break-the-familiar.jpg" alt="RAYVE — Break the familiar" />
@@ -195,7 +204,7 @@ export default async function HomePage() {
       </section>
 
       {/* Image trail: campaign photos follow the cursor */}
-      <section className="bg-olive-950 text-sand">
+      {SHOW_ENERGY && <section className="bg-olive-950 text-sand">
         <ImageTrail>
           <div className="flex min-h-svh flex-col items-center justify-center px-5 py-24 text-center">
             <p className="eyebrow text-olive-400">Collection 01</p>
@@ -209,23 +218,25 @@ export default async function HomePage() {
             </p>
           </div>
         </ImageTrail>
-      </section>
+      </section>}
 
       {/* Lifestyle: headline holds still while photos drift past */}
-      <FloatingGallery
-        eyebrow="Worn in the everyday"
-        title="Seen in RAYVE"
-        subtitle="A frame you recognise — altered."
-        items={GALLERY.map(([img, slug]) => ({
-          img: `/images/${img}.jpg`,
-          href: bySlug[slug] ? `/product/${slug}` : "/shop",
-          label: bySlug[slug]?.name ?? "RAYVE",
-          caption: bySlug[slug]?.frameColor ?? "",
-        }))}
-      />
+      {SHOW_GALLERY && (
+        <FloatingGallery
+          eyebrow="Worn in the everyday"
+          title="Seen in RAYVE"
+          subtitle="A frame you recognise — altered."
+          items={GALLERY.map(([img, slug]) => ({
+            img: `/images/${img}.jpg`,
+            href: bySlug[slug] ? `/product/${slug}` : "/shop",
+            label: bySlug[slug]?.name ?? "RAYVE",
+            caption: bySlug[slug]?.frameColor ?? "",
+          }))}
+        />
+      )}
 
       {/* Flashlight: a pool of light follows the pointer and uncovers the campaign photo */}
-      <FlashlightReveal />
+      {SHOW_FLASHLIGHT && <FlashlightReveal />}
 
       {/* FAQ */}
       <section className="border-t border-line">

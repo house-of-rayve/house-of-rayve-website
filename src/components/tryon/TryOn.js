@@ -8,7 +8,8 @@ import { ArrowRight, Camera, Check, Download, ImageUp, Loader2, RefreshCw, ScanF
 import { useCart } from "@/components/cart/CartProvider";
 import Price from "@/components/ui/Price";
 import { frameColorFor, lensColorFor } from "@/lib/frameColors";
-import { TRY_ON_CUTOUTS } from "@/lib/constants";
+import { TRY_ON_CUTOUTS, WAITLIST_MODE } from "@/lib/constants";
+import WaitlistButton from "@/components/store/WaitlistButton";
 import { measureFace, classifyFace, photoView, faceFocus } from "./faceShape";
 
 const TryOnScene = dynamic(() => import("./TryOnScene"), { ssr: false });
@@ -509,23 +510,27 @@ export default function TryOn({ products, initialSlug }) {
             <p className="mt-2 text-xs text-sand/55">{[product.shape, product.frameColor, product.lensColor && `${product.lensColor} lens`].filter(Boolean).join(" · ")}</p>
             <Price price={product.price} comparePrice={product.comparePrice} className="mt-3 text-lg font-light" />
             <div className="mt-6 flex gap-2">
-              <button
-                disabled={product.stock <= 0}
-                onClick={(e) => {
-                  add(product, 1, e.currentTarget);
-                  setAdded(true);
-                  setTimeout(() => setAdded(false), 1600);
-                }}
-                className="btn h-12 flex-1 bg-sand text-olive-950 hover:bg-paper"
-              >
-                {product.stock <= 0 ? "Sold out" : added ? (
-                  <>
-                    <Check className="size-4" /> Added
-                  </>
-                ) : (
-                  "Add to bag"
-                )}
-              </button>
+              {WAITLIST_MODE ? (
+                <WaitlistButton product={product} className="btn h-12 flex-1 bg-sand text-olive-950 hover:bg-paper" />
+              ) : (
+                <button
+                  disabled={product.stock <= 0}
+                  onClick={(e) => {
+                    add(product, 1, e.currentTarget);
+                    setAdded(true);
+                    setTimeout(() => setAdded(false), 1600);
+                  }}
+                  className="btn h-12 flex-1 bg-sand text-olive-950 hover:bg-paper"
+                >
+                  {product.stock <= 0 ? "Sold out" : added ? (
+                    <>
+                      <Check className="size-4" /> Added
+                    </>
+                  ) : (
+                    "Add to bag"
+                  )}
+                </button>
+              )}
               <Link href={`/product/${product.slug}`} className="btn h-12 border border-sand/25 text-sand hover:border-sand">
                 Details <ArrowRight className="size-3.5" />
               </Link>

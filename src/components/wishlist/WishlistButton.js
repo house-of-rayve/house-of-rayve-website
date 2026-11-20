@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { Heart } from "lucide-react";
 import { useWishlist } from "./WishlistProvider";
+import { WISHLIST_ENABLED } from "@/lib/constants";
 import { gsap, prefersReducedMotion } from "@/components/motion/gsap";
 
 // Ring + sparks that burst out of the heart when an item is saved
@@ -34,7 +35,7 @@ function burst(host, heart) {
     );
 }
 
-export default function WishlistButton({ product, className = "", withLabel = false }) {
+function WishlistHeart({ product, className = "", withLabel = false }) {
   const { has, toggle } = useWishlist();
   const heart = useRef(null);
   const saved = has(product.id);
@@ -61,4 +62,9 @@ export default function WishlistButton({ product, className = "", withLabel = fa
       {withLabel && <span>{saved ? "Saved" : "Save"}</span>}
     </button>
   );
+}
+
+// Hidden everywhere while the wishlist is switched off
+export default function WishlistButton(props) {
+  return WISHLIST_ENABLED ? <WishlistHeart {...props} /> : null;
 }

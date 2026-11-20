@@ -3,7 +3,8 @@ import { prisma } from "@/lib/prisma";
 import CheckoutForm from "@/components/store/CheckoutForm";
 import { razorpayEnabled } from "@/lib/razorpay";
 import { pointsBalance } from "@/lib/points";
-import { POINTS_ENABLED } from "@/lib/constants";
+import { POINTS_ENABLED, WAITLIST_MODE } from "@/lib/constants";
+import { redirect } from "next/navigation";
 import { magicCheckoutEnabled } from "@/lib/magic";
 import { normalizePhone } from "@/lib/phone";
 import MagicCheckout from "@/components/store/MagicCheckout";
@@ -11,6 +12,7 @@ import MagicCheckout from "@/components/store/MagicCheckout";
 export const metadata = { title: "Checkout" };
 
 export default async function CheckoutPage() {
+  if (WAITLIST_MODE) redirect("/"); // no buying before launch, only the waitlist
   const user = await requireUser("/checkout");
   // Razorpay Magic Checkout, once switched on, replaces our own address and payment steps
   if (magicCheckoutEnabled()) {

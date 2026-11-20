@@ -1,8 +1,11 @@
+import { notFound } from "next/navigation";
 import WishlistView from "@/components/wishlist/WishlistView";
+import { WISHLIST_ENABLED } from "@/lib/constants";
 
 export const metadata = { title: "Wishlist" };
 
 export default function WishlistPage() {
+  if (!WISHLIST_ENABLED) notFound();
   return (
     <div className="container-x py-12 sm:py-16">
       <p className="eyebrow">Saved for later</p>
