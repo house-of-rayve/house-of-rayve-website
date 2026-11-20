@@ -1,7 +1,7 @@
 import { listProducts } from "@/lib/products";
 import TryOn from "@/components/tryon/TryOn";
 import { notFound } from "next/navigation";
-import { TRY_ON_ENABLED } from "@/lib/constants";
+import { TRY_ON_DEFAULT, TRY_ON_ENABLED } from "@/lib/constants";
 
 export const metadata = {
   title: "Virtual try-on",
@@ -13,5 +13,5 @@ export default async function TryOnPage({ searchParams }) {
   const { p } = await searchParams;
   const products = (await listProducts({ category: "Sunglasses" })).filter((x) => x.images.length);
 
-  return <TryOn products={products} initialSlug={typeof p === "string" ? p : undefined} />;
+  return <TryOn products={products} initialSlug={typeof p === "string" ? p : TRY_ON_DEFAULT} />;
 }

@@ -50,7 +50,8 @@ export function classifyFace(samples) {
  */
 export function photoView(cw, ch, w, h, focus) {
   const contain = Math.min(cw / w, ch / h);
-  const s = focus ? Math.max(contain, (ch * 0.42) / (focus.height * h)) : contain;
+  // Zoom in only enough that the face fills about a quarter of the height: head, shoulders and a little of the scene
+  const s = focus ? Math.max(contain, (ch * 0.26) / (focus.height * h)) : contain;
   const place = (stage, len, centre) => (len <= stage ? (stage - len) / 2 : Math.min(0, Math.max(stage - len, stage / 2 - centre)));
   return {
     s,

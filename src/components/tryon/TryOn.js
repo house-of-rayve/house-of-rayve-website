@@ -8,6 +8,7 @@ import { ArrowRight, Camera, Check, Download, ImageUp, Loader2, RefreshCw, ScanF
 import { useCart } from "@/components/cart/CartProvider";
 import Price from "@/components/ui/Price";
 import { frameColorFor, lensColorFor } from "@/lib/frameColors";
+import { TRY_ON_CUTOUTS } from "@/lib/constants";
 import { measureFace, classifyFace, photoView, faceFocus } from "./faceShape";
 
 const TryOnScene = dynamic(() => import("./TryOnScene"), { ssr: false });
@@ -20,13 +21,37 @@ const SCAN_SAMPLES = 40; // frames averaged for the face-shape estimate
 async function createLandmarker() {
   const { FaceLandmarker, FilesetResolver } = await import("@mediapipe/tasks-vision");
   const files = await FilesetResolver.forVisionTasks(WASM_URL);
-  const options = (delegate) => ({ baseOptions: { modelAssetPath: MODEL_URL, delegate }, runningMode: "VIDEO", numFaces: 1 });
+  const options = (delegate) => ({ baseOptions: { modelAssetPath: MODEL_URL, delegate }, runningMode: "VIDEO", numFaces: 1, outputFacialTransformationMatrixes: true });
   try {
     return await FaceLandmarker.createFromOptions(files, options("GPU"));
   } catch {
     return FaceLandmarker.createFromOptions(files, options("CPU"));
   }
 }
+
+// How bright the face is (0–1): the average of a small sample of its bounding box, so the frame can match the light
+let probe = null;
+function measureLight(media, lm, w, h) {
+  try {
+    probe ??= document.createElement("canvas");
+    probe.width = probe.height = 12;
+    const ctx = probe.getContext("2d", { willReadFrequently: true });
+    let x0 = 1, y0 = 1, x1 = 0, y1 = 0;
+    for (const p of lm) {
+      x0 = Math.min(x0, p.x); y0 = Math.min(y0, p.y); x1 = Math.max(x1, p.x); y1 = Math.max(y1, p.y);
+    }
+    ctx.drawImage(media, x0 * w, y0 * h, (x1 - x0) * w, (y1 - y0) * h, 0, 0, 12, 12);
+    const d = ctx.getImageData(0, 0, 12, 12).data;
+    let sum = 0;
+    for (let i = 0; i < d.length; i += 4) sum += 0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2];
+    return sum / (d.length / 4) / 255;
+  } catch {
+    return null;
+  }
+}
+
+// How far the head is turned to the side: 0 facing the camera, about 0.5 in profile (nose against the face edges)
+const turn = (lm) => Math.abs((lm[1].x - lm[234].x) / (lm[454].x - lm[234].x || 1) - 0.5);
 
 const cameraError = (err) =>
   err?.name === "NotAllowedError"
@@ -59,10 +84,13 @@ export default function TryOn({ products, initialSlug }) {
   const stream = useRef(null);
   const raf = useRef(0);
   const face = useRef(null); // latest landmarks, read every frame by the 3D scene
+  const light = useRef(null); // brightness of the face, sampled every few frames
+  const frameCount = useRef(0);
+  const [turned, setTurned] = useState(false); // head turned too far to the side for the frame to look right
   const samples = useRef([]);
 
   const product = products.find((p) => p.slug === slug) ?? products[0];
-  const frame = { shape: product?.shape ?? "Oval", ...frameColorFor(product?.frameColor), lens: lensColorFor(product?.lensColor) };
+  const frame = { shape: product?.shape ?? "Oval", ...frameColorFor(product?.frameColor), lens: lensColorFor(product?.lensColor), cutout: TRY_ON_CUTOUTS[product?.slug] };
   const list = shapeFilter
     ? products.filter((p) => p.shape === shapeFilter)
     : onlyMatches && faceShape
@@ -114,7 +142,11 @@ export default function TryOn({ products, initialSlug }) {
   // Feeds one detection into the scene and the face-shape estimate
   const handleResult = (result, w, h) => {
     const lm = result.faceLandmarks?.[0];
-    face.current = lm ? { landmarks: lm, w, h } : null;
+    if (lm && frameCount.current++ % 10 === 0) {
+      light.current = measureLight(video.current, lm, w, h) ?? light.current;
+      setTurned(turn(lm) > 0.24);
+    }
+    face.current = lm ? { landmarks: lm, pose: result.facialTransformationMatrixes?.[0]?.data, light: light.current, w, h } : null;
     setFound(Boolean(lm));
     if (!lm || samples.current.length >= SCAN_SAMPLES) return;
     const m = measureFace(lm, w, h);
@@ -183,7 +215,7 @@ export default function TryOn({ products, initialSlug }) {
       const lm = result.faceLandmarks?.[0];
       const meta = { w: img.naturalWidth, h: img.naturalHeight, focus: lm ? faceFocus(lm) : null };
       setPhotoMeta(meta);
-      face.current = lm ? { landmarks: lm, ...meta, photo: true } : null;
+      face.current = lm ? { landmarks: lm, pose: result.facialTransformationMatrixes?.[0]?.data, light: measureLight(img, lm, img.naturalWidth, img.naturalHeight), ...meta, photo: true } : null;
       setFound(Boolean(lm));
       const m = lm && measureFace(lm, img.naturalWidth, img.naturalHeight);
       if (m) {
@@ -503,7 +535,7 @@ export default function TryOn({ products, initialSlug }) {
 
         <p className="mt-auto flex items-start gap-2 pt-10 text-[11px] leading-relaxed text-sand/45">
           <ShieldCheck className="mt-px size-3.5 shrink-0 text-olive-400" />
-          Everything runs on your device — your camera and photos are never uploaded or saved. Frames are shown as 3D stand-ins, so colour and size are approximate.
+          Everything runs on your device — your camera and photos are never uploaded or saved. Frames with a photo cut-out are shown from real photos; the rest are 3D stand-ins, so their colour and size are approximate.
         </p>
       </aside>
     </div>

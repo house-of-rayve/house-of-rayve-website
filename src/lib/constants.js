@@ -32,3 +32,13 @@ export const STATUS_LABELS = {
 // Photos kept out of editorial features (lookbook, stories) because they carry a third-party watermark.
 // Replace the photo in the admin panel, then remove it from this list.
 export const EDITORIAL_EXCLUDE = ["/images/model-cordoba.jpg"];
+
+// Try-on: a photo of the frame from the front, cut out on a transparent background, worn on the face instead of the
+// drawn 3D model, with 3D temples running back to the ears. `aspect` is the cut-out's width / height; `temple` the
+// temples' colour and `templeOpacity` how solid they are. Frames without a cut-out use the 3D model for their shape.
+export const TRY_ON_DEFAULT = "bravo"; // the frame try-on opens with
+export const TRY_ON_CUTOUTS = {
+  bravo: { src: "/images/tryon/bravo.webp", aspect: 2.963, temple: "#cdbfa8", templeOpacity: 0.7 },
+  fiero: { src: "/images/tryon/fiero.webp", aspect: 3.183, temple: "#4a2a17", templeOpacity: 1 },
+  nobel: { src: "/images/tryon/nobel.webp", aspect: 2.9056, temple: "#c9a35a", templeOpacity: 1 },
+};
