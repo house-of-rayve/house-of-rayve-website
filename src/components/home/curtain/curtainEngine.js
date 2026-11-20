@@ -10,6 +10,8 @@ const PANEL = { half: 0.55, width: 0.552, height: 1.1 }; // × view.w / view.w /
 const COLS = 360, ROWS = 90, PLEATS = 12;
 const OPEN_MS = 2600, CLOSE_MS = 2400;
 
+// seeded random: the velvet comes out identical on every load (and identical to the poster image)
+function rng(seed) { return () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646; }
 const hash = (n) => { const x = Math.sin(n) * 43758.5453; return x - Math.floor(x); };
 const vnoise = (x) => { const i = Math.floor(x); let f = x - i; f = f * f * (3 - 2 * f); return hash(i) + (hash(i + 1) - hash(i)) * f; };
 const ease = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
@@ -109,10 +111,11 @@ export async function mountCurtain(hero, { markSrc, wordSrc, fontFamily = "sans-
     const g = c.getContext("2d");
     g.fillStyle = PALETTE.base;
     g.fillRect(0, 0, CW, CH);
+    const rand = rng(side < 0 ? 7 : 11);
     g.save();
     g.scale(CW / 1024, 1);
     for (let x = 0; x < 1024; x += 2) {
-      const v = Math.sin(x * 0.013) * 0.5 + Math.sin(x * 0.051 + 1.7) * 0.3 + (Math.random() - 0.5) * 0.4;
+      const v = Math.sin(x * 0.013) * 0.5 + Math.sin(x * 0.051 + 1.7) * 0.3 + (rand() - 0.5) * 0.4;
       g.fillStyle = v > 0 ? `rgba(${PALETTE.light}, ${0.06 * v})` : `rgba(${PALETTE.dark}, ${-0.08 * v})`;
       g.fillRect(x, 0, 2, CH);
     }
@@ -159,7 +162,8 @@ export async function mountCurtain(hero, { markSrc, wordSrc, fontFamily = "sans-
   function pileNormal() {
     const S = 256;
     const h = new Float32Array(S * S);
-    for (let i = 0; i < h.length; i++) h[i] = Math.random();
+    const rand = rng(3);
+    for (let i = 0; i < h.length; i++) h[i] = rand();
     const b = new Float32Array(S * S);
     const at = (x, y) => h[((y + S) % S) * S + ((x + S) % S)];
     for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) {
