@@ -211,12 +211,10 @@ export default async function ProductPage({ params, searchParams }) {
           <div className="px-5 pt-6 sm:px-8 lg:hidden">
             <ProductStage images={pageImages} name={product.name} />
           </div>
-          <div className="hidden lg:block">
+          <div className="hidden bg-white lg:block">
             {pageImages.map((src, i) => (
-              <div key={src} className="relative flex h-[calc(100svh-4rem)] min-h-[520px] w-full items-center justify-center px-10 py-8">
-                <div className="relative aspect-[4/5] h-full max-w-full bg-mist">
-                  <Image src={src} alt={i === 0 ? product.name : ""} fill priority={i === 0} sizes="45vw" className="object-cover" />
-                </div>
+              <div key={src} className="relative h-[calc(100svh-4rem)] min-h-[520px] w-full bg-white">
+                <Image src={src} alt={i === 0 ? product.name : ""} fill priority={i === 0} sizes="60vw" className="object-cover" />
                 <span className="pointer-events-none absolute bottom-6 left-6 font-display text-[10px] tracking-[0.3em] text-ink/50">
                   {String(i + 1).padStart(2, "0")} / {String(pageImages.length).padStart(2, "0")}
                 </span>
