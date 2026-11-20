@@ -76,8 +76,11 @@ export default function CurtainHero({ className = "" }) {
 
       <div className="rv-ui">
         <div className="rv-headline">
-          <p className="rv-eyebrow rv-up rv-d1">Collection No. 1 · The Arena</p>
-          <p className="rv-title rv-up rv-d2">Stare down <em>the sun</em></p>
+          <p className="rv-title rv-up rv-d2">
+            Stare down
+            <br />
+            <em>the sun</em>
+          </p>
           <span className="rv-rule rv-up rv-d3" aria-hidden="true" />
         </div>
       </div>

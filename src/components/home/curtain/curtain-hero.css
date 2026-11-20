@@ -145,7 +145,7 @@
   color: #f4ecd8;
   text-shadow: 0 2px 24px rgba(0, 0, 0, 0.55);
 }
-.rv-curtain .rv-title em { font-style: normal; color: var(--rv-gold); }
+.rv-curtain .rv-title em { font-style: normal; color: var(--rv-gold); white-space: nowrap; }
 .rv-curtain .rv-rule {
   display: block;
   width: 64px;
