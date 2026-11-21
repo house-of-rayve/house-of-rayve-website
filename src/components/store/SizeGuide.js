@@ -13,7 +13,7 @@ export default function SizeGuide({ product }) {
           {lens}-{bridge}-{temple} · <span className="text-ink">{fit} fit</span>
         </p>
       </div>
-      <svg viewBox="0 0 320 120" className="mt-5 w-full text-olive-800" role="img" aria-label={`Lens ${lens} mm, bridge ${bridge} mm, temple ${temple} mm`}>
+      <svg viewBox="0 -14 320 134" overflow="visible" className="mt-5 w-full text-olive-800" role="img" aria-label={`Lens ${lens} mm, bridge ${bridge} mm, temple ${temple} mm`}>
         {/* front view */}
         <rect x="18" y="20" width="118" height="62" rx="26" className="fill-none stroke-current" strokeWidth="2" />
         <rect x="184" y="20" width="118" height="62" rx="26" className="fill-none stroke-current" strokeWidth="2" />
@@ -23,7 +23,7 @@ export default function SizeGuide({ product }) {
         <text x="77" y="114" textAnchor="middle" className="fill-current text-[10px]">Lens {lens}</text>
         {/* bridge */}
         <path d="M136 12 H184 M136 7 V17 M184 7 V17" className="stroke-olive-500" strokeWidth="1" />
-        <text x="160" y="5" textAnchor="middle" className="fill-current text-[10px]">Bridge {bridge}</text>
+        <text x="160" y="2" textAnchor="middle" className="fill-current text-[10px]">Bridge {bridge}</text>
         <text x="243" y="114" textAnchor="middle" className="fill-current text-[10px]">Temple {temple}</text>
       </svg>
       <p className="mt-4 text-xs leading-relaxed text-muted">

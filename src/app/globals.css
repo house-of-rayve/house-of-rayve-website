@@ -191,3 +191,17 @@ html[data-reveal-ready] [data-reveal].is-revealed::after {
     background: #bcb56a;
   }
 }
+
+/* A band of light sweeps across a photo on hover (home frame chapters) */
+.rv-sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 35%, rgb(255 248 225 / 0.45) 50%, transparent 65%);
+  transform: translateX(-120%);
+}
+@media (hover: hover) {
+  .rv-sheen:hover::after { transform: translateX(120%); transition: transform 1.2s cubic-bezier(0.2, 0.7, 0.2, 1); }
+}

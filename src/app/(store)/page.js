@@ -13,10 +13,41 @@ import ImageTrail from "@/components/motion/ImageTrail";
 import FlashlightReveal from "@/components/motion/FlashlightReveal";
 import PhotoInWord from "@/components/motion/PhotoInWord";
 import HomeFAQ from "@/components/home/HomeFAQ";
+import Manifesto from "@/components/home/Manifesto";
+import FrameChapters from "@/components/home/FrameChapters";
+import { PRODUCT_DETAILS } from "@/lib/productDetails";
 import ProductCard from "@/components/store/ProductCard";
 import NewsletterForm from "@/components/store/NewsletterForm";
 
 export const dynamic = "force-dynamic";
+
+// The launch frames, in the order they stand in the arena
+const LAUNCH = ["fiero", "bravo", "nobel"];
+
+// What a chapter needs: the opening line of the description and three quick facts from the product sheet
+function chapter(p) {
+  const spec = (label) => PRODUCT_DETAILS[p.slug]?.specs.find(([k]) => k === label)?.[1];
+  const first = (p.description ?? "").split(/\n\s*\n/)[0].trim();
+  const sentences = first.match(/[^.!?]+[.!?]+/g) ?? (first ? [first] : []);
+  let blurb = "";
+  for (const s of sentences) {
+    if (blurb && (blurb + s).length > 190) break;
+    blurb += s;
+  }
+  return {
+    slug: p.slug,
+    name: p.name,
+    tagline: p.tagline,
+    images: p.images,
+    colors: p.colors ?? [],
+    blurb: blurb.trim(),
+    facts: [
+      ["Frame", spec("Frame material") ?? p.material ?? p.shape],
+      ["Weight", spec("Weight")],
+      ["Lens", "UV400"],
+    ].filter(([, v]) => v),
+  };
+}
 
 const CRAFT = [
   { value: "UV400", title: "Full protection", text: "Every sunglass lens blocks 100% of UVA and UVB rays." },
@@ -84,6 +115,12 @@ export default async function HomePage() {
       <h1 className="sr-only">RAYVE — the familiar, broken open</h1>
       <CurtainHero className="-mt-[65px]" />
 
+      {/* The brand line, lighting up word by word */}
+      <Manifesto />
+
+      {/* The three launch frames, one chapter each */}
+      <FrameChapters frames={LAUNCH.map((s) => bySlug[s]).filter((p) => p?.images?.length).map(chapter)} />
+
       {/* Lookbook: Instagram-style stories of the frames on model */}
       {SHOW_LOOKBOOK && <section className="px-5 pb-6 pt-12 sm:px-8 sm:pt-16 lg:px-12">
         <p className="eyebrow mb-8 flex items-center gap-4 lg:justify-center">
@@ -116,14 +153,9 @@ export default async function HomePage() {
       {/* What we stand for */}
       <section className="border-y border-line bg-mist">
         <div className="container-home section-y">
-          <Reveal className="section-head grid items-end gap-6 lg:grid-cols-2">
-            <div>
-              <p className="eyebrow">The symbol</p>
-              <h2 className="display-title mt-4 text-2xl sm:text-3xl lg:text-4xl">What we stand for</h2>
-            </div>
-            <p className="max-w-md text-sm leading-relaxed text-muted lg:justify-self-end">
-              The bull is our symbol of precision, vision and presence. Not aggression — control. Not noise — confidence.
-            </p>
+          <Reveal className="section-head">
+            <p className="eyebrow">The mark</p>
+            <h2 className="display-title mt-4 text-2xl sm:text-3xl lg:text-4xl">What we stand for</h2>
           </Reveal>
           <div className="grid gap-px bg-line md:grid-cols-3">
             {PILLARS.map((p, i) => (
