@@ -195,7 +195,7 @@
 .rv-curtain.gl-ready .rv-cover, .rv-curtain.is-revealed .rv-cover { opacity: 0; }
 
 /* the swipe hint only shows on portrait screens (see below) */
-.rv-curtain .rv-hint { display: none; }
+.rv-curtain .rv-dots { display: none; }
 
 /* portrait screens (phones): the arena photo fills the full height and pans sideways, snapping to each niche
    (it starts on the middle one). Once open, the drawn curtain fades so the arena gets the whole screen. */
@@ -222,20 +222,46 @@
   .rv-curtain .rv-scrim { background: linear-gradient(180deg, rgba(10, 8, 2, 0.7), rgba(10, 8, 2, 0.25) 30%, transparent 45%); }
   .rv-curtain .rv-headline { top: clamp(92px, 13cqh, 140px); }
   .rv-curtain .rv-title { font-size: clamp(24px, 8cqw, 34px); }
-  .rv-curtain .rv-hint {
-    display: block;
+  .rv-curtain .rv-niche { scroll-snap-stop: always; }
+  .rv-curtain .rv-dots {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
     position: absolute;
     left: 0;
     right: 0;
-    bottom: calc(max(22px, env(safe-area-inset-bottom)) + 60px);
-    text-align: center;
+    bottom: calc(max(22px, env(safe-area-inset-bottom)) + 52px);
     font-family: var(--font-display), sans-serif;
+    text-transform: uppercase;
+  }
+  .rv-curtain .rv-hint {
     font-size: 9px;
     letter-spacing: 0.35em;
-    text-transform: uppercase;
     color: rgba(244, 236, 216, 0.75);
     text-shadow: 0 1px 10px rgba(0, 0, 0, 0.7);
+    transition: opacity 0.6s ease;
   }
+  .rv-curtain .rv-hint.is-gone { opacity: 0; }
+  .rv-curtain .rv-dots-row { display: flex; gap: 6px; pointer-events: auto; }
+  .rv-curtain .rv-dots-row button {
+    display: grid;
+    place-items: center;
+    height: 28px;
+    padding: 0 6px;
+  }
+  .rv-curtain .rv-dots-row span {
+    display: block;
+    width: 6px;
+    height: 6px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(244, 236, 216, 0.45);
+    color: transparent;
+    font-size: 0;
+    transition: width 0.4s ease, background 0.4s ease;
+  }
+  .rv-curtain .rv-dots-row .is-active span { width: 22px; background: var(--rv-gold); }
   .rv-curtain .rv-replay { right: 50%; transform: translateX(50%); bottom: max(22px, env(safe-area-inset-bottom)); }
 }
 @media (prefers-reduced-motion: reduce) {

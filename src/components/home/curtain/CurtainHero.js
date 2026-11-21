@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import "./curtain-hero.css";
 
@@ -18,6 +18,8 @@ const NICHES = [
 
 export default function CurtainHero({ className = "" }) {
   const heroRef = useRef(null);
+  const [active, setActive] = useState(1); // phones: which niche is in view (starts on the middle one)
+  const [swiped, setSwiped] = useState(false);
 
   useEffect(() => {
     const hero = heroRef.current;
@@ -46,16 +48,56 @@ export default function CurtainHero({ className = "" }) {
       });
     }).catch(() => hero.classList.add("is-playing", "is-revealed"));
 
-    // phones: the arena pans sideways; start on the middle niche
+    // phones: the arena pans sideways one niche at a time, starting on the middle one. Mobile browsers can lay the
+    // photo out (or reset the snap position) after mount, so keep re-centring until the visitor swipes themselves.
     const pan = hero.querySelector("[data-curtain-pan]");
+    let touched = false;
     const centre = () => {
-      if (pan && pan.scrollWidth > pan.clientWidth) pan.scrollLeft = (pan.scrollWidth - pan.clientWidth) / 2;
+      if (!pan || touched || pan.scrollWidth <= pan.clientWidth) return;
+      const mid = pan.querySelectorAll(".rv-niche")[1];
+      pan.scrollLeft = mid ? mid.offsetLeft + mid.offsetWidth / 2 - pan.clientWidth / 2 : (pan.scrollWidth - pan.clientWidth) / 2;
+    };
+    const onTouch = () => (touched = true);
+    const onScroll = () => {
+      if (!pan) return;
+      const mid = pan.scrollLeft + pan.clientWidth / 2;
+      let best = 0;
+      pan.querySelectorAll(".rv-niche").forEach((el, i, all) => {
+        const d = Math.abs(el.offsetLeft + el.offsetWidth / 2 - mid);
+        if (d < Math.abs(all[best].offsetLeft + all[best].offsetWidth / 2 - mid)) best = i;
+      });
+      setActive(best);
+      if (touched && best !== 1) setSwiped(true);
     };
     centre();
+    const raf = requestAnimationFrame(() => requestAnimationFrame(centre));
+    const ro = pan ? new ResizeObserver(centre) : null;
+    if (pan) {
+      ro.observe(pan.firstElementChild);
+      pan.addEventListener("pointerdown", onTouch, { passive: true });
+      pan.addEventListener("touchstart", onTouch, { passive: true });
+      pan.addEventListener("scroll", onScroll, { passive: true });
+      pan.querySelector("img")?.addEventListener("load", centre);
+    }
+    // the curtain opening changes the layout under it: line the middle frame up again
+    const mo = new MutationObserver(centre);
+    mo.observe(hero, { attributes: true, attributeFilter: ["class"] });
     window.addEventListener("resize", centre);
+    hero.rvShow = (i) => {
+      const el = pan?.querySelectorAll(".rv-niche")[i];
+      if (!el) return;
+      touched = true;
+      pan.scrollTo({ left: el.offsetLeft + el.offsetWidth / 2 - pan.clientWidth / 2, behavior: "smooth" });
+    };
 
     return () => {
       window.removeEventListener("resize", centre);
+      cancelAnimationFrame(raf);
+      ro?.disconnect();
+      mo.disconnect();
+      pan?.removeEventListener("pointerdown", onTouch);
+      pan?.removeEventListener("touchstart", onTouch);
+      pan?.removeEventListener("scroll", onScroll);
       cancelled = true;
       clearTimeout(safety);
       dispose?.();
@@ -95,7 +137,24 @@ export default function CurtainHero({ className = "" }) {
           </p>
           <span className="rv-rule rv-up rv-d3" aria-hidden="true" />
         </div>
-        <p className="rv-hint rv-up rv-d3">Swipe to explore</p>
+        {/* phones: which frame is in view; tap a dot to slide to it */}
+        <div className="rv-dots rv-up rv-d3">
+          <p className={`rv-hint ${swiped ? "is-gone" : ""}`}>Swipe for more</p>
+          <div className="rv-dots-row">
+            {NICHES.map((n, i) => (
+              <button
+                key={n.slug}
+                type="button"
+                className={i === active ? "is-active" : ""}
+                aria-label={`Show ${n.name}`}
+                aria-current={i === active}
+                onClick={() => heroRef.current?.rvShow?.(i)}
+              >
+                <span>{n.name}</span>
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* closed-curtain poster: shows instantly, the live 3D curtain takes over as soon as it's ready */}
