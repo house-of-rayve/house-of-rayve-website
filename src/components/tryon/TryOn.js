@@ -256,7 +256,7 @@ export default function TryOn({ products, initialSlug }) {
     }
     const mw = media.videoWidth || media.naturalWidth;
     const mh = media.videoHeight || media.naturalHeight;
-    ctx.fillStyle = "#22221a";
+    ctx.fillStyle = "#2a120a";
     ctx.fillRect(0, 0, out.width, out.height);
     if (mode === "photo") {
       const { s, ox, oy } = photoView(out.width, out.height, mw, mh, photoMeta?.focus);
@@ -284,7 +284,7 @@ export default function TryOn({ products, initialSlug }) {
     // At least a screen tall; the panel can make it taller and the stage stretches with it, so nothing is cut off
     <div className="grid bg-olive-950 text-sand lg:min-h-[max(640px,calc(100svh-4rem))] lg:grid-cols-[minmax(0,1fr)_380px] xl:grid-cols-[minmax(0,1fr)_420px]">
       {/* Stage */}
-      <div ref={stage} className="relative h-[72svh] min-h-[460px] overflow-hidden bg-[#1b1b15] lg:h-auto">
+      <div ref={stage} className="relative h-[72svh] min-h-[460px] overflow-hidden bg-[#24120b] lg:h-auto">
         {/* Selfie view is mirrored, like a mirror; the 3D layer flips with it so they stay aligned */}
         <div className="absolute inset-0" style={mode === "camera" ? { transform: "scaleX(-1)" } : undefined}>
           <video ref={video} playsInline muted className={`absolute inset-0 size-full object-cover ${mode === "camera" ? "" : "hidden"}`} />
@@ -311,7 +311,7 @@ export default function TryOn({ products, initialSlug }) {
         {/* Start screen */}
         {!live && (
           <div className="absolute inset-0 grid place-items-center p-6 pb-36 text-center">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_42%,rgba(166,159,78,0.22),transparent_62%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_42%,rgba(229,84,26,0.22),transparent_62%)]" />
             <div className="relative max-w-md">
               {mode === "loading" ? (
                 <>

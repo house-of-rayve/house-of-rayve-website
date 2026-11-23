@@ -116,7 +116,7 @@ export default function CheckoutForm({ user, addresses, onlinePayments = false, 
       image: `${window.location.origin}/brand/admin-app/icon-512.png`,
       description: `Order ${session.orderNumber}`,
       prefill: session.customer,
-      theme: { color: "#44442a" },
+      theme: { color: "#a63a10" },
       handler: async (response) => {
         try {
           await api("/api/payments/razorpay/verify", { method: "POST", body: { orderId: order.id, ...response } });

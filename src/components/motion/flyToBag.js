@@ -35,7 +35,7 @@ export function flyToBag(from, src) {
     zIndex: "80",
     pointerEvents: "none",
     borderRadius: "2px",
-    boxShadow: "0 18px 40px -12px rgba(30,30,18,0.45)",
+    boxShadow: "0 18px 40px -12px rgba(42,18,10,0.45)",
   });
   document.body.appendChild(ghost);
 

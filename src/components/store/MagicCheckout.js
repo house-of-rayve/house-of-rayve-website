@@ -77,7 +77,7 @@ export default function MagicCheckout({ user }) {
       order_id: session.razorpayOrderId,
       show_coupons: true,
       prefill: { name: user.name, email: user.email, ...(user.phone ? { contact: `+91${user.phone}` } : {}) },
-      theme: { color: "#44442a" },
+      theme: { color: "#a63a10" },
       handler: (response) => {
         finished = true;
         complete(session, response);

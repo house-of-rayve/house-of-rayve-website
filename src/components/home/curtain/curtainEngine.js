@@ -5,8 +5,8 @@
 import * as THREE from "three";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 
-// Deep olive velvet (the site's olive-900/950) with a warm gold sheen on the folds, like the brand's gold accent
-const PALETTE = { base: "#23251a", light: [86, 92, 52], dark: [6, 6, 3], sheen: [0.34, 0.33, 0.17], spot: 0xf4ead2, exposure: 0.56, foot: 0xf6e3c0 };
+// Deep rust velvet (the site's rust 800/900) with a warm gold sheen on the folds, like the brand's gold accent
+const PALETTE = { base: "#3a160a", light: [150, 58, 22], dark: [10, 4, 2], sheen: [0.38, 0.22, 0.12], spot: 0xf4ead2, exposure: 0.56, foot: 0xf6e3c0 };
 const GOLD = ["#f6e7b8", "#d9b96a", "#a8843a", "#e9d08e"]; // crest foil, light to dark and back
 const PANEL = { half: 0.55, width: 0.552, height: 1.1 }; // × view.w / view.w / view.h
 const COLS = 360, ROWS = 90, PLEATS = 12;

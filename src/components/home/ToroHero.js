@@ -193,7 +193,7 @@ export default function ToroHero({ looks, start }) {
   const [nx, ny] = look.nose;
 
   return (
-    <section aria-label={`RAYVE — ${product.name}`} className="relative overflow-hidden bg-[#1b1f14] text-sand">
+    <section aria-label={`RAYVE — ${product.name}`} className="relative overflow-hidden bg-[#2a120a] text-sand">
       <style>{KEYFRAMES}</style>
       <div ref={stage} className="relative h-svh min-h-[560px] overflow-hidden" onMouseMove={onMove} onMouseLeave={() => (target.current = { x: 0, y: 0 })}>
         {box && (

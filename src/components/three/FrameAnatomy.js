@@ -65,7 +65,7 @@ export default function FrameAnatomy({ product }) {
   return (
     <section ref={root} className="relative h-[250svh] bg-olive-950 text-sand motion-reduce:h-svh">
       <div className="sticky top-0 flex h-svh flex-col overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_55%,rgba(166,159,78,0.14),transparent_60%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_55%,rgba(229,84,26,0.14),transparent_60%)]" />
         <div className="container-x relative z-10 pt-20 md:pt-24">
           <p className="eyebrow text-olive-400">Anatomy</p>
           <h2 className="display-title mt-4 text-3xl sm:text-5xl" data-no-split>

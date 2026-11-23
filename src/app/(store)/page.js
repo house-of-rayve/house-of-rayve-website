@@ -91,6 +91,7 @@ function SectionHead({ eyebrow, title, href, linkLabel = "View all", center = fa
 
 // Sections switched off for now
 const SHOW_TORO = false;
+const SHOW_TORO_BULL = false; // Toro, the bull in sunglasses, after the brand line
 // Off while only the launch frames are live
 const SHOW_LOOKBOOK = false; // the story bubbles
 const SHOW_COLLECTION = false; // "Shop the collection"
@@ -124,7 +125,7 @@ export default async function HomePage() {
       <Manifesto />
 
       {/* Toro, the RAYVE bull, in a world per frame: lands, breathes, snorts steam; the pill switches looks */}
-      <ToroHero looks={toroLooks} start="fiero" />
+      {SHOW_TORO_BULL && <ToroHero looks={toroLooks} start="fiero" />}
 
       {/* The three launch frames, one chapter each */}
       <FrameChapters frames={LAUNCH.map((s) => bySlug[s]).filter((p) => p?.images?.length).map(chapter)} />
@@ -232,7 +233,7 @@ export default async function HomePage() {
           <Image src="/images/campaign-matador.jpg" alt="RAYVE campaign at the bullring" fill sizes="(min-width:1024px) 50vw, 100vw" className="object-cover transition-transform duration-[1.5s] group-hover:scale-105" />
         </div>
         <Reveal className="flex flex-col justify-center px-5 py-20 sm:px-8 md:px-16 lg:px-20 xl:px-24">
-          <p className="eyebrow text-olive-400">A different way of seeing the familiar</p>
+          <p className="eyebrow text-sand/70">A different way of seeing the familiar</p>
           <h2 className="display-title mt-6 text-3xl lg:text-4xl">Where the familiar takes an unexpected form</h2>
           <p className="mt-6 max-w-md leading-relaxed text-sand/75">
             Rayve takes forms, codes and references we already recognise and shifts them through proportion, detail,

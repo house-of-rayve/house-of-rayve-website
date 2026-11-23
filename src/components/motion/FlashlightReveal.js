@@ -77,10 +77,10 @@ export default function FlashlightReveal() {
   const mask = "radial-gradient(circle var(--r) at var(--x) var(--y), transparent 0%, transparent 35%, #000 100%)";
 
   return (
-    <section ref={root} className="relative h-[85svh] min-h-[520px] select-none overflow-hidden bg-[#0d0d0a] text-sand" style={{ "--x": "50%", "--y": "50%", "--r": "0px" }}>
+    <section ref={root} className="relative h-[85svh] min-h-[520px] select-none overflow-hidden bg-[#140805] text-sand" style={{ "--x": "50%", "--y": "50%", "--r": "0px" }}>
       <Image src="/images/campaign-matador.jpg" alt="RAYVE campaign" fill sizes="100vw" className="object-cover" />
       {/* the dark, with a hole of light where the pointer is */}
-      <div className="absolute inset-0 bg-[#0d0d0a]" style={{ maskImage: mask, WebkitMaskImage: mask }} aria-hidden="true" />
+      <div className="absolute inset-0 bg-[#140805]" style={{ maskImage: mask, WebkitMaskImage: mask }} aria-hidden="true" />
       <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-5 text-center">
         <p className="eyebrow text-olive-400">100% UV400 · every pair</p>
         <h2 className="display-title mt-5 text-4xl mix-blend-difference sm:text-6xl lg:text-7xl" data-no-split>

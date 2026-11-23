@@ -25,19 +25,19 @@ async function send(to, subject, html) {
 function layout(title, intro, order, cta) {
   const rows = order.items
     .map(
-      (i) => `<tr><td style="padding:8px 0;color:#1d1d17">${esc(i.name)} <span style="color:#7a7766">× ${i.quantity}</span></td><td align="right" style="padding:8px 0">${formatPrice(i.price * i.quantity)}</td></tr>`,
+      (i) => `<tr><td style="padding:8px 0;color:#24150e">${esc(i.name)} <span style="color:#7d6556">× ${i.quantity}</span></td><td align="right" style="padding:8px 0">${formatPrice(i.price * i.quantity)}</td></tr>`,
     )
     .join("");
   const line = (label, value, bold) =>
-    `<tr><td style="padding:4px 0;color:${bold ? "#1d1d17" : "#7a7766"};${bold ? "font-weight:600" : ""}">${label}</td><td align="right" style="padding:4px 0;${bold ? "font-weight:600" : ""}">${value}</td></tr>`;
-  return `<!doctype html><html><body style="margin:0;background:#f1efe8;font-family:Helvetica,Arial,sans-serif;font-size:14px;color:#1d1d17">
-<table width="100%" cellpadding="0" cellspacing="0" style="background:#f1efe8;padding:32px 12px"><tr><td align="center">
-<table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;background:#fdfcf9">
-<tr><td style="background:#44442a;padding:28px 32px;color:#e9e2d0;font-size:13px;letter-spacing:6px">R A Y V E</td></tr>
+    `<tr><td style="padding:4px 0;color:${bold ? "#24150e" : "#7d6556"};${bold ? "font-weight:600" : ""}">${label}</td><td align="right" style="padding:4px 0;${bold ? "font-weight:600" : ""}">${value}</td></tr>`;
+  return `<!doctype html><html><body style="margin:0;background:#f4ebdf;font-family:Helvetica,Arial,sans-serif;font-size:14px;color:#24150e">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f4ebdf;padding:32px 12px"><tr><td align="center">
+<table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;background:#fdf9f4">
+<tr><td style="background:#a63a10;padding:28px 32px;color:#efe1cc;font-size:13px;letter-spacing:6px">R A Y V E</td></tr>
 <tr><td style="padding:32px">
-<p style="margin:0 0 6px;font-size:11px;letter-spacing:3px;color:#a69f4e;text-transform:uppercase">Order ${esc(order.orderNumber)}</p>
+<p style="margin:0 0 6px;font-size:11px;letter-spacing:3px;color:#e5541a;text-transform:uppercase">Order ${esc(order.orderNumber)}</p>
 <h1 style="margin:0 0 14px;font-size:22px;font-weight:600">${esc(title)}</h1>
-<p style="margin:0 0 24px;line-height:1.6;color:#4a483c">${intro}</p>
+<p style="margin:0 0 24px;line-height:1.6;color:#4d3528">${intro}</p>
 <table width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #e5e1d6;border-bottom:1px solid #e5e1d6;margin-bottom:12px">${rows}</table>
 <table width="100%" cellpadding="0" cellspacing="0">
 ${line("Subtotal", formatPrice(order.subtotal))}
@@ -46,10 +46,10 @@ ${line("Shipping", order.shippingFee ? formatPrice(order.shippingFee) : "Free")}
 ${order.pointsUsed ? line("RAYVE points", `−${formatPrice(order.pointsUsed)}`) : ""}
 ${line("Total", formatPrice(order.total), true)}
 </table>
-<p style="margin:24px 0 0;line-height:1.6;color:#4a483c">Shipping to ${esc(order.shipName)}, ${esc(order.shipLine1)}${order.shipLine2 ? `, ${esc(order.shipLine2)}` : ""}, ${esc(order.shipCity)}, ${esc(order.shipState)} ${esc(order.shipPostalCode)}</p>
-${cta ? `<p style="margin:28px 0 0"><a href="${cta.href}" style="display:inline-block;background:#44442a;color:#e9e2d0;padding:12px 22px;text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase">${cta.label}</a></p>` : ""}
+<p style="margin:24px 0 0;line-height:1.6;color:#4d3528">Shipping to ${esc(order.shipName)}, ${esc(order.shipLine1)}${order.shipLine2 ? `, ${esc(order.shipLine2)}` : ""}, ${esc(order.shipCity)}, ${esc(order.shipState)} ${esc(order.shipPostalCode)}</p>
+${cta ? `<p style="margin:28px 0 0"><a href="${cta.href}" style="display:inline-block;background:#a63a10;color:#efe1cc;padding:12px 22px;text-decoration:none;font-size:11px;letter-spacing:3px;text-transform:uppercase">${cta.label}</a></p>` : ""}
 </td></tr>
-<tr><td style="padding:20px 32px;background:#f1efe8;color:#7a7766;font-size:12px">Questions? Write to us at <a href="mailto:info@houseofrayve.com" style="color:#44442a">info@houseofrayve.com</a></td></tr>
+<tr><td style="padding:20px 32px;background:#f4ebdf;color:#7d6556;font-size:12px">Questions? Write to us at <a href="mailto:info@houseofrayve.com" style="color:#a63a10">info@houseofrayve.com</a></td></tr>
 </table></td></tr></table></body></html>`;
 }
 

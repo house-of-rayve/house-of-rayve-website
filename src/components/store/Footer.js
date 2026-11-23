@@ -48,7 +48,7 @@ export default function Footer() {
         </div>
         {COLUMNS.map((col) => (
           <div key={col.title} className="lg:col-span-2">
-            <p className="font-display text-[10px] uppercase tracking-[0.3em] text-olive-400">{col.title}</p>
+            <p className="font-display text-[10px] uppercase tracking-[0.3em] text-sand/60">{col.title}</p>
             <ul className="mt-5 space-y-3 text-sm text-sand/75">
               {col.links.map(([label, href]) => (
                 <li key={label}>
@@ -61,7 +61,7 @@ export default function Footer() {
           </div>
         ))}
         <div className="lg:col-span-2">
-          <p className="font-display text-[10px] uppercase tracking-[0.3em] text-olive-400">Newsletter</p>
+          <p className="font-display text-[10px] uppercase tracking-[0.3em] text-sand/60">Newsletter</p>
           <p className="mt-5 text-sm text-sand/75">New frames, first.</p>
           <NewsletterForm />
         </div>

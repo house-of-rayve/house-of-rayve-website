@@ -1,21 +1,21 @@
 @import "tailwindcss";
 
 @theme {
-  --color-olive-950: #22221a;
-  --color-olive-900: #2f2f1f;
-  --color-olive-800: #44442a; /* brand dark */
-  --color-olive-700: #5a5a3a;
-  --color-olive-500: #a69f4e; /* brand accent */
-  --color-olive-400: #bcb56a;
-  --color-olive-200: #d9d4b0;
-  --color-sand: #e9e2d0; /* brand light */
-  --color-cream: #f5f2ea;
-  --color-paper: #fbfaf6;
-  --color-canvas: #fdfcf9; /* page background */
-  --color-mist: #f1efe8; /* image wells */
-  --color-ink: #1d1d16;
-  --color-muted: #6f6c5c;
-  --color-line: #ddd7c6;
+  --color-olive-950: #2a120a;
+  --color-olive-900: #3d1a0d;
+  --color-olive-800: #a63a10; /* brand dark */
+  --color-olive-700: #7f2c0c;
+  --color-olive-500: #e5541a; /* brand accent */
+  --color-olive-400: #ef7a45;
+  --color-olive-200: #f6b89c;
+  --color-sand: #efe1cc; /* brand light */
+  --color-cream: #f8efe3;
+  --color-paper: #fcf8f2;
+  --color-canvas: #fdf9f4; /* page background */
+  --color-mist: #f4ebdf; /* image wells */
+  --color-ink: #24150e;
+  --color-muted: #7d6556;
+  --color-line: #e6d6c3;
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-michroma), var(--font-inter), sans-serif;
@@ -107,8 +107,9 @@
 @utility link-underline { @apply underline decoration-line underline-offset-4 hover:decoration-olive-800; }
 textarea.field { height: auto; padding-top: 0.75rem; padding-bottom: 0.75rem; }
 
+/* The RAYVE logo in brushed gold, everywhere it appears */
 .logo-mask {
-  background-color: currentColor;
+  background: linear-gradient(115deg, #f4dfa0 0%, #d4ad55 30%, #9a7426 52%, #d9b866 72%, #f1d996 100%);
   mask-repeat: no-repeat;
   mask-position: center;
   mask-size: contain;
@@ -175,20 +176,20 @@ html[data-reveal-ready] [data-reveal].is-revealed::after {
 
 /* Dark panel (product page split screen): the same components, re-coloured by swapping the theme colours in scope */
 @utility on-dark {
-  --color-ink: #e9e2d0;
-  --color-muted: #a9a48c;
-  --color-line: rgb(233 226 208 / 0.16);
-  --color-olive-800: #d9d4b0;
-  --color-olive-700: #bcb56a;
-  --color-paper: #2f2f1f;
-  --color-canvas: #22221a;
+  --color-ink: #efe1cc;
+  --color-muted: #b49a88;
+  --color-line: rgb(239 225 204 / 0.16);
+  --color-olive-800: #f6b89c;
+  --color-olive-700: #ef7a45;
+  --color-paper: #3d1a0d;
+  --color-canvas: #2a120a;
   color: var(--color-ink);
   & .btn-primary {
-    background: #a69f4e;
-    color: #22221a;
+    background: #e5541a;
+    color: #2a120a;
   }
   & .btn-primary:hover {
-    background: #bcb56a;
+    background: #ef7a45;
   }
 }
 

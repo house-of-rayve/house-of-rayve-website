@@ -87,20 +87,20 @@ function DeliveryCheck({ value }) {
       {result?.serviceable && (
         <ul className="mt-3 space-y-1.5 text-xs text-ink/80">
           <li className="flex items-start gap-2">
-            <Check className="mt-0.5 size-3.5 shrink-0 text-emerald-600" />
+            <Check className="mt-0.5 size-3.5 shrink-0 text-olive-500" />
             <span>
               Delivery by <strong className="font-medium text-ink">{fmt(result.from)} – {fmt(result.to)}</strong> if ordered today
             </span>
           </li>
           <li className="flex items-start gap-2">
-            <Check className="mt-0.5 size-3.5 shrink-0 text-emerald-600" />
+            <Check className="mt-0.5 size-3.5 shrink-0 text-olive-500" />
             <span>
               <strong className="font-medium text-ink">Free delivery</strong> when you pay online
             </span>
           </li>
           {result.cod && (
             <li className="flex items-start gap-2">
-              <Check className="mt-0.5 size-3.5 shrink-0 text-emerald-600" />
+              <Check className="mt-0.5 size-3.5 shrink-0 text-olive-500" />
               <span>Cash on delivery available · {formatPrice(result.codShipping)} shipping</span>
             </li>
           )}

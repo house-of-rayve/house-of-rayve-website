@@ -23,10 +23,10 @@ export default function RevenueChart({ data }) {
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 8, right: 8, left: -8, bottom: 0 }} barCategoryGap={4}>
           <CartesianGrid vertical={false} stroke="#ebe8dd" />
-          <XAxis dataKey="label" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "#6f6c5c" }} interval="preserveStartEnd" minTickGap={16} />
-          <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "#6f6c5c" }} tickFormatter={compact} width={48} />
-          <Tooltip content={<ChartTooltip />} cursor={{ fill: "#a69f4e", fillOpacity: 0.1 }} />
-          <Bar dataKey="revenue" fill="#44442a" radius={[4, 4, 0, 0]} maxBarSize={28} isAnimationActive={false} />
+          <XAxis dataKey="label" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "#7d6556" }} interval="preserveStartEnd" minTickGap={16} />
+          <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "#7d6556" }} tickFormatter={compact} width={48} />
+          <Tooltip content={<ChartTooltip />} cursor={{ fill: "#e5541a", fillOpacity: 0.1 }} />
+          <Bar dataKey="revenue" fill="#a63a10" radius={[4, 4, 0, 0]} maxBarSize={28} isAnimationActive={false} />
         </BarChart>
       </ResponsiveContainer>
     </div>

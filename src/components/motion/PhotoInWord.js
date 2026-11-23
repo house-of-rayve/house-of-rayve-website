@@ -134,13 +134,13 @@ export default function PhotoInWord({ image, alt = "", focus = "50% 50%", line, 
               </g>
             </mask>
           </defs>
-          <rect width="100%" height="100%" fill="#22221a" mask={`url(#${maskId})`} />
+          <rect width="100%" height="100%" fill="#2a120a" mask={`url(#${maskId})`} />
         </svg>
 
         {/* the two doors that take over from the mask and slide apart */}
         <div className="piw-doors invisible absolute inset-0" aria-hidden="true">
-          <div className="piw-door-l absolute inset-y-0 left-0 bg-[#22221a] shadow-[12px_0_40px_rgba(0,0,0,0.35)]" />
-          <div className="piw-door-r absolute inset-y-0 right-0 bg-[#22221a] shadow-[-12px_0_40px_rgba(0,0,0,0.35)]" />
+          <div className="piw-door-l absolute inset-y-0 left-0 bg-[#2a120a] shadow-[12px_0_40px_rgba(0,0,0,0.35)]" />
+          <div className="piw-door-r absolute inset-y-0 right-0 bg-[#2a120a] shadow-[-12px_0_40px_rgba(0,0,0,0.35)]" />
         </div>
 
         <div className="piw-line absolute inset-x-0 bottom-[13%] px-5 text-center text-sand opacity-0 motion-reduce:opacity-100">
