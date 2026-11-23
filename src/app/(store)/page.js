@@ -14,6 +14,8 @@ import FlashlightReveal from "@/components/motion/FlashlightReveal";
 import PhotoInWord from "@/components/motion/PhotoInWord";
 import HomeFAQ from "@/components/home/HomeFAQ";
 import Manifesto from "@/components/home/Manifesto";
+import ToroHero from "@/components/home/ToroHero";
+import { TORO_LOOKS } from "@/lib/constants";
 import FrameChapters from "@/components/home/FrameChapters";
 import { PRODUCT_DETAILS } from "@/lib/productDetails";
 import ProductCard from "@/components/store/ProductCard";
@@ -108,6 +110,9 @@ export default async function HomePage() {
   const frames = (n) => `${n} ${n === 1 ? "frame" : "frames"}`;
   const spotlight = all.find((p) => p.slug === "toro") ?? featured[0] ?? all[0];
   const bySlug = Object.fromEntries(all.map((p) => [p.slug, p]));
+  const toroLooks = Object.entries(TORO_LOOKS)
+    .filter(([slug]) => bySlug[slug])
+    .map(([slug, look], index) => ({ slug, look, index, product: bySlug[slug] }));
 
   return (
     <>
@@ -117,6 +122,9 @@ export default async function HomePage() {
 
       {/* The brand line, lighting up word by word */}
       <Manifesto />
+
+      {/* Toro, the RAYVE bull, in a world per frame: lands, breathes, snorts steam; the pill switches looks */}
+      <ToroHero looks={toroLooks} start="fiero" />
 
       {/* The three launch frames, one chapter each */}
       <FrameChapters frames={LAUNCH.map((s) => bySlug[s]).filter((p) => p?.images?.length).map(chapter)} />

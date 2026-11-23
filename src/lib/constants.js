@@ -61,3 +61,42 @@ export const PAGE_IMAGE_ORDER = {
 
 // The bottom tab bar on phones (Home / Try on). Off for launch.
 export const MOBILE_TABBAR_ENABLED = false;
+
+// Toro, the RAYVE bull, in one look per launch frame: his world (a rendered scene with a round platform) and his
+// cut-out. `platform` is where his feet go in the world image, `nose` and `glasses` where those are on the cut-out,
+// all in %; `bullAspect` is the cut-out's width / height. The home page shows them in this order.
+export const TORO_LOOKS = {
+  fiero: {
+    word: "OLIVO",
+    world: "/images/toro/olivo.webp",
+    width: 1376,
+    height: 768,
+    platform: [50.1, 75.0],
+    bull: "/images/toro/bull-arena.webp",
+    bullAspect: 593 / 737,
+    nose: [52, 23],
+    glasses: [39.6, 15.3, 27, 7],
+  },
+  bravo: {
+    word: "AMANECER",
+    world: "/images/toro/amanecer.webp",
+    width: 1376,
+    height: 768,
+    platform: [50.1, 75.0],
+    bull: "/images/toro/bull-alba.webp",
+    bullAspect: 449 / 745,
+    nose: [58, 19],
+    glasses: [42.3, 12.3, 29, 5.5],
+  },
+  nobel: {
+    word: "ORO",
+    world: "/images/toro/oro.webp",
+    width: 1376,
+    height: 768,
+    platform: [50.1, 75.0],
+    bull: "/images/toro/bull-cordoba.webp",
+    bullAspect: 702 / 736,
+    nose: [49, 27],
+    glasses: [39.6, 19, 23.8, 7.1],
+  },
+};
