@@ -194,7 +194,7 @@ export default async function HomePage() {
       </section>}
 
       {/* Campaign banner */}
-      <FullBanner src="/images/banners/break-the-familiar.jpg" alt="RAYVE — Break the familiar" />
+      <FullBanner src="/images/banners/break-the-familiar.webp" alt="RAYVE Bravo bursting through a rust wall — Break the familiar" whole />
 
       {/* Craft details */}
       <section className="container-home section-y">

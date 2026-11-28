@@ -7,10 +7,11 @@ import Link from "next/link";
  */
 // `reveal`: lift a curtain off it on scroll (off for banners at the top of a page)
 // `full`: fill the screen below the header from tablet up (cropped to fit, keeping `focus` in view); phones get 4:3
-export default function FullBanner({ src, alt, href = "/shop", focus = "50% 50%", priority = false, reveal = true, full = false, underHeader = false, className = "" }) {
+// `whole`: show the artwork uncropped at 16:9 on every screen (for banners with type near the edges)
+export default function FullBanner({ src, alt, href = "/shop", focus = "50% 50%", priority = false, reveal = true, full = false, whole = false, underHeader = false, className = "" }) {
   // underHeader: a soft shade at the top keeps the transparent header readable over bright artwork
   return (
-    <Link href={href} data-reveal={reveal || undefined} className={`group relative block overflow-hidden bg-olive-950 ${full ? "aspect-[4/3] sm:aspect-auto sm:h-[calc(100svh-65px)] sm:min-h-[520px]" : "aspect-[4/3] sm:aspect-[1942/809]"} ${className}`} aria-label={alt}>
+    <Link href={href} data-reveal={reveal || undefined} className={`group relative block overflow-hidden bg-olive-950 ${whole ? "aspect-video" : full ? "aspect-[4/3] sm:aspect-auto sm:h-[calc(100svh-65px)] sm:min-h-[520px]" : "aspect-[4/3] sm:aspect-[1942/809]"} ${className}`} aria-label={alt}>
       <Image
         src={src}
         alt={alt}
