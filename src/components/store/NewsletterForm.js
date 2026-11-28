@@ -24,6 +24,27 @@ export default function NewsletterForm({ variant = "dark", source = "newsletter"
     }
   };
 
+  // Footer: a framed field with a solid orange button, on the dark footer
+  if (variant === "footer") {
+    return (
+      <form onSubmit={submit} className="flex border border-sand/25 transition-colors focus-within:border-sand/60">
+        <input
+          type="email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Your email address"
+          aria-label="Email address"
+          className="h-12 min-w-0 flex-1 bg-transparent px-4 text-sm text-sand outline-none placeholder:text-sand/40"
+        />
+        <button disabled={busy} className="flex h-12 shrink-0 cursor-pointer items-center gap-2 bg-olive-500 px-5 font-display text-[10px] uppercase tracking-[0.25em] text-olive-950 transition-colors hover:bg-sand disabled:opacity-60 sm:px-7">
+          {busy ? "…" : cta}
+          <ArrowRight className="size-3.5" />
+        </button>
+      </form>
+    );
+  }
+
   if (variant === "light") {
     return (
       <form onSubmit={submit} className="flex border border-olive-800 bg-paper">

@@ -19,7 +19,6 @@ import { TORO_LOOKS } from "@/lib/constants";
 import FrameChapters from "@/components/home/FrameChapters";
 import { PRODUCT_DETAILS } from "@/lib/productDetails";
 import ProductCard from "@/components/store/ProductCard";
-import NewsletterForm from "@/components/store/NewsletterForm";
 
 export const dynamic = "force-dynamic";
 
@@ -131,7 +130,7 @@ export default async function HomePage() {
       <FrameChapters frames={LAUNCH.map((s) => bySlug[s]).filter((p) => p?.images?.length).map(chapter)} />
 
       {/* Campaign: the three frames on three faces (Nobel, Bravo, Fiero) */}
-      <FullBanner src="/images/banners/three-faces.webp" laptopSrc="/images/banners/three-faces-laptop.webp" alt="RAYVE Nobel, Bravo and Fiero worn by three models" whole />
+      <FullBanner src="/images/banners/three-faces.webp" laptopSrc="/images/banners/three-faces-laptop.webp" alt="RAYVE Nobel, Bravo and Fiero worn by three models — shop the collection" cta="Shop the collection" whole />
 
       {/* Lookbook: Instagram-style stories of the frames on model */}
       {SHOW_LOOKBOOK && <section className="px-5 pb-6 pt-12 sm:px-8 sm:pt-16 lg:px-12">
@@ -196,8 +195,6 @@ export default async function HomePage() {
         </div>
       </section>}
 
-      {/* Campaign banner */}
-      <FullBanner src="/images/banners/break-the-familiar.webp" alt="RAYVE Bravo bursting through a rust wall — Break the familiar" whole />
 
       {/* Craft details */}
       <section className="container-home section-y">
@@ -290,18 +287,6 @@ export default async function HomePage() {
             <HomeFAQ />
           </Reveal>
         </div>
-      </section>
-
-      {/* Newsletter */}
-      <section className="border-t border-line bg-mist">
-        <Reveal className="container-home section-y flex flex-col items-center text-center">
-          <p className="eyebrow">The Rayve list</p>
-          <h2 className="display-title mt-4 max-w-xl text-2xl sm:text-3xl lg:text-4xl">New frames, first</h2>
-          <p className="mt-4 max-w-md text-sm text-muted">Early access to new drops, restocks and private previews. No noise.</p>
-          <div className="mt-10 w-full max-w-md">
-            <NewsletterForm variant="light" />
-          </div>
-        </Reveal>
       </section>
     </>
   );
