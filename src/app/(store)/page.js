@@ -207,7 +207,7 @@ export default async function HomePage() {
       {/* Editorial split */}
       <section className="grid bg-olive-800 text-sand lg:grid-cols-2">
         <div data-reveal className="group relative aspect-[4/5] overflow-hidden md:aspect-[16/11] lg:aspect-auto lg:min-h-[640px]">
-          <Image src="/images/campaign-matador.jpg" alt="RAYVE campaign at the bullring" fill sizes="(min-width:1024px) 50vw, 100vw" className="object-cover transition-transform duration-[1.5s] group-hover:scale-105" />
+          <Image src="/images/campaign-arena.webp" alt="A man in a gold-trimmed jacket and RAYVE sunglasses at the bullring" fill sizes="(min-width:1024px) 50vw, 100vw" className="object-cover object-[50%_35%] transition-transform duration-[1.5s] group-hover:scale-105" />
         </div>
         <Reveal className="flex flex-col justify-center px-5 py-20 sm:px-8 md:px-16 lg:px-20 xl:px-24">
           <p className="eyebrow text-sand/70">A different way of seeing the familiar</p>
