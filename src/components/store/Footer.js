@@ -1,8 +1,7 @@
 import Link from "next/link";
-import Logo from "@/components/ui/Logo";
 import NewsletterForm from "./NewsletterForm";
 import ScrambleText from "@/components/motion/ScrambleText";
-import FooterMark from "@/components/motion/FooterMark";
+import { LogoMark, Wordmark } from "@/components/ui/Logo";
 import { BUSINESS } from "@/lib/business";
 import { NEW_ARRIVALS_ENABLED, WISHLIST_ENABLED } from "@/lib/constants";
 
@@ -36,41 +35,34 @@ const COLUMNS = [
   },
 ];
 
+// Black and quiet: the bull and RAYVE centred, the links in one row, the newsletter, then the legal line
 export default function Footer() {
+  const links = COLUMNS.flatMap((c) => c.links);
   return (
-    <footer className="mt-auto bg-olive-800 text-sand">
-      <div className="container-x grid grid-cols-2 gap-x-8 gap-y-12 py-16 lg:grid-cols-12">
-        <div className="col-span-2 lg:col-span-4">
-          <Logo stacked className="items-start text-sand [&>span:first-child]:self-start" />
-          <p className="mt-6 max-w-xs text-sm leading-relaxed text-sand/70">
-            Premium, in the everyday. Distinctive silhouettes, refined details and an elevated finish.
-          </p>
-        </div>
-        {COLUMNS.map((col) => (
-          <div key={col.title} className="lg:col-span-2">
-            <p className="font-display text-[10px] uppercase tracking-[0.3em] text-sand/60">{col.title}</p>
-            <ul className="mt-5 space-y-3 text-sm text-sand/75">
-              {col.links.map(([label, href]) => (
-                <li key={label}>
-                  <Link href={href} className="hover:text-sand">
-                    <ScrambleText>{label}</ScrambleText>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-        <div className="lg:col-span-2">
-          <p className="font-display text-[10px] uppercase tracking-[0.3em] text-sand/60">Newsletter</p>
-          <p className="mt-5 text-sm text-sand/75">New frames, first.</p>
+    <footer className="mt-auto bg-olive-950 text-sand">
+      <div className="container-x flex flex-col items-center py-20 text-center lg:py-28">
+        <LogoMark className="h-[44px] w-[74px] text-olive-500" />
+        <Wordmark className="mt-6 h-[18px] w-[137px] text-sand" />
+        <p className="mt-5 font-display text-[10px] uppercase tracking-[0.35em] text-sand/50">Own the energy</p>
+
+        <nav aria-label="Footer" className="mt-14 flex max-w-3xl flex-wrap justify-center gap-x-9 gap-y-4 text-[13px] text-sand/75">
+          {links.map(([label, href]) => (
+            <Link key={label} href={href} className="transition-colors hover:text-sand">
+              <ScrambleText>{label}</ScrambleText>
+            </Link>
+          ))}
+        </nav>
+
+        <div className="mt-14 w-full max-w-sm">
+          <p className="font-display text-[10px] uppercase tracking-[0.35em] text-sand/50">First access</p>
           <NewsletterForm />
         </div>
       </div>
-      <FooterMark />
       <div className="border-t border-sand/10">
-        <div className="container-x flex flex-col gap-2 py-6 text-[11px] uppercase tracking-[0.2em] text-sand/75 sm:flex-row sm:justify-between">
-          <span>© {new Date().getFullYear()} {BUSINESS.name} · GSTIN {BUSINESS.gstin}</span>
-          <span>Own the energy</span>
+        <div className="container-x flex flex-col items-center gap-2 py-6 text-[10px] uppercase tracking-[0.25em] text-sand/45 sm:flex-row sm:justify-between">
+          <span>© {new Date().getFullYear()} {BUSINESS.name}</span>
+          <a href={`mailto:${BUSINESS.email}`} className="hover:text-sand">{BUSINESS.email}</a>
+          <span>GSTIN {BUSINESS.gstin}</span>
         </div>
       </div>
     </footer>

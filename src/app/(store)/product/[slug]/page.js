@@ -19,6 +19,11 @@ import { PAGE_IMAGE_ORDER, PRODUCT_LAYOUT, TRY_ON_ENABLED } from "@/lib/constant
 import { CARE_INTRO, PRODUCT_DETAILS } from "@/lib/productDetails";
 import FilmStrip from "@/components/store/FilmStrip";
 
+// Sections switched off for now
+const SHOW_RECENTLY_VIEWED = false; // the "Recently viewed" row at the bottom
+const SHOW_REVIEWS = false; // the reviews section, and the rating in the search-engine data
+const SHOW_LENS_LAB = false; // "Lens lab": look through the lenses at a street, pick a tint
+
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const product = await getProductBySlug(slug);
@@ -131,7 +136,7 @@ export default async function ProductPage({ params, searchParams }) {
       price: product.price,
       availability: product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
     },
-    ...(reviews.count ? { aggregateRating: { "@type": "AggregateRating", ratingValue: reviews.average.toFixed(1), reviewCount: reviews.count } } : {}),
+    ...(SHOW_REVIEWS && reviews.count ? { aggregateRating: { "@type": "AggregateRating", ratingValue: reviews.average.toFixed(1), reviewCount: reviews.count } } : {}),
   };
 
   // Breadcrumb trail for search results only (not shown on the page)
@@ -302,20 +307,19 @@ export default async function ProductPage({ params, searchParams }) {
         </>
       )}
 
-      {product.category === "Sunglasses" && (
-        <>
-          <LensTintLab initialTint={tintIndexFor(product.lensColor)} />
-        </>
-      )}
+      {/* Lens lab: hidden for now, set SHOW_LENS_LAB to true to bring it back */}
+      {SHOW_LENS_LAB && product.category === "Sunglasses" && <LensTintLab initialTint={tintIndexFor(product.lensColor)} />}
 
-      <ProductReviews productId={product.id} slug={product.slug} summary={reviews} signedIn={Boolean(user)} />
+      {/* Reviews: hidden for now, set SHOW_REVIEWS to true to bring them back */}
+      {SHOW_REVIEWS && <ProductReviews productId={product.id} slug={product.slug} summary={reviews} signedIn={Boolean(user)} />}
 
       {related.length > 0 && (
         <section className="container-x border-t border-line py-20">
           <ProductCarousel eyebrow="Complete the look" title="You may also like" tabs={[{ label: "Related", products: related, href: `/shop?category=${product.category}` }]} />
         </section>
       )}
-      <RecentlyViewed excludeId={product.id} />
+      {/* Recently viewed: hidden for now, set SHOW_RECENTLY_VIEWED to true to bring it back */}
+      {SHOW_RECENTLY_VIEWED && <RecentlyViewed excludeId={product.id} />}
     </>
   );
 }

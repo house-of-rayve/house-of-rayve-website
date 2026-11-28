@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import BrandStory from "@/components/motion/BrandStory";
-import FullBanner from "@/components/home/FullBanner";
 
 export const metadata = { title: "The brand" };
 
@@ -9,9 +8,6 @@ export default function AboutPage() {
   return (
     <>
       <h1 className="sr-only">The brand</h1>
-      {/* text sits on the left of this artwork, so phones keep the left side in view */}
-      <FullBanner src="/images/banners/the-signal.jpg" alt="RAYVE — The signal has arrived" priority reveal={false} focus="0% 50%" full />
-
       {/* The story, chapter by chapter: idea, symbol, voice, promise */}
       <BrandStory />
 

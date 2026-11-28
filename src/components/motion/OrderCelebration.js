@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { gsap, prefersReducedMotion } from "./gsap";
 import { playBull } from "./bullSound";
 
-const COLORS = ["#c9a85b", "#e5541a", "#efe1cc", "#a63a10", "#d8c27a"];
+const COLORS = ["#c9a85b", "#ee7038", "#e8e2cf", "#b34326", "#d8c27a"];
 
 /** One-off burst when an order is placed: gold confetti and the bull mark flying up, with the bull sound. */
 export default function OrderCelebration({ id }) {
@@ -48,7 +48,7 @@ export default function OrderCelebration({ id }) {
       top: `${H * 0.45 - 30}px`,
       width: "96px",
       height: "58px",
-      background: "#e5541a",
+      background: "#ee7038",
       maskImage: "url(/brand/mark.png)",
       WebkitMaskImage: "url(/brand/mark.png)",
       maskSize: "contain",

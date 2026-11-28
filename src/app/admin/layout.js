@@ -11,7 +11,7 @@ export const metadata = {
   robots: { index: false, follow: false },
 };
 
-export const viewport = { themeColor: "#2a120a" };
+export const viewport = { themeColor: "#15110e" };
 
 export default async function AdminLayout({ children }) {
   const user = await requireAdminPage();

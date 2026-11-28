@@ -1,21 +1,21 @@
 @import "tailwindcss";
 
 @theme {
-  --color-olive-950: #2a120a;
-  --color-olive-900: #3d1a0d;
-  --color-olive-800: #a63a10; /* brand dark */
-  --color-olive-700: #7f2c0c;
-  --color-olive-500: #e5541a; /* brand accent */
-  --color-olive-400: #ef7a45;
-  --color-olive-200: #f6b89c;
-  --color-sand: #efe1cc; /* brand light */
-  --color-cream: #f8efe3;
-  --color-paper: #fcf8f2;
-  --color-canvas: #fdf9f4; /* page background */
-  --color-mist: #f4ebdf; /* image wells */
-  --color-ink: #24150e;
-  --color-muted: #7d6556;
-  --color-line: #e6d6c3;
+  --color-olive-950: #15110e;
+  --color-olive-900: #231b16;
+  --color-olive-800: #b34326; /* brand dark */
+  --color-olive-700: #8e341d;
+  --color-olive-500: #ee7038; /* brand accent */
+  --color-olive-400: #f28d5f;
+  --color-olive-200: #f6c3a6;
+  --color-sand: #e8e2cf; /* brand light */
+  --color-cream: #f1ede1;
+  --color-paper: #f8f6ef;
+  --color-canvas: #faf8f3; /* page background */
+  --color-mist: #efeadc; /* image wells */
+  --color-ink: #1a1612;
+  --color-muted: #766b5d;
+  --color-line: #dcd4bf;
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-michroma), var(--font-inter), sans-serif;
@@ -107,9 +107,9 @@
 @utility link-underline { @apply underline decoration-line underline-offset-4 hover:decoration-olive-800; }
 textarea.field { height: auto; padding-top: 0.75rem; padding-bottom: 0.75rem; }
 
-/* The RAYVE logo in brushed gold, everywhere it appears */
+/* The RAYVE logo takes the text colour around it: rust on light, beige on dark, orange as an accent (brand sheet) */
 .logo-mask {
-  background: linear-gradient(115deg, #f4dfa0 0%, #d4ad55 30%, #9a7426 52%, #d9b866 72%, #f1d996 100%);
+  background-color: currentColor;
   mask-repeat: no-repeat;
   mask-position: center;
   mask-size: contain;
@@ -176,20 +176,20 @@ html[data-reveal-ready] [data-reveal].is-revealed::after {
 
 /* Dark panel (product page split screen): the same components, re-coloured by swapping the theme colours in scope */
 @utility on-dark {
-  --color-ink: #efe1cc;
-  --color-muted: #b49a88;
-  --color-line: rgb(239 225 204 / 0.16);
-  --color-olive-800: #f6b89c;
-  --color-olive-700: #ef7a45;
-  --color-paper: #3d1a0d;
-  --color-canvas: #2a120a;
+  --color-ink: #e8e2cf;
+  --color-muted: #b3a993;
+  --color-line: rgb(232 226 207 / 0.16);
+  --color-olive-800: #f6c3a6;
+  --color-olive-700: #f28d5f;
+  --color-paper: #231b16;
+  --color-canvas: #15110e;
   color: var(--color-ink);
   & .btn-primary {
-    background: #e5541a;
-    color: #2a120a;
+    background: #ee7038;
+    color: #15110e;
   }
   & .btn-primary:hover {
-    background: #ef7a45;
+    background: #f28d5f;
   }
 }
 

@@ -82,7 +82,7 @@ export default function LookbookStories({ products }) {
             {/* thin brushed-gold ring (grey once seen), a little air, then the photo */}
             <span
               className={`rounded-full p-px transition-transform duration-500 ease-out group-hover:-translate-y-1 ${
-                seen.has(p.id) ? "bg-line" : "bg-[conic-gradient(from_210deg,#e3cf8f,#e5541a,#8a3210,#c9a85b,#e3cf8f)]"
+                seen.has(p.id) ? "bg-line" : "bg-[conic-gradient(from_210deg,#e3cf8f,#ee7038,#8e341d,#c9a85b,#e3cf8f)]"
               }`}
             >
               <span className="block rounded-full bg-canvas p-1 sm:p-1.5">

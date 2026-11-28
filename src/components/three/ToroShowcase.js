@@ -104,7 +104,7 @@ export default function ToroShowcase({ product }) {
         >
           TORO
         </p>
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_55%,rgba(229,84,26,0.16),transparent_60%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_55%,rgba(238,112,56,0.16),transparent_60%)]" />
 
         <div className="container-home relative z-10 flex items-start justify-between gap-6 pt-24 md:pt-28">
           <div>

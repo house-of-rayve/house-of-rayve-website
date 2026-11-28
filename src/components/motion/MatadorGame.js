@@ -68,7 +68,7 @@ export default function MatadorGame() {
     const pop = (text, good) => {
       const p = popEl.current;
       p.textContent = text;
-      p.style.color = good ? "#f39569" : "#e8b4a0";
+      p.style.color = good ? "#f28d5f" : "#e8b4a0";
       gsap.fromTo(p, { x: s.bull.x, y: s.bull.y - 40, opacity: 1, scale: 0.6 }, { y: s.bull.y - 110, scale: 1.15, opacity: 0, duration: 1.1, ease: "power2.out" });
     };
 
@@ -164,7 +164,7 @@ export default function MatadorGame() {
 
   return (
     <div className="relative flex min-h-svh flex-col overflow-hidden bg-olive-950 text-sand">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_60%,rgba(229,84,26,0.16),transparent_65%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_60%,rgba(238,112,56,0.16),transparent_65%)]" />
       {/* Arena ring */}
       <div className="pointer-events-none absolute left-1/2 top-[58%] aspect-square w-[150vmax] -translate-x-1/2 -translate-y-1/2 rounded-full border border-sand/5 sm:w-[90vmax]" />
 
