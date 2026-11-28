@@ -130,6 +130,9 @@ export default async function HomePage() {
       {/* The three launch frames, one chapter each */}
       <FrameChapters frames={LAUNCH.map((s) => bySlug[s]).filter((p) => p?.images?.length).map(chapter)} />
 
+      {/* Campaign: the three frames on three faces (Nobel, Bravo, Fiero) */}
+      <FullBanner src="/images/banners/three-faces.webp" alt="RAYVE Nobel, Bravo and Fiero worn by three models" whole />
+
       {/* Lookbook: Instagram-style stories of the frames on model */}
       {SHOW_LOOKBOOK && <section className="px-5 pb-6 pt-12 sm:px-8 sm:pt-16 lg:px-12">
         <p className="eyebrow mb-8 flex items-center gap-4 lg:justify-center">
