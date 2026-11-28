@@ -14,6 +14,7 @@ import FlashlightReveal from "@/components/motion/FlashlightReveal";
 import PhotoInWord from "@/components/motion/PhotoInWord";
 import HomeFAQ from "@/components/home/HomeFAQ";
 import Manifesto from "@/components/home/Manifesto";
+import CraftTicker from "@/components/home/CraftTicker";
 import ToroHero from "@/components/home/ToroHero";
 import { TORO_LOOKS } from "@/lib/constants";
 import FrameChapters from "@/components/home/FrameChapters";
@@ -52,7 +53,7 @@ function chapter(p) {
 
 const CRAFT = [
   { value: "UV400", title: "Full protection", text: "Every sunglass lens blocks 100% of UVA and UVB rays." },
-  { value: "Acetate", title: "Italian & bio-acetate", text: "Frames cut from premium acetate and hand-polished for depth of colour." },
+  { value: "3 builds", title: "Metal, sculpted, rimless", text: "A gold-tone metal octagon, a faceted PC + CP frame and a light rimless rectangle: one build per character." },
   { value: "Horns", title: "Signature hinges", text: "RAYVE signature hinges, with the horns marked on every pair." },
   { value: "1 year", title: "Warranty", text: "Covered against manufacturing defects in the frame and hinges." },
 ];
@@ -196,32 +197,8 @@ export default async function HomePage() {
       </section>}
 
 
-      {/* Craft details */}
-      <section className="container-home section-y">
-        <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
-          <Reveal className="relative aspect-[4/5] overflow-hidden bg-mist md:aspect-[16/10] lg:col-span-5 lg:aspect-auto lg:min-h-[520px]">
-            <Image src="/images/matador.jpg" alt="RAYVE temple detail with the signature horns" fill sizes="(min-width:1024px) 40vw, 100vw" className="object-cover" />
-          </Reveal>
-          <div className="flex flex-col justify-center lg:col-span-7">
-            <Reveal>
-              <p className="eyebrow">The details</p>
-              <h2 className="display-title mt-4 text-2xl sm:text-3xl lg:text-4xl">Made to be worn every day</h2>
-              <p className="mt-4 max-w-lg text-sm leading-relaxed text-muted">
-                Distinctive silhouettes, refined details and an elevated finish — the pair beside your keys, the pair you reach for without thinking.
-              </p>
-            </Reveal>
-            <div className="mt-10 grid gap-px bg-line sm:grid-cols-2">
-              {CRAFT.map((c, i) => (
-                <Reveal key={c.title} delay={i * 80} className="bg-canvas p-6 sm:p-8">
-                  <p className="font-display text-xl text-olive-500">{c.value}</p>
-                  <h3 className="mt-4 font-display text-[11px] uppercase tracking-[0.2em]">{c.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted">{c.text}</p>
-                </Reveal>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Craft details: the four specs as a big running strip, a short line for each underneath */}
+      <CraftTicker items={CRAFT} />
 
       {/* Signature product in 3D: rotates, folds and changes lens tint as you scroll */}
       {/* Hidden for now — set SHOW_TORO to true to bring it back */}
