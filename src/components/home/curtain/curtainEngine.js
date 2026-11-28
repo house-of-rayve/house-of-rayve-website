@@ -338,9 +338,21 @@ export async function mountCurtain(hero, { markSrc, wordSrc, fontFamily = "sans-
     animateTo(1, OPEN_MS);
   }
 
-  on(canvas, "click", open);
-  on(window, "wheel", () => open(), { passive: true });
-  on(window, "touchmove", () => open(), { passive: true });
+  // The site's first-visit intro covers the page for a few seconds: hold the curtain closed (and ignore scrolls)
+  // until it has lifted, so the opening is actually seen.
+  let introDone = !!window.__rayveIntroDone;
+  const whenIntroDone = (fn) => {
+    if (introDone) return fn();
+    const go = () => { if (introDone) return; introDone = true; clearTimeout(fallbackTimer); fn(); };
+    const fallbackTimer = setTimeout(go, 7000); // in case the intro never reports back
+    on(window, "rayve:intro-done", go);
+    cleanups.push(() => clearTimeout(fallbackTimer));
+  };
+  const openIfReady = () => { if (introDone) open(); };
+
+  on(canvas, "click", openIfReady);
+  on(window, "wheel", openIfReady, { passive: true });
+  on(window, "touchmove", openIfReady, { passive: true });
   if (replayBtn) on(replayBtn, "click", () => {
     canvas.style.pointerEvents = "";
     hero.classList.remove("is-playing", "is-revealed");
@@ -367,7 +379,8 @@ export async function mountCurtain(hero, { markSrc, wordSrc, fontFamily = "sans-
     reveal();
     render();
   } else {
-    autoTimer = setTimeout(open, 700); // open soon after the first frame is on screen
+    // open soon after the first frame is on screen, and after the intro has lifted
+    whenIntroDone(() => { autoTimer = setTimeout(open, 700); });
   }
 
   return () => {

@@ -8,19 +8,29 @@ import Link from "next/link";
 // `reveal`: lift a curtain off it on scroll (off for banners at the top of a page)
 // `full`: fill the screen below the header from tablet up (cropped to fit, keeping `focus` in view); phones get 4:3
 // `whole`: show the artwork uncropped at 16:9 on every screen (for banners with type near the edges)
-export default function FullBanner({ src, alt, href = "/shop", focus = "50% 50%", priority = false, reveal = true, full = false, whole = false, underHeader = false, className = "" }) {
+// `laptopSrc` (with `whole`): a 16:10 version of the artwork for screens narrower than 1536px (laptops, tablets,
+// phones); `src` then shows only on wider desktop screens
+export default function FullBanner({ src, alt, href = "/shop", focus = "50% 50%", priority = false, reveal = true, full = false, whole = false, laptopSrc = null, underHeader = false, className = "" }) {
   // underHeader: a soft shade at the top keeps the transparent header readable over bright artwork
   return (
-    <Link href={href} data-reveal={reveal || undefined} className={`group relative block overflow-hidden bg-olive-950 ${whole ? "aspect-video" : full ? "aspect-[4/3] sm:aspect-auto sm:h-[calc(100svh-65px)] sm:min-h-[520px]" : "aspect-[4/3] sm:aspect-[1942/809]"} ${className}`} aria-label={alt}>
-      <Image
-        src={src}
-        alt={alt}
-        fill
-        priority={priority}
-        sizes="100vw"
-        className={`object-cover transition-transform duration-[2s] ease-out group-hover:scale-[1.03] [object-position:var(--focus)]`}
-        style={{ "--focus": focus }}
-      />
+    <Link href={href} data-reveal={reveal || undefined} className={`group relative block overflow-hidden bg-olive-950 ${whole ? (laptopSrc ? "aspect-[16/10] 2xl:aspect-video" : "aspect-video") : full ? "aspect-[4/3] sm:aspect-auto sm:h-[calc(100svh-65px)] sm:min-h-[520px]" : "aspect-[4/3] sm:aspect-[1942/809]"} ${className}`} aria-label={alt}>
+      {[
+        laptopSrc && { src: laptopSrc, only: "2xl:hidden" },
+        { src, only: laptopSrc ? "hidden 2xl:block" : "" },
+      ]
+        .filter(Boolean)
+        .map((art) => (
+          <Image
+            key={art.src}
+            src={art.src}
+            alt={alt}
+            fill
+            priority={priority}
+            sizes="100vw"
+            className={`object-cover transition-transform duration-[2s] ease-out group-hover:scale-[1.03] [object-position:var(--focus)] ${art.only}`}
+            style={{ "--focus": focus }}
+          />
+        ))}
       {underHeader && <span className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/55 to-transparent" aria-hidden="true" />}
     </Link>
   );

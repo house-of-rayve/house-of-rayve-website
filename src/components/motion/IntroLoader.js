@@ -6,6 +6,12 @@ import { gsap, useGSAP, prefersReducedMotion } from "./gsap";
 
 const KEY = "rayve_intro_seen";
 
+// Tells the page the intro is out of the way, so the home curtain can start opening only once it's visible
+function announceDone() {
+  window.__rayveIntroDone = true;
+  window.dispatchEvent(new Event("rayve:intro-done"));
+}
+
 // Brand intro on the first visit of a session: the horns open, the wordmark settles, then the curtain splits.
 export default function IntroLoader() {
   const root = useRef(null);
@@ -24,6 +30,7 @@ export default function IntroLoader() {
       }
       if (!shouldPlay.current) {
         setDone(true);
+        announceDone();
         return;
       }
       document.body.style.overflow = "hidden";
@@ -32,6 +39,7 @@ export default function IntroLoader() {
         onComplete: () => {
           document.body.style.overflow = "";
           setDone(true);
+          announceDone();
         },
       });
       tl.fromTo(".intro-mark", { clipPath: "inset(0 50% 0 50%)", scale: 0.9 }, { clipPath: "inset(0 0% 0 0%)", scale: 1, duration: 1.1 })
